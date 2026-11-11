@@ -2,37 +2,15 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Pencil, KeyRound, Plus, Folder, User, Settings, Search } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
-import WorldClockWidget from '../components/WorldClockWidget';
-import CurrencyWidget from '../components/CurrencyWidget'; // <-- Ներմուծում ենք Փոխարժեքների նոր վիդջեթը
 
 export default function Dashboard() {
     const { t } = useLanguage();
 
     return (
-        <div className="min-h-screen bg-[#0b0f19] text-white p-5 font-sans pb-24">
-            {/* Վերնագիր */}
-            <header className="flex justify-between items-center mb-8">
-                <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
-                <div className="flex items-center gap-2">
-                    <Link to="/auth" className="px-3.5 py-2 rounded-2xl glass-card text-xs font-medium text-blue-400 hover:bg-white/10 transition flex items-center gap-1.5 shadow-neoDark">
-                        <User size={16} />
-                        <span>{t('login')}</span>
-                    </Link>
+        <div className="font-sans pb-24">
 
-                    <Link to="/settings" className="p-2.5 rounded-2xl glass-card hover:bg-white/10 transition shadow-neoDark">
-                        <Settings size={20} className="text-gray-300" />
-                    </Link>
-                </div>
-            </header>
-
-            {/* 1. Ժամացույցներ (World Clocks) */}
-            <WorldClockWidget />
-
-            {/* 2. Փոխարժեքների գեղեցիկ գծապատկերային վիդջեթ (Currency & Trends) */}
-            <CurrencyWidget />
-
-            {/* 3. Հիմնական բաժինների ցանցը */}
-            <div className="grid grid-cols-2 gap-4 mb-6">
+            {/* Հիմնական բաժինների ցանցը */}
+            <div className="grid grid-cols-2 gap-4 mb-6 mt-2">
                 <Link to="/notes" className="glass-card p-5 rounded-3xl flex flex-col items-center justify-center text-center h-32 shadow-neoDark border-2 border-blue-900/50 bg-blue-900/10 transition hover:scale-105">
                     <Pencil className="text-blue-400 mb-2" size={32} />
                     <span className="font-semibold text-sm text-white">{t('notes')}</span>
@@ -54,7 +32,7 @@ export default function Dashboard() {
                 </Link>
             </div>
 
-            {/* 4. Ներքևի նավիգացիոն մենյու */}
+            {/* Ներքևի նավիգացիոն մենյու */}
             <footer className="fixed bottom-0 left-0 right-0 glass-card-light border-t border-gray-800 mx-auto max-w-md rounded-t-3xl p-4 shadow-2xl z-50 bg-[#0b0f19]/90 backdrop-blur-md">
                 <nav className="grid grid-cols-4 gap-4 text-center">
                     <Link to="/" className="flex flex-col items-center text-blue-400">

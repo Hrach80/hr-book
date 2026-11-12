@@ -320,7 +320,7 @@ export default function MedicalPage() {
                 </div>
             )}
 
-            {/* Ավելացման / Խմբագրման ֆորմա (Ուղղված box-border-ով ամսաթվի ինփութ) */}
+            {/* Ավելացման / Խմբագրման ֆորմա (Լիովին շտկված date input լայնությունով և box-border-ով) */}
             {showForm && (
                 <form onSubmit={saveRecord} className="w-full box-border glass-card p-5 rounded-3xl border border-red-500/40 bg-[#0b0f19]/95 backdrop-blur-2xl shadow-[0_15px_35px_rgba(0,0,0,0.8)] mb-5 animate-fadeIn">
                     <h2 className="text-xs font-bold text-red-400 uppercase tracking-wider mb-4 px-1">
@@ -343,7 +343,7 @@ export default function MedicalPage() {
                                 type="date"
                                 value={treatmentDate}
                                 onChange={(e) => setTreatmentDate(e.target.value)}
-                                className="w-full box-border max-w-full bg-[#070a14]/90 border border-white/15 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-500/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]"
+                                className="w-full box-border max-w-full block bg-[#070a14]/90 border border-white/15 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-500/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]"
                                 required
                             />
                         </div>

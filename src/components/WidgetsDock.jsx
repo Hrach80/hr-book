@@ -121,27 +121,29 @@ export default function WidgetsDock() {
         <div className="relative z-[90]">
 
             {/* ==========================================
-          4. ՁԱԽ ԱՆԿՅՈՒՆԻ ՈՒՂՂԱՀԱՅԱՑ ՎԱՀԱՆԱԿ (DOCK)
+          4. ՁԱԽ ԱՆԿՅՈՒՆԻ ՈՒՂՂԱՀԱՅԱՑ ՎԱՀԱՆԱԿ (DOCK) 
+          - Ջրի կաթիլի կիսաթափանցիկ էֆեկտով (Glassmorphism & Liquid Drop Shine)
+          - Հենց ձախ եզրին, առանց բաց տարածության
          ========================================== */}
-            <div className="fixed left-3 sm:left-6 top-1/2 -translate-y-1/2 flex flex-col items-start">
+            <div className="fixed left-0 top-1/2 -translate-y-1/2 flex flex-col items-start">
 
-                {/* Գլխավոր երկարավուն և բարակ կոճակ */}
+                {/* Գլխավոր երկարավուն և բարակ կոճակ՝ ջրի կաթիլի փայլով */}
                 <button
                     type="button"
                     onClick={() => setIsDockOpen(!isDockOpen)}
-                    className={`w-9 sm:w-10 py-5 rounded-2xl glass-card border border-white/15 bg-[#0b0f19]/85 backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.7)] text-gray-300 hover:text-white hover:border-blue-500/50 transition-all duration-300 flex flex-col items-center justify-between gap-3 cursor-pointer active:scale-95 group`}
+                    className={`w-7 sm:w-8 py-5 rounded-r-2xl border-y border-r border-white/20 bg-gradient-to-r from-white/10 via-white/5 to-transparent backdrop-blur-md shadow-[0_8px_32px_0_rgba(31,38,135,0.25),inset_0_1px_1px_0_rgba(255,255,255,0.3)] text-gray-200 hover:text-white hover:border-blue-400/50 hover:bg-white/15 transition-all duration-300 flex flex-col items-center justify-between gap-3 cursor-pointer active:scale-95 group`}
                     title="Վիդջեթների մենյու"
                 >
-                    <LayoutGrid size={18} className="text-blue-400 group-hover:rotate-90 transition-transform duration-500" />
-                    <span className="text-[9px] font-bold tracking-widest uppercase [writing-mode:vertical-lr] text-gray-400 group-hover:text-white select-none">
+                    <LayoutGrid size={16} className="text-blue-300 drop-shadow-[0_0_8px_rgba(59,130,246,0.8)] group-hover:rotate-90 transition-transform duration-500" />
+                    <span className="text-[8px] font-bold tracking-widest uppercase [writing-mode:vertical-lr] text-gray-300 group-hover:text-white select-none drop-shadow-sm">
                         WIDGETS
                     </span>
-                    <ChevronRight size={14} className={`text-gray-400 transition-transform duration-300 ${isDockOpen ? 'rotate-180' : ''}`} />
+                    <ChevronRight size={12} className={`text-gray-300 transition-transform duration-300 ${isDockOpen ? 'rotate-180' : ''}`} />
                 </button>
 
-                {/* Բացվող իկոնաների ցանկ (Վերևից ներքև) */}
+                {/* Բացվող իկոնաների ցանկ (Ջրի կաթիլի ոճով) */}
                 {isDockOpen && (
-                    <div className="absolute left-12 sm:left-14 top-0 flex flex-col gap-2 p-2 rounded-2xl glass-card border border-white/15 bg-[#0b0f19]/95 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.8)] animate-[fadeIn_0.3s_ease-out]">
+                    <div className="absolute left-8 sm:left-9 top-0 flex flex-col gap-2 p-1.5 rounded-2xl border border-white/20 bg-[#0b0f19]/60 backdrop-blur-xl shadow-[0_10px_35px_rgba(0,0,0,0.6),inset_0_1px_1px_rgba(255,255,255,0.2)] animate-[fadeIn_0.3s_ease-out]">
 
                         {/* Ժամացույցի իկոնա */}
                         <button
@@ -150,10 +152,10 @@ export default function WidgetsDock() {
                                 setActiveModal('clock');
                                 setIsDockOpen(false);
                             }}
-                            className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 border border-white/15 text-blue-400 hover:border-blue-500/60 hover:scale-105 transition-all duration-300 shadow-sm flex items-center justify-center cursor-pointer active:scale-95 group"
+                            className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500/30 to-indigo-500/20 border border-white/20 text-blue-300 hover:border-blue-400/80 hover:scale-105 transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] flex items-center justify-center cursor-pointer active:scale-95 group"
                             title="World Clocks"
                         >
-                            <Globe size={18} className="group-hover:rotate-45 transition-transform duration-500 drop-shadow-[0_0_6px_rgba(59,130,246,0.6)]" />
+                            <Globe size={16} className="group-hover:rotate-45 transition-transform duration-500 drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
                         </button>
 
                         {/* Տարադրամի իկոնա */}
@@ -163,10 +165,10 @@ export default function WidgetsDock() {
                                 setActiveModal('currency');
                                 setIsDockOpen(false);
                             }}
-                            className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-white/15 text-emerald-400 hover:border-emerald-500/60 hover:scale-105 transition-all duration-300 shadow-sm flex items-center justify-center cursor-pointer active:scale-95 group"
+                            className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500/30 to-teal-500/20 border border-white/20 text-emerald-300 hover:border-emerald-400/80 hover:scale-105 transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] flex items-center justify-center cursor-pointer active:scale-95 group"
                             title="Market Rates"
                         >
-                            <DollarSign size={18} className="group-hover:scale-110 transition-transform duration-500 drop-shadow-[0_0_6px_rgba(16,185,129,0.6)]" />
+                            <DollarSign size={16} className="group-hover:scale-110 transition-transform duration-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
                         </button>
 
                         {/* ========================================================
@@ -178,7 +180,7 @@ export default function WidgetsDock() {
                   onClick={() => { setActiveModal('weather'); setIsDockOpen(false); }}
                   className="..."
                 >
-                  <WeatherIcon size={18} />
+                  <WeatherIcon size={16} />
                 </button>
                ======================================================== */}
 

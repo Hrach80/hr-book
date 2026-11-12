@@ -184,136 +184,138 @@ export default function MedicalPage() {
             }
         } else {
             navigator.clipboard.writeText(shareData.url);
-            showToast('Հղումը պատճենվեց буфер обмена-ում!');
+            showToast('Հղումը պատճենվեց!');
         }
     };
 
     return (
-        <div className="font-sans pb-36 w-full max-w-md mx-auto px-4 pt-3 text-white relative overflow-x-hidden flex flex-col items-center">
+        <div className="font-sans pb-40 w-full max-w-md mx-auto px-4 pt-4 text-white relative overflow-x-hidden flex flex-col items-center">
 
             {toast.show && (
                 <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 animate-bounce transition-all duration-300">
-                    <div className={`px-4 py-2.5 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl border flex items-center gap-2.5 text-xs font-semibold ${toast.type === 'error'
-                            ? 'bg-red-950/80 border-red-500/40 text-red-200'
+                    <div className={`px-5 py-3 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl border flex items-center gap-3 text-sm font-semibold ${toast.type === 'error'
+                            ? 'bg-red-950/90 border-red-500/40 text-red-200'
                             : toast.type === 'info'
-                                ? 'bg-amber-950/80 border-amber-500/40 text-amber-200'
-                                : 'bg-emerald-950/80 border-emerald-500/40 text-emerald-200'
+                                ? 'bg-amber-950/90 border-amber-500/40 text-amber-200'
+                                : 'bg-emerald-950/90 border-emerald-500/40 text-emerald-200'
                         }`}>
-                        <Sparkles size={16} className="text-red-400" />
+                        <Sparkles size={18} className="text-red-400" />
                         <span>{toast.message}</span>
                     </div>
                 </div>
             )}
 
-            <div className="w-full flex items-center justify-between mb-4">
-                <Link to="/" className="p-2.5 rounded-2xl bg-white/5 border border-white/10 text-gray-300 hover:text-white transition hover:scale-105 shadow-md">
-                    <ArrowLeft size={18} />
+            {/* Վերնագրի հատված */}
+            <div className="w-full flex items-center justify-between mb-5">
+                <Link to="/" className="p-3 rounded-2xl bg-white/5 border border-white/10 text-gray-300 hover:text-white transition shadow-md">
+                    <ArrowLeft size={20} />
                 </Link>
-                <h1 className="text-sm font-bold text-white tracking-wider uppercase">
+                <h1 className="text-base font-bold text-white tracking-wider uppercase">
                     Բժշկական գրառումներ
                 </h1>
 
                 <button
                     onClick={() => { setShowForm(!showForm); setEditingId(null); setTitle(''); setDiagnosis(''); setTreatment(''); setPrescription(''); setFileUrl(''); }}
-                    className="p-2.5 rounded-2xl border transition-all duration-300 hover:scale-105 shadow-lg flex items-center justify-center cursor-pointer bg-red-600/20 border-red-500/40 text-red-300 shadow-[0_0_15px_rgba(239,68,68,0.3)]"
+                    className="p-3 rounded-2xl border transition shadow-lg flex items-center justify-center cursor-pointer bg-red-600/20 border-red-500/40 text-red-300 shadow-[0_0_15px_rgba(239,68,68,0.3)]"
                 >
-                    {showForm ? <X size={18} /> : <Plus size={18} />}
+                    {showForm ? <X size={20} /> : <Plus size={20} />}
                 </button>
             </div>
 
+            {/* Մանրամասն դիտման մոդալ (Մեծացված տառերով) */}
             {selectedRecord && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
-                    <div className="w-full max-w-sm glass-card p-5 rounded-3xl border border-red-500/40 bg-[#0b0f19]/95 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.9)] flex flex-col gap-4 max-h-[85vh] overflow-y-auto">
-                        <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                            <div className="flex items-center gap-2 min-w-0 pr-2">
-                                <div className="p-2 rounded-xl bg-red-600/20 text-red-400 border border-red-500/30 flex-shrink-0">
-                                    <Activity size={20} />
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
+                    <div className="w-full max-w-sm glass-card p-6 rounded-3xl border border-red-500/40 bg-[#0b0f19]/95 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.9)] flex flex-col gap-5 max-h-[85vh] overflow-y-auto">
+                        <div className="flex items-center justify-between border-b border-white/10 pb-3.5">
+                            <div className="flex items-center gap-3 min-w-0 pr-2">
+                                <div className="p-2.5 rounded-2xl bg-red-600/20 text-red-400 border border-red-500/30 flex-shrink-0">
+                                    <Activity size={22} />
                                 </div>
-                                <h2 className="text-sm font-bold text-white truncate">
+                                <h2 className="text-base font-bold text-white truncate">
                                     {selectedRecord.title}
                                 </h2>
                             </div>
                             <button
                                 onClick={() => setSelectedRecord(null)}
-                                className="text-gray-400 hover:text-white p-1 rounded-lg transition flex-shrink-0"
+                                className="text-gray-400 hover:text-white p-1.5 rounded-xl transition flex-shrink-0"
                             >
-                                <X size={20} />
+                                <X size={22} />
                             </button>
                         </div>
 
-                        <div className="space-y-3 text-xs">
-                            <div className="flex items-center justify-between text-gray-400 bg-white/5 p-2 rounded-xl border border-white/5">
-                                <div className="flex items-center gap-2">
-                                    <Calendar size={14} className="text-red-400" />
+                        <div className="space-y-4 text-sm">
+                            <div className="flex items-center justify-between text-gray-300 bg-white/5 p-3 rounded-2xl border border-white/5">
+                                <div className="flex items-center gap-2.5">
+                                    <Calendar size={16} className="text-red-400" />
                                     <span>Ամսաթիվ՝ <strong className="text-white">{selectedRecord.treatment_date}</strong></span>
                                 </div>
                                 <button
                                     onClick={() => handleShare(selectedRecord)}
-                                    className="px-2.5 py-1 rounded-lg bg-blue-600/20 text-blue-300 hover:bg-blue-600/40 border border-blue-500/30 transition flex items-center gap-1 text-[11px]"
+                                    className="px-3 py-1.5 rounded-xl bg-blue-600/20 text-blue-300 hover:bg-blue-600/40 border border-blue-500/30 transition flex items-center gap-1.5 text-xs font-semibold"
                                 >
-                                    <Share2 size={13} />
+                                    <Share2 size={15} />
                                     <span>Կիսվել</span>
                                 </button>
                             </div>
 
                             {selectedRecord.diagnosis && (
-                                <div className="bg-[#070a14]/80 p-3 rounded-2xl border border-white/10">
-                                    <span className="text-[10px] text-red-400 uppercase tracking-wider block font-bold mb-1">Ախտորոշում</span>
-                                    <p className="text-gray-200 whitespace-pre-wrap">{selectedRecord.diagnosis}</p>
+                                <div className="bg-[#070a14]/80 p-3.5 rounded-2xl border border-white/10">
+                                    <span className="text-xs text-red-400 uppercase tracking-wider block font-bold mb-1.5">Ախտորոշում</span>
+                                    <p className="text-gray-100 whitespace-pre-wrap leading-relaxed text-sm">{selectedRecord.diagnosis}</p>
                                 </div>
                             )}
 
                             {selectedRecord.treatment && (
-                                <div className="bg-[#070a14]/80 p-3 rounded-2xl border border-white/10">
-                                    <span className="text-[10px] text-red-400 uppercase tracking-wider block font-bold mb-1">Բուժում</span>
-                                    <p className="text-gray-200 whitespace-pre-wrap">{selectedRecord.treatment}</p>
+                                <div className="bg-[#070a14]/80 p-3.5 rounded-2xl border border-white/10">
+                                    <span className="text-xs text-red-400 uppercase tracking-wider block font-bold mb-1.5">Բուժում</span>
+                                    <p className="text-gray-100 whitespace-pre-wrap leading-relaxed text-sm">{selectedRecord.treatment}</p>
                                 </div>
                             )}
 
                             {selectedRecord.prescription && (
-                                <div className="bg-[#070a14]/80 p-3 rounded-2xl border border-white/10">
-                                    <span className="text-[10px] text-red-400 uppercase tracking-wider block font-bold mb-1">Դեղատոմս</span>
-                                    <p className="text-gray-200 whitespace-pre-wrap">{selectedRecord.prescription}</p>
+                                <div className="bg-[#070a14]/80 p-3.5 rounded-2xl border border-white/10">
+                                    <span className="text-xs text-red-400 uppercase tracking-wider block font-bold mb-1.5">Դեղատոմս</span>
+                                    <p className="text-gray-100 whitespace-pre-wrap leading-relaxed text-sm">{selectedRecord.prescription}</p>
                                 </div>
                             )}
 
                             {selectedRecord.file_url ? (
-                                <div className="bg-[#070a14]/80 p-3 rounded-2xl border border-white/10 flex items-center justify-between">
-                                    <div className="flex items-center gap-2 min-w-0 pr-2">
-                                        <Paperclip size={16} className="text-red-400 flex-shrink-0" />
-                                        <span className="text-gray-300 truncate text-[11px]">Կցված ֆայլ / փաստաթուղթ</span>
+                                <div className="bg-[#070a14]/80 p-3.5 rounded-2xl border border-white/10 flex items-center justify-between">
+                                    <div className="flex items-center gap-2.5 min-w-0 pr-2">
+                                        <Paperclip size={18} className="text-red-400 flex-shrink-0" />
+                                        <span className="text-gray-200 truncate text-xs font-medium">Կցված փաստաթուղթ / նկար</span>
                                     </div>
                                     <a
                                         href={selectedRecord.file_url}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="px-3 py-1.5 rounded-xl bg-red-600/20 text-red-300 hover:bg-red-600/40 border border-red-500/30 transition flex items-center gap-1 text-[11px] flex-shrink-0"
+                                        className="px-3.5 py-2 rounded-xl bg-red-600/20 text-red-300 hover:bg-red-600/40 border border-red-500/30 transition flex items-center gap-1.5 text-xs font-semibold flex-shrink-0"
                                     >
                                         <span>Բացել</span>
-                                        <ExternalLink size={12} />
+                                        <ExternalLink size={14} />
                                     </a>
                                 </div>
                             ) : (
-                                <div className="bg-white/5 p-2.5 rounded-xl text-gray-400 text-[11px] flex items-center gap-2">
-                                    <AlertCircle size={14} className="text-amber-400 flex-shrink-0" />
+                                <div className="bg-white/5 p-3 rounded-2xl text-gray-400 text-xs flex items-center gap-2.5">
+                                    <AlertCircle size={16} className="text-amber-400 flex-shrink-0" />
                                     <span>Ֆայլ կցված չէ</span>
                                 </div>
                             )}
                         </div>
 
-                        <div className="flex justify-end gap-2 pt-2 border-t border-white/10">
+                        <div className="flex justify-end gap-2.5 pt-3 border-t border-white/10">
                             <button
                                 onClick={(e) => startEditing(selectedRecord, e)}
-                                className="px-3.5 py-2 rounded-xl text-xs font-semibold text-red-300 bg-red-600/20 border border-red-500/30 hover:bg-red-600/40 transition flex items-center gap-1.5"
+                                className="px-4 py-2.5 rounded-2xl text-xs font-semibold text-red-300 bg-red-600/20 border border-red-500/30 hover:bg-red-600/40 transition flex items-center gap-2"
                             >
-                                <Edit3 size={14} />
+                                <Edit3 size={16} />
                                 <span>Խմբագրել</span>
                             </button>
                             <button
                                 onClick={(e) => deleteRecord(selectedRecord.id, e)}
-                                className="px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-300 bg-white/5 border border-white/10 hover:bg-red-500/20 hover:text-red-300 transition flex items-center gap-1.5"
+                                className="px-4 py-2.5 rounded-2xl text-xs font-semibold text-gray-300 bg-white/5 border border-white/10 hover:bg-red-500/20 hover:text-red-300 transition flex items-center gap-2"
                             >
-                                <Trash2 size={14} />
+                                <Trash2 size={16} />
                                 <span>Ջնջել</span>
                             </button>
                         </div>
@@ -321,29 +323,30 @@ export default function MedicalPage() {
                 </div>
             )}
 
+            {/* Ավելացման / Խմբագրման ֆորմա */}
             {showForm && (
-                <form onSubmit={saveRecord} className="w-full glass-card p-4 rounded-3xl border border-red-500/40 bg-[#0b0f19]/95 backdrop-blur-2xl shadow-[0_15px_35px_rgba(0,0,0,0.8)] mb-4 animate-fadeIn">
-                    <h2 className="text-[11px] font-bold text-red-400 uppercase tracking-wider mb-2.5">
+                <form onSubmit={saveRecord} className="w-full glass-card p-5 rounded-3xl border border-red-500/40 bg-[#0b0f19]/95 backdrop-blur-2xl shadow-[0_15px_35px_rgba(0,0,0,0.8)] mb-5 animate-fadeIn">
+                    <h2 className="text-xs font-bold text-red-400 uppercase tracking-wider mb-3.5">
                         {editingId ? 'Խմբագրել բժշկական գրառումը' : 'Նոր բժշկական գրառում'}
                     </h2>
 
-                    <div className="space-y-2.5">
+                    <div className="space-y-3.5">
                         <input
                             type="text"
                             placeholder="Վերնագիր (օր. Ստուգում բժշկի մոտ)"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            className="w-full bg-[#070a14]/90 border border-white/15 rounded-2xl px-3 py-2.5 text-base sm:text-xs text-white placeholder-gray-500 focus:outline-none focus:border-red-500/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]"
+                            className="w-full bg-[#070a14]/90 border border-white/15 rounded-2xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]"
                             required
                         />
 
                         <div>
-                            <label className="text-[10px] text-gray-400 ml-1 mb-1 block uppercase">Բուժման ամսաթիվ</label>
+                            <label className="text-xs text-gray-400 ml-1 mb-1.5 block uppercase font-medium">Բուժման ամսաթիվ</label>
                             <input
                                 type="date"
                                 value={treatmentDate}
                                 onChange={(e) => setTreatmentDate(e.target.value)}
-                                className="w-full bg-[#070a14]/90 border border-white/15 rounded-2xl px-3 py-2 text-base sm:text-xs text-white focus:outline-none focus:border-red-500/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]"
+                                className="w-full bg-[#070a14]/90 border border-white/15 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-500/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]"
                                 required
                             />
                         </div>
@@ -352,34 +355,34 @@ export default function MedicalPage() {
                             placeholder="Ախտորոշում..."
                             value={diagnosis}
                             onChange={(e) => setDiagnosis(e.target.value)}
-                            rows="2"
-                            className="w-full bg-[#070a14]/90 border border-white/15 rounded-2xl p-3 text-base sm:text-xs text-white placeholder-gray-500 focus:outline-none focus:border-red-500/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] resize-none"
+                            rows="2.5"
+                            className="w-full bg-[#070a14]/90 border border-white/15 rounded-2xl p-4 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] resize-none"
                         ></textarea>
 
                         <textarea
                             placeholder="Բուժում..."
                             value={treatment}
                             onChange={(e) => setTreatment(e.target.value)}
-                            rows="2"
-                            className="w-full bg-[#070a14]/90 border border-white/15 rounded-2xl p-3 text-base sm:text-xs text-white placeholder-gray-500 focus:outline-none focus:border-red-500/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] resize-none"
+                            rows="2.5"
+                            className="w-full bg-[#070a14]/90 border border-white/15 rounded-2xl p-4 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] resize-none"
                         ></textarea>
 
                         <textarea
                             placeholder="Դեղատոմս (դեղեր, չափաբաժիններ)..."
                             value={prescription}
                             onChange={(e) => setPrescription(e.target.value)}
-                            rows="2"
-                            className="w-full bg-[#070a14]/90 border border-white/15 rounded-2xl p-3 text-base sm:text-xs text-white placeholder-gray-500 focus:outline-none focus:border-red-500/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] resize-none"
+                            rows="2.5"
+                            className="w-full bg-[#070a14]/90 border border-white/15 rounded-2xl p-4 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] resize-none"
                         ></textarea>
 
-                        <div className="bg-[#070a14]/90 border border-white/15 rounded-2xl p-3 flex flex-col gap-2">
-                            <label className="text-[10px] text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
-                                <Upload size={14} className="text-red-400" />
-                                <span>Ներբեռնել նկար կամ PDF սարքավորումից</span>
+                        <div className="bg-[#070a14]/90 border border-white/15 rounded-2xl p-3.5 flex flex-col gap-2.5">
+                            <label className="text-xs text-gray-400 uppercase tracking-wider flex items-center gap-2 font-medium">
+                                <Upload size={16} className="text-red-400" />
+                                <span>Կցել նկար կամ PDF սարքավորումից</span>
                             </label>
 
-                            <label className="w-full py-2.5 px-3 rounded-xl bg-red-600/20 border border-red-500/30 text-red-300 hover:bg-red-600/30 transition text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer">
-                                <Upload size={16} />
+                            <label className="w-full py-3 px-4 rounded-2xl bg-red-600/20 border border-red-500/30 text-red-300 hover:bg-red-600/30 transition text-xs font-semibold flex items-center justify-center gap-2.5 cursor-pointer shadow-md">
+                                <Upload size={18} />
                                 <span>Ընտրել ֆայլ հեռախոսից</span>
                                 <input
                                     type="file"
@@ -389,11 +392,11 @@ export default function MedicalPage() {
                                 />
                             </label>
 
-                            {uploading && <span className="text-[11px] text-amber-400 animate-pulse text-center">Բեռնվում է սարքավորումից...</span>}
+                            {uploading && <span className="text-xs text-amber-400 animate-pulse text-center">Բեռնվում է սարքավորումից...</span>}
                             {fileUrl && !uploading && (
-                                <div className="flex items-center justify-between bg-white/5 p-2 rounded-xl border border-emerald-500/30 text-emerald-400 text-[11px]">
-                                    <span className="flex items-center gap-1 truncate">
-                                        <CheckCircle2 size={14} />
+                                <div className="flex items-center justify-between bg-white/5 p-2.5 rounded-xl border border-emerald-500/30 text-emerald-400 text-xs font-medium">
+                                    <span className="flex items-center gap-1.5 truncate">
+                                        <CheckCircle2 size={16} />
                                         <span>Ֆայլը հաջողությամբ կցվեց</span>
                                     </span>
                                     <a href={fileUrl} target="_blank" rel="noreferrer" className="underline text-blue-400 ml-2">Ստուգել</a>
@@ -402,18 +405,18 @@ export default function MedicalPage() {
                         </div>
                     </div>
 
-                    <div className="flex justify-end gap-2 mt-3">
+                    <div className="flex justify-end gap-2.5 mt-4">
                         <button
                             type="button"
                             onClick={() => { setShowForm(false); setEditingId(null); }}
-                            className="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-gray-300 hover:text-white bg-white/5 border border-white/10 transition cursor-pointer"
+                            className="px-4 py-2 rounded-xl text-xs font-semibold text-gray-300 hover:text-white bg-white/5 border border-white/10 transition cursor-pointer"
                         >
                             Չեղարկել
                         </button>
                         <button
                             type="submit"
                             disabled={uploading}
-                            className="px-4 py-1.5 rounded-xl text-xs font-semibold text-white bg-red-600/50 border border-red-500/60 hover:bg-red-600/70 shadow-[0_0_12px_rgba(239,68,68,0.4)] transition cursor-pointer disabled:opacity-50"
+                            className="px-5 py-2 rounded-xl text-xs font-semibold text-white bg-red-600/50 border border-red-500/60 hover:bg-red-600/70 shadow-[0_0_12px_rgba(239,68,68,0.4)] transition cursor-pointer disabled:opacity-50"
                         >
                             {editingId ? 'Թարմացնել' : 'Պահպանել'}
                         </button>
@@ -421,15 +424,16 @@ export default function MedicalPage() {
                 </form>
             )}
 
-            <div className="w-full space-y-3">
+            {/* Գրառումների ցանկը մեծացրած քարտերով */}
+            <div className="w-full space-y-3.5">
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center py-24">
-                        <div className="w-16 h-16 rounded-3xl bg-[#0b0f19] border border-white/10 shadow-[0_15px_35px_rgba(0,0,0,0.9),inset_0_1px_1px_rgba(255,255,255,0.15)] flex items-center justify-center animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite]">
-                            <Activity size={28} className="text-red-400 drop-shadow-[0_0_10px_rgba(239,68,68,0.8)] animate-pulse" />
+                    <div className="flex flex-col items-center justify-center py-28">
+                        <div className="w-16 h-16 rounded-3xl bg-[#0b0f19] border border-white/10 shadow-[0_15px_35px_rgba(0,0,0,0.9)] flex items-center justify-center animate-[pulse_2s_infinite]">
+                            <Activity size={30} className="text-red-400 drop-shadow-[0_0_10px_rgba(239,68,68,0.8)] animate-pulse" />
                         </div>
                     </div>
                 ) : records.length === 0 ? (
-                    <div className="text-center py-16 text-gray-500 text-xs">
+                    <div className="text-center py-20 text-gray-400 text-sm font-medium">
                         Բժշկական գրառումներ դեռևս չկան
                     </div>
                 ) : (
@@ -437,38 +441,38 @@ export default function MedicalPage() {
                         <div
                             key={item.id}
                             onClick={() => setSelectedRecord(item)}
-                            className="w-full glass-card p-4 rounded-2xl border border-white/10 bg-gradient-to-br from-[#0b0f19]/90 to-[#070a12]/95 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.6)] flex items-center justify-between group transition hover:border-red-500/40 cursor-pointer"
+                            className="w-full glass-card p-4.5 rounded-2xl border border-white/10 bg-gradient-to-br from-[#0b0f19]/90 to-[#070a12]/95 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.6)] flex items-center justify-between group transition hover:border-red-500/50 cursor-pointer"
                         >
                             <div className="min-w-0 flex-1 pr-3">
-                                <div className="flex items-center gap-2 mb-1">
-                                    <Activity size={16} className="text-red-400 flex-shrink-0" />
-                                    <h3 className="font-bold text-xs text-white truncate">{item.title}</h3>
+                                <div className="flex items-center gap-2.5 mb-1.5">
+                                    <Activity size={18} className="text-red-400 flex-shrink-0" />
+                                    <h3 className="font-bold text-sm text-white truncate">{item.title}</h3>
                                 </div>
-                                <div className="flex items-center gap-3 text-[11px] text-gray-400">
-                                    <span className="flex items-center gap-1">
-                                        <Calendar size={12} className="text-red-400/80" />
+                                <div className="flex items-center gap-3 text-xs text-gray-300">
+                                    <span className="flex items-center gap-1 font-medium">
+                                        <Calendar size={13} className="text-red-400" />
                                         {item.treatment_date}
                                     </span>
                                     {item.diagnosis && (
-                                        <span className="truncate text-gray-300">
+                                        <span className="truncate text-gray-400">
                                             • {item.diagnosis}
                                         </span>
                                     )}
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-1.5 flex-shrink-0">
+                            <div className="flex items-center gap-2 flex-shrink-0">
                                 {item.file_url && (
-                                    <span className="p-1.5 rounded-lg bg-red-500/10 text-red-400" title="Կցված ֆայլ">
-                                        <Paperclip size={14} />
+                                    <span className="p-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20" title="Կցված ֆայլ">
+                                        <Paperclip size={16} />
                                     </span>
                                 )}
                                 <button
                                     onClick={(e) => deleteRecord(item.id, e)}
-                                    className="text-gray-400 hover:text-red-400 p-1.5 rounded-lg hover:bg-red-500/10 transition"
+                                    className="text-gray-400 hover:text-red-400 p-2 rounded-xl hover:bg-red-500/15 transition"
                                     title="Ջնջել"
                                 >
-                                    <Trash2 size={15} />
+                                    <Trash2 size={18} />
                                 </button>
                             </div>
                         </div>
@@ -476,7 +480,8 @@ export default function MedicalPage() {
                 )}
             </div>
 
-            <footer className="fixed bottom-2 left-0 right-0 mx-auto max-w-md px-4 z-40">
+            {/* Ստորին նավիգացիա */}
+            <footer className="fixed bottom-2.5 left-0 right-0 mx-auto max-w-md px-4 z-40">
                 <div className="border border-white/10 rounded-3xl p-2.5 shadow-[0_15px_35px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.15)] bg-[#070a14]/90 backdrop-blur-2xl">
                     <nav className="grid grid-cols-4 gap-2 text-center">
                         <Link to="/" className="flex flex-col items-center justify-center py-2 px-2 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 transition-all duration-300 hover:scale-105">

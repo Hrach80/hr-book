@@ -116,31 +116,40 @@ export default function Dashboard() {
                 </div>
             </div>
 
-            {/* Ներքևի նավիգացիոն մենյու */}
-            <footer className="fixed bottom-0 left-0 right-0 glass-card-light border-t border-gray-800 mx-auto max-w-md rounded-t-3xl p-3.5 shadow-2xl z-50 bg-[#0b0f19]/90 backdrop-blur-md">
-                <nav className="grid grid-cols-4 gap-4 text-center">
-                    <Link to="/" className="flex flex-col items-center text-blue-400">
-                        <div className="p-1.5 bg-blue-500/10 rounded-xl">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M3 10.1183C3 9.23167 3 8.78835 3.17964 8.38673C3.35928 7.98512 3.69548 7.66755 4.36789 7.03242L9.36789 2.29909C10.5129 1.20417 11.0854 0.656709 11.7473 0.451981C12.4092 0.247253 13.1134 0.430393 14.5219 0.796673L19.5219 2.12999C20.2547 2.32417 20.6212 2.42125 20.8106 2.69887C21 2.97648 21 3.34915 21 4.09449V17.0183C21 19.2291 21 20.3345 20.6651 21.1794C20.3303 22.0243 19.433 22.6202 17.6385 22.812L13.6385 23.2453C12.5192 23.3653 11.9596 23.4253 11.4818 23.2378C11.004 23.0503 10.6827 22.6344 10.0401 21.8025L5.04007 15.3025C4.28177 14.3321 3.90263 13.8469 3.45132 13.2856C3 12.7243 3 12.0036 3 10.5623V10.1183Z" fill="currentColor" />
-                                <path d="M16.5 12.5V18.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            {/* Ներքևի նավիգացիոն մենյու (Dashboard / Home էջի համար) */}
+            <footer className="fixed bottom-4 left-0 right-0 mx-auto max-w-md px-4 z-50">
+                <div className="border border-white/10 rounded-3xl p-2.5 shadow-[0_15px_35px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.15)] bg-[#070a14]/90 backdrop-blur-2xl">
+                    <nav className="grid grid-cols-4 gap-2 text-center">
+
+                        {/* Home (Ակտիվ է այս էջում) */}
+                        <Link to="/" className="flex flex-col items-center justify-center py-2 px-2 rounded-2xl text-blue-400 bg-blue-600/20 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.25)] transition-all duration-300 hover:scale-105">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="drop-shadow-[0_0_6px_rgba(59,130,246,0.8)]">
+                                <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                                <polyline points="9 22 9 12 15 12 15 22" />
                             </svg>
-                        </div>
-                        <span className="text-[11px] mt-0.5 font-medium">{t('home') || 'Home'}</span>
-                    </Link>
-                    <Link to="/settings" className="flex flex-col items-center text-gray-500 hover:text-gray-300">
-                        <Search size={22} />
-                        <span className="text-[11px] mt-0.5">{t('search') || 'Search'}</span>
-                    </Link>
-                    <Link to="/notes" className="flex flex-col items-center text-gray-500 hover:text-gray-300">
-                        <Plus size={22} />
-                        <span className="text-[11px] mt-0.5">{t('add') || 'Add'}</span>
-                    </Link>
-                    <Link to="/auth" className="flex flex-col items-center text-gray-500 hover:text-gray-300">
-                        <User size={22} />
-                        <span className="text-[11px] mt-0.5">{t('profile') || 'Profile'}</span>
-                    </Link>
-                </nav>
+                            <span className="text-[10px] mt-1 font-semibold tracking-wide">{t('home') || 'Home'}</span>
+                        </Link>
+
+                        {/* Search */}
+                        <Link to="/search" className="flex flex-col items-center justify-center py-2 px-2 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 transition-all duration-300 hover:scale-105 group">
+                            <Search size={22} className="group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all" />
+                            <span className="text-[10px] mt-1 font-medium">{t('search') || 'Search'}</span>
+                        </Link>
+
+                        {/* Add */}
+                        <Link to="/notes" className="flex flex-col items-center justify-center py-2 px-2 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 transition-all duration-300 hover:scale-105 group">
+                            <Plus size={22} className="group-hover:drop-shadow-[0_0_8px_rgba(16,185,129,0.5)] transition-all" />
+                            <span className="text-[10px] mt-1 font-medium">{t('add') || 'Add'}</span>
+                        </Link>
+
+                        {/* Profile */}
+                        <Link to="/auth" className="flex flex-col items-center justify-center py-2 px-2 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 transition-all duration-300 hover:scale-105 group">
+                            <User size={22} className="group-hover:drop-shadow-[0_0_8px_rgba(59,130,246,0.5)] transition-all" />
+                            <span className="text-[10px] mt-1 font-medium">{t('profile') || 'Profile'}</span>
+                        </Link>
+
+                    </nav>
+                </div>
             </footer>
         </div>
     );

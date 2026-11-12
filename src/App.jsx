@@ -8,9 +8,9 @@ import MedicalPage from './pages/MedicalPage';
 import DocsPage from './pages/DocsPage';
 import SettingsPage from './pages/SettingsPage';
 import AuthPage from './pages/AuthPage';
-
 import Navbar from './components/Navbar';
 import WidgetsDock from './components/WidgetsDock'; // <-- Նոր միավորված վահանակը (Dock)
+import Search from './pages/Search';
 
 function App() {
   return (
@@ -34,6 +34,7 @@ function App() {
               <Route path="/docs" element={<DocsPage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/auth" element={<AuthPage />} />
+              <Route path="/search" element={<Search />} />
             </Routes>
           </main>
 

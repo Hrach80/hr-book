@@ -77,31 +77,33 @@ export default function CurrencyWidget() {
 
     return (
         <>
-            {/* Ֆիքսված դիրք ժամացույցի իկոնայի տակ՝ նավիգացիայից ներքև (top-32) */}
-            {!isOpen && (
-                <div className="fixed left-4 top-32 z-40">
+            {/* Ֆիքսված իկոնա ամենաբարձր շերտով (z-[90]) */}
+            <div className="fixed left-4 sm:left-8 top-40 sm:top-48 z-[90]">
+                {!isOpen && (
                     <button
                         onClick={() => setIsOpen(true)}
-                        className="p-2 rounded-xl bg-white/[0.03] backdrop-blur-md border border-white/10 text-emerald-400 hover:bg-white/[0.08] hover:border-emerald-500/40 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.3)] group flex items-center justify-center cursor-pointer"
+                        className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 backdrop-blur-xl border border-white/15 text-emerald-400 hover:border-emerald-500/60 hover:scale-105 transition-all duration-300 shadow-[0_0_20px_rgba(16,185,129,0.25)] group flex items-center justify-center cursor-pointer active:scale-95"
                         title="Բացել փոխարժեքները"
                     >
-                        <DollarSign size={18} className="text-emerald-400 group-hover:scale-110 transition-transform duration-500 drop-shadow-[0_0_6px_rgba(16,185,129,0.6)]" />
+                        <DollarSign size={22} className="text-emerald-400 group-hover:scale-110 transition-transform duration-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
                     </button>
-                </div>
-            )}
+                )}
+            </div>
 
-            {/* Բացվող պատուհանը (Modal) */}
+            {/* Բացվող պատուհան՝ բացարձակ ամենաբարձր շերտում (z-[100]) */}
             {isOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-                    <div className="relative w-full max-w-sm sm:max-w-md glass-card p-4 sm:p-5 rounded-3xl bg-[#0b0f19]/95 border border-white/15 shadow-[0_16px_50px_rgba(0,0,0,0.8)] backdrop-blur-2xl">
+                <div className="fixed inset-0 z-[100] flex items-start justify-center pt-24 px-4 sm:px-8 bg-black/60 backdrop-blur-md transition-opacity duration-500">
+                    <div className="relative w-full max-w-7xl glass-card p-5 sm:p-6 rounded-3xl border border-white/20 bg-gradient-to-br from-[#0b0f19]/95 via-[#101726]/90 to-[#070a12]/98 shadow-[0_20px_60px_rgba(0,0,0,0.95)] backdrop-blur-2xl transition-all duration-500 ease-out transform translate-x-0 opacity-100 animate-[slideRight_0.4s_cubic-bezier(0.16,1,0.3,1)]">
 
-                        <div className="absolute -top-16 -right-16 w-36 h-36 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none"></div>
-                        <div className="absolute -bottom-16 -left-16 w-36 h-36 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
+                        {/* Հետին ֆոնի նեոնային լույսեր */}
+                        <div className="absolute -top-20 -right-20 w-48 h-48 bg-emerald-600/15 rounded-full blur-3xl pointer-events-none"></div>
+                        <div className="absolute -bottom-20 -left-20 w-48 h-48 bg-blue-600/15 rounded-full blur-3xl pointer-events-none"></div>
 
-                        <div className="flex items-center justify-between mb-3.5 relative z-10 border-b border-white/10 pb-2">
+                        {/* Վերնագիրը */}
+                        <div className="flex items-center justify-between mb-4 relative z-10 border-b border-white/10 pb-3">
                             <div className="w-6"></div>
 
-                            <div className="flex items-center gap-2 text-emerald-400 text-xs font-semibold tracking-wider uppercase">
+                            <div className="flex items-center gap-2 text-emerald-400 text-sm font-semibold tracking-wider uppercase">
                                 <div className="w-6 h-6 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
                                     <DollarSign size={14} className="drop-shadow-[0_0_6px_rgba(16,185,129,0.6)]" />
                                 </div>
@@ -112,27 +114,28 @@ export default function CurrencyWidget() {
 
                             <button
                                 onClick={() => setIsOpen(false)}
-                                className="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-white/5 transition cursor-pointer"
+                                className="text-gray-400 hover:text-white p-1.5 rounded-xl hover:bg-white/10 transition cursor-pointer"
                                 title="Փակել"
                             >
-                                <X size={16} />
+                                <X size={18} />
                             </button>
                         </div>
 
+                        {/* Տարադրամների ցանկը */}
                         <div className="space-y-3 relative z-10">
                             {currencies.map((item, index) => (
                                 <div
                                     key={index}
-                                    className="flex items-center justify-between p-3 rounded-2xl bg-white/[0.02] border border-white/10 backdrop-blur-xl shadow-[0_4px_15px_rgba(0,0,0,0.4)] transition-all duration-300 hover:border-white/20 group"
+                                    className="flex items-center justify-between p-3.5 sm:p-4 rounded-2xl bg-white/[0.02] border border-white/10 backdrop-blur-xl shadow-[0_4px_15px_rgba(0,0,0,0.4)] transition-all duration-300 hover:border-white/20 group"
                                 >
-                                    <div className="flex flex-col w-24">
-                                        <span className="font-bold text-xs sm:text-sm text-white tracking-wide transition-colors">
+                                    <div className="flex flex-col w-28 sm:w-36">
+                                        <span className="font-bold text-sm sm:text-base text-white tracking-wide transition-colors">
                                             {item.code}
                                         </span>
-                                        <span className="text-[10px] text-gray-400 truncate">{item.name}</span>
+                                        <span className="text-[11px] sm:text-xs text-gray-400 truncate">{item.name}</span>
                                     </div>
 
-                                    <div className="hidden sm:block w-28 h-8">
+                                    <div className="w-24 sm:w-48 h-8 sm:h-10 mx-2">
                                         <ResponsiveContainer width="100%" height="100%">
                                             <AreaChart data={item.data} margin={{ top: 2, right: 0, left: 0, bottom: 2 }}>
                                                 <defs>
@@ -153,21 +156,21 @@ export default function CurrencyWidget() {
                                         </ResponsiveContainer>
                                     </div>
 
-                                    <div className="flex items-center gap-2.5 text-right">
-                                        <span className="font-semibold text-xs sm:text-sm text-white tracking-wider">
-                                            {item.rate} <span className="text-[10px] text-gray-400 font-normal">֏</span>
+                                    <div className="flex items-center gap-3 text-right">
+                                        <span className="font-bold text-sm sm:text-base text-white tracking-wider">
+                                            {item.rate} <span className="text-xs text-gray-400 font-normal">֏</span>
                                         </span>
 
                                         <div
-                                            className="flex items-center gap-0.5 text-[10px] font-medium px-1.5 py-0.5 rounded-lg border shadow-sm"
+                                            className="flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-xl border shadow-sm"
                                             style={{
                                                 color: item.color,
                                                 backgroundColor: `${item.color}15`,
                                                 borderColor: `${item.color}40`,
-                                                boxShadow: `0 0 10px ${item.color}25`
+                                                boxShadow: `0 0 12px ${item.color}25`
                                             }}
                                         >
-                                            {item.isUp ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
+                                            {item.isUp ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
                                             <span>{item.change}</span>
                                         </div>
                                     </div>

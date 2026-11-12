@@ -68,47 +68,50 @@ export default function WorldClockWidget() {
 
     return (
         <>
-            {/* Ֆիքսված դիրք նավիգացիայից փոքր-ինչ ներքև (top-20) */}
-            {!isOpen && (
-                <div className="fixed left-4 top-20 z-40">
+            {/* Ֆիքսված իկոնա ամենաբարձր շերտով (z-[90]) */}
+            <div className="fixed left-4 sm:left-8 top-28 sm:top-32 z-[90]">
+                {!isOpen && (
                     <button
                         onClick={() => setIsOpen(true)}
-                        className="p-2 rounded-xl bg-white/[0.03] backdrop-blur-md border border-white/10 text-blue-400 hover:bg-white/[0.08] hover:border-blue-500/40 transition-all duration-300 shadow-[0_4px_12px_rgba(0,0,0,0.3)] group flex items-center justify-center cursor-pointer"
+                        className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 backdrop-blur-xl border border-white/15 text-blue-400 hover:border-blue-500/60 hover:scale-105 transition-all duration-300 shadow-[0_0_20px_rgba(59,130,246,0.25)] group flex items-center justify-center cursor-pointer active:scale-95"
                         title="Բացել ժամացույցները"
                     >
-                        <Globe size={18} className="text-blue-400 group-hover:rotate-45 transition-transform duration-700 drop-shadow-[0_0_6px_rgba(59,130,246,0.6)]" />
+                        <Globe size={22} className="text-blue-400 group-hover:rotate-45 transition-transform duration-700 drop-shadow-[0_0_8px_rgba(59,130,246,0.6)]" />
                     </button>
-                </div>
-            )}
+                )}
+            </div>
 
-            {/* Բացվող պատուհանը (Modal) */}
+            {/* Բացվող պատուհան՝ բացարձակ ամենաբարձր շերտում (z-[100]) */}
             {isOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-                    <div className="relative w-full max-w-sm sm:max-w-md glass-card p-4 sm:p-5 rounded-3xl bg-[#0b0f19]/95 border border-white/15 shadow-[0_16px_50px_rgba(0,0,0,0.8)] backdrop-blur-2xl">
+                <div className="fixed inset-0 z-[100] flex items-start justify-center pt-24 px-4 sm:px-8 bg-black/60 backdrop-blur-md transition-opacity duration-500">
+                    <div className="relative w-full max-w-7xl glass-card p-5 sm:p-6 rounded-3xl border border-white/20 bg-gradient-to-br from-[#0b0f19]/95 via-[#101726]/90 to-[#070a12]/98 shadow-[0_20px_60px_rgba(0,0,0,0.95)] backdrop-blur-2xl transition-all duration-500 ease-out transform translate-x-0 opacity-100 animate-[slideRight_0.4s_cubic-bezier(0.16,1,0.3,1)]">
 
-                        <div className="absolute -top-16 -right-16 w-36 h-36 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
-                        <div className="absolute -bottom-16 -left-16 w-36 h-36 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none"></div>
+                        {/* Հետին ֆոնի նեոնային լույսեր */}
+                        <div className="absolute -top-20 -right-20 w-48 h-48 bg-blue-600/15 rounded-full blur-3xl pointer-events-none"></div>
+                        <div className="absolute -bottom-20 -left-20 w-48 h-48 bg-indigo-600/15 rounded-full blur-3xl pointer-events-none"></div>
 
-                        <div className="flex items-center justify-between mb-3.5 relative z-10 border-b border-white/10 pb-2">
+                        {/* Վերնագիրը */}
+                        <div className="flex items-center justify-between mb-4 relative z-10 border-b border-white/10 pb-3">
                             <div className="w-6"></div>
 
-                            <div className="flex items-center gap-2 text-blue-400 text-xs font-semibold tracking-wider uppercase">
-                                <Globe size={16} className="text-blue-400 drop-shadow-[0_0_8px_rgba(59,130,246,0.6)]" />
+                            <div className="flex items-center gap-2 text-blue-400 text-sm font-semibold tracking-wider uppercase">
+                                <Globe size={18} className="text-blue-400 drop-shadow-[0_0_8px_rgba(59,130,246,0.6)]" />
                                 <span className="bg-gradient-to-r from-blue-400 to-indigo-300 bg-clip-text text-transparent">
-                                    {t('worldClocks')}
+                                    {t('worldClocks') || 'World Clocks'}
                                 </span>
                             </div>
 
                             <button
                                 onClick={() => setIsOpen(false)}
-                                className="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-white/5 transition cursor-pointer"
+                                className="text-gray-400 hover:text-white p-1.5 rounded-xl hover:bg-white/10 transition cursor-pointer"
                                 title="Փակել"
                             >
-                                <X size={16} />
+                                <X size={18} />
                             </button>
                         </div>
 
-                        <div className="grid grid-cols-3 gap-2.5 relative z-10">
+                        {/* Ժամացույցների բովանդակություն */}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 relative z-10">
                             {selectedZones.map((zone, index) => {
                                 const { hours, minutes, seconds } = getTimeComponents(zone);
 
@@ -122,34 +125,34 @@ export default function WorldClockWidget() {
                                     <div
                                         key={index}
                                         onClick={() => setExpandedZone(zone)}
-                                        className="flex flex-col items-center p-2.5 rounded-xl bg-white/[0.02] border border-white/10 backdrop-blur-xl shadow-sm transition-all duration-300 hover:border-blue-500/50 hover:shadow-[0_0_15px_rgba(59,130,246,0.2)] cursor-pointer group relative overflow-hidden"
+                                        className="flex flex-col items-center p-3.5 sm:p-4 rounded-2xl bg-white/[0.02] border border-white/10 backdrop-blur-xl shadow-sm transition-all duration-300 hover:border-blue-500/50 hover:shadow-[0_0_20px_rgba(59,130,246,0.25)] cursor-pointer group relative overflow-hidden"
                                     >
-                                        <div className="absolute top-1.5 right-1.5 text-gray-500 group-hover:text-blue-400 transition-colors">
-                                            <Maximize2 size={10} />
+                                        <div className="absolute top-2 right-2 text-gray-500 group-hover:text-blue-400 transition-colors">
+                                            <Maximize2 size={12} />
                                         </div>
 
-                                        <div className="relative w-12 h-12 rounded-full border border-white/15 bg-gradient-to-b from-[#060911] to-[#0b101d] flex items-center justify-center mb-1.5 shadow-[inset_0_2px_8px_rgba(0,0,0,0.9)]">
-                                            <div className="absolute w-1.5 h-1.5 rounded-full bg-blue-400 z-30"></div>
+                                        <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full border border-white/15 bg-gradient-to-b from-[#060911] to-[#0b101d] flex items-center justify-center mb-2.5 shadow-[inset_0_4px_12px_rgba(0,0,0,0.9)]">
+                                            <div className="absolute w-2 h-2 rounded-full bg-blue-400 z-30"></div>
 
                                             <div
-                                                className="absolute w-0.5 bg-blue-400 rounded-full origin-bottom z-20"
-                                                style={{ height: '14px', bottom: '50%', transform: `rotate(${hourDeg}deg)` }}
+                                                className="absolute w-1 bg-blue-400 rounded-full origin-bottom z-20"
+                                                style={{ height: '18px', bottom: '50%', transform: `rotate(${hourDeg}deg)` }}
                                             ></div>
                                             <div
-                                                className="absolute w-[1px] bg-cyan-300 rounded-full origin-bottom z-20"
-                                                style={{ height: '18px', bottom: '50%', transform: `rotate(${minuteDeg}deg)` }}
+                                                className="absolute w-[1.5px] bg-cyan-300 rounded-full origin-bottom z-20"
+                                                style={{ height: '26px', bottom: '50%', transform: `rotate(${minuteDeg}deg)` }}
                                             ></div>
                                             <div
                                                 className="absolute w-[1px] bg-red-400 rounded-full origin-bottom z-20"
-                                                style={{ height: '20px', bottom: '50%', transform: `rotate(${secondDeg}deg)` }}
+                                                style={{ height: '30px', bottom: '50%', transform: `rotate(${secondDeg}deg)` }}
                                             ></div>
                                         </div>
 
-                                        <p className="text-xs font-bold tracking-wider text-white mb-1">
+                                        <p className="text-sm sm:text-base font-extrabold tracking-wider text-white mb-1">
                                             {String(hours).padStart(2, '0')}:{String(minutes).padStart(2, '0')}
                                         </p>
 
-                                        <span className="text-[10px] text-gray-300 font-medium truncate w-full text-center">
+                                        <span className="text-xs text-gray-300 font-medium truncate w-full text-center">
                                             {currentObj ? currentObj.short : zone.split('/')[1]}
                                         </span>
                                     </div>
@@ -160,9 +163,9 @@ export default function WorldClockWidget() {
                 </div>
             )}
 
-            {/* Մեծացված պատուհան (Modal) */}
+            {/* Մեծացված մանրամասների պատուհան (Modal) */}
             {expandedZone && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
+                <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
                     <div className="relative w-full max-w-sm glass-card p-6 rounded-3xl bg-[#0b0f19] border border-blue-500/30 shadow-[0_0_40px_rgba(59,130,246,0.3)] flex flex-col items-center">
 
                         <button

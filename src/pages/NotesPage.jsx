@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Plus, CheckCircle, Circle, Trash2, Edit3, X, Check, Search, User, Sparkles } from 'lucide-react';
+import { ArrowLeft, Plus, CheckCircle, Circle, Trash2, Edit3, X, Check, Search, User, Sparkles, Clock } from 'lucide-react';
 import { supabase } from '../services/supabaseClient';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -166,9 +166,9 @@ export default function NotesPage() {
                 </button>
             </div>
 
-            {/* Ավելացման դաշտ / Մոդալ (Հարմարեցված ստեղնաշարի և փոքր էկրանների համար) */}
+            {/* Ավելացման դաշտ - Ստեղնաշարի դեպքում ֆիքսված մաքսիմալ բարձրությամբ և ներքին սքրոլով */}
             {isAddingOpen && (
-                <form onSubmit={addNote} className="w-full glass-card p-4 rounded-3xl border border-emerald-500/30 bg-[#0b0f19]/95 backdrop-blur-xl shadow-[0_15px_35px_rgba(0,0,0,0.8)] mb-5 animate-fadeIn max-h-[70vh] overflow-y-auto">
+                <form onSubmit={addNote} className="w-full glass-card p-4 rounded-3xl border border-emerald-500/30 bg-[#0b0f19]/95 backdrop-blur-xl shadow-[0_15px_35px_rgba(0,0,0,0.8)] mb-5 animate-fadeIn max-h-[50vh] overflow-y-auto">
                     <h2 className="text-[11px] font-bold text-emerald-300 uppercase tracking-wider mb-2.5">
                         {t('addNewNote') || 'Նոր նշում կամ անելիք'}
                     </h2>
@@ -199,8 +199,11 @@ export default function NotesPage() {
 
             <div className="w-full space-y-3">
                 {loading ? (
-                    <div className="text-center py-16 text-gray-400 text-xs">
-                        {t('loading') || 'Բեռնվում է...'}
+                    /* Շնչառական անիմացիայով նեոմորֆիկ ժամացույց բեռնման համար */
+                    <div className="flex flex-col items-center justify-center py-24">
+                        <div className="w-16 h-16 rounded-3xl bg-[#0b0f19] border border-white/10 shadow-[0_15px_35px_rgba(0,0,0,0.9),inset_0_1px_1px_rgba(255,255,255,0.15)] flex items-center justify-center animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite]">
+                            <Clock size={28} className="text-emerald-400 drop-shadow-[0_0_10px_rgba(16,185,129,0.8)] animate-spin" style={{ animationDuration: '4s' }} />
+                        </div>
                     </div>
                 ) : notes.length === 0 ? (
                     <div className="text-center py-16 text-gray-500 text-xs">

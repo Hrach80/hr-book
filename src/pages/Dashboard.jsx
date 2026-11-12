@@ -117,7 +117,7 @@ export default function Dashboard() {
             </div>
 
             {/* Ներքևի նավիգացիոն մենյու (Dashboard / Home էջի համար) */}
-            <footer className="fixed bottom-4 left-0 right-0 mx-auto max-w-md px-4 z-50">
+            <footer className="fixed bottom-2 left-0 right-0 mx-auto max-w-md px-4 z-50">
                 <div className="border border-white/10 rounded-3xl p-2.5 shadow-[0_15px_35px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.15)] bg-[#070a14]/90 backdrop-blur-2xl">
                     <nav className="grid grid-cols-4 gap-2 text-center">
 

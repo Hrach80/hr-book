@@ -21,6 +21,19 @@ export default function NotesPage() {
         fetchNotes();
     }, []);
 
+    // Այս հուկը արգելափակում է հետևի ֆոնի սքրոլը և շեղումը iPhone-ում, երբ մոդալը բաց է
+    useEffect(() => {
+        if (isAddingOpen) {
+            document.body.style.overflow = 'hidden';
+            document.body.style.position = 'fixed';
+            document.body.style.width = '100%';
+        } else {
+            document.body.style.overflow = 'auto';
+            document.body.style.position = 'static';
+            document.body.style.width = 'auto';
+        }
+    }, [isAddingOpen]);
+
     const showToast = (message, type = 'success') => {
         setToast({ show: true, message, type });
         setTimeout(() => {
@@ -131,7 +144,6 @@ export default function NotesPage() {
     };
 
     return (
-        /* overflow-x-hidden ապահովում է, որ էջը երբեք դեպի աջ կամ ձախ չշեղվի */
         <div className="font-sans pb-36 w-full max-w-md mx-auto px-4 pt-3 text-white relative overflow-x-hidden flex flex-col items-center">
 
             {toast.show && (
@@ -167,7 +179,7 @@ export default function NotesPage() {
                 </button>
             </div>
 
-            {/* Կենտրոնացված մոդալ՝ հստակ max-w-sm և h-full սահմանափակումներով */}
+            {/* iOS-ի համար լիովին պաշտպանված և կենտրոնացված մոդալ */}
             {isAddingOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
                     <form onSubmit={addNote} className="w-full max-w-sm glass-card p-5 rounded-3xl border border-emerald-500/40 bg-[#0b0f19]/95 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.9)] flex flex-col gap-3">

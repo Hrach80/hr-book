@@ -61,10 +61,10 @@ export default function Dashboard() {
                 </Link>
             </div>
 
-            {/* Supabase Ռեսուրսների Վերլուծական Վահանակ */}
-            <div className="p-4 sm:p-5 rounded-3xl border border-blue-500/30 bg-gradient-to-b from-[#06142e] via-[#0b1f3d] to-[#040914] shadow-[0_20px_50px_rgba(0,0,0,0.9),inset_0_1px_2px_rgba(255,255,255,0.25)] mb-3 relative overflow-hidden">
+            {/* Supabase Ռեսուրսների Վերլուծական Վահանակ (Մեծացված բարձրությամբ դեպի ներքև) */}
+            <div className="p-4 sm:p-6 rounded-3xl border border-blue-500/30 bg-gradient-to-b from-[#06142e] via-[#0b1f3d] to-[#040914] shadow-[0_20px_50px_rgba(0,0,0,0.9),inset_0_1px_2px_rgba(255,255,255,0.25)] mb-3 relative overflow-hidden">
 
-                <div className="flex items-center justify-between mb-3 relative z-10 border-b border-blue-500/20 pb-2.5">
+                <div className="flex items-center justify-between mb-3.5 relative z-10 border-b border-blue-500/20 pb-3">
                     <span className="text-xs font-bold text-blue-200 tracking-wider uppercase flex items-center gap-2">
                         <div className="w-5 h-5 rounded-lg bg-blue-500/20 border border-blue-400/40 flex items-center justify-center text-blue-300 shadow-[0_0_10px_rgba(59,130,246,0.6)]">
                             <Activity size={12} />
@@ -80,10 +80,10 @@ export default function Dashboard() {
                     </button>
                 </div>
 
-                {/* Վերլուծական գրաֆիկ */}
-                <div className="w-full h-40 sm:h-44 relative z-10">
+                {/* Վերլուծական գրաֆիկ (ավելի մեծ բարձրությամբ՝ h-52 / h-60) */}
+                <div className="w-full h-52 sm:h-60 relative z-10">
                     <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                        <LineChart data={chartData} margin={{ top: 15, right: 10, left: -20, bottom: 5 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="rgba(59, 130, 246, 0.2)" />
                             <XAxis dataKey="time" stroke="#93c5fd" fontSize={10} tickLine={false} />
                             <YAxis stroke="#93c5fd" fontSize={10} tickLine={false} />
@@ -98,7 +98,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Մանրամասն տեքստային ցուցանիշներ */}
-                <div className="grid grid-cols-2 gap-3 mt-3 pt-2.5 border-t border-blue-500/20 relative z-10 text-xs">
+                <div className="grid grid-cols-2 gap-3 mt-4 pt-3 border-t border-blue-500/20 relative z-10 text-xs">
                     <div className="flex items-center gap-2">
                         <Database size={14} className="text-sky-400 drop-shadow-[0_0_6px_rgba(56,189,248,0.8)]" />
                         <div>

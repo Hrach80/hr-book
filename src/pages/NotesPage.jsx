@@ -131,7 +131,7 @@ export default function NotesPage() {
     };
 
     return (
-        <div className="font-sans pb-32 max-w-md mx-auto px-4 pt-3 text-white relative min-h-screen flex flex-col items-center">
+        <div className="font-sans pb-36 max-w-md mx-auto px-4 pt-3 text-white relative min-h-screen flex flex-col items-center">
 
             {toast.show && (
                 <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 animate-bounce transition-all duration-300">
@@ -166,8 +166,9 @@ export default function NotesPage() {
                 </button>
             </div>
 
+            {/* Ավելացման դաշտ / Մոդալ (Հարմարեցված ստեղնաշարի և փոքր էկրանների համար) */}
             {isAddingOpen && (
-                <form onSubmit={addNote} className="w-full glass-card p-4 rounded-3xl border border-emerald-500/30 bg-[#0b0f19]/95 backdrop-blur-xl shadow-[0_15px_35px_rgba(0,0,0,0.8)] mb-5 animate-fadeIn">
+                <form onSubmit={addNote} className="w-full glass-card p-4 rounded-3xl border border-emerald-500/30 bg-[#0b0f19]/95 backdrop-blur-xl shadow-[0_15px_35px_rgba(0,0,0,0.8)] mb-5 animate-fadeIn max-h-[70vh] overflow-y-auto">
                     <h2 className="text-[11px] font-bold text-emerald-300 uppercase tracking-wider mb-2.5">
                         {t('addNewNote') || 'Նոր նշում կամ անելիք'}
                     </h2>

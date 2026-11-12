@@ -166,35 +166,49 @@ export default function NotesPage() {
                 </button>
             </div>
 
-            {/* Ավելացման դաշտ - Ստեղնաշարի դեպքում ֆիքսված մաքսիմալ բարձրությամբ և ներքին սքրոլով */}
+            {/* ՕՊՏԻՄԱԼ ԼՈՒԾՈՒՄ. Կենտրոնացված մոդալ պատուհան (Fixed Modal Overlay) */}
             {isAddingOpen && (
-                <form onSubmit={addNote} className="w-full glass-card p-4 rounded-3xl border border-emerald-500/30 bg-[#0b0f19]/95 backdrop-blur-xl shadow-[0_15px_35px_rgba(0,0,0,0.8)] mb-5 animate-fadeIn max-h-[50vh] overflow-y-auto">
-                    <h2 className="text-[11px] font-bold text-emerald-300 uppercase tracking-wider mb-2.5">
-                        {t('addNewNote') || 'Նոր նշում կամ անելիք'}
-                    </h2>
-                    <textarea
-                        value={newNoteTitle}
-                        onChange={(e) => setNewNoteTitle(e.target.value)}
-                        placeholder={t('notePlaceholder') || 'Գրեք ձեր նշումը այստեղ...'}
-                        rows="3"
-                        className="w-full bg-[#070a14]/80 border border-white/15 rounded-2xl p-3 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] backdrop-blur-xl transition resize-none mb-3"
-                    ></textarea>
-                    <div className="flex justify-end gap-2">
-                        <button
-                            type="button"
-                            onClick={() => setIsAddingOpen(false)}
-                            className="px-3.5 py-1.5 rounded-xl text-[11px] font-semibold text-gray-400 hover:text-white bg-white/5 border border-white/10 transition cursor-pointer"
-                        >
-                            {t('cancel') || 'Չեղարկել'}
-                        </button>
-                        <button
-                            type="submit"
-                            className="px-4 py-1.5 rounded-xl text-[11px] font-semibold text-white bg-emerald-600/40 border border-emerald-500/50 hover:bg-emerald-600/60 shadow-[0_0_12px_rgba(16,185,129,0.4)] transition cursor-pointer"
-                        >
-                            {t('save') || 'Պահպանել'}
-                        </button>
-                    </div>
-                </form>
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fadeIn">
+                    <form onSubmit={addNote} className="w-full max-w-sm glass-card p-5 rounded-3xl border border-emerald-500/40 bg-[#0b0f19]/95 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.9)] flex flex-col gap-3">
+                        <div className="flex items-center justify-between mb-1">
+                            <h2 className="text-xs font-bold text-emerald-300 uppercase tracking-wider">
+                                {t('addNewNote') || 'Նոր նշում կամ անելիք'}
+                            </h2>
+                            <button
+                                type="button"
+                                onClick={() => setIsAddingOpen(false)}
+                                className="text-gray-400 hover:text-white p-1 rounded-lg transition"
+                            >
+                                <X size={18} />
+                            </button>
+                        </div>
+
+                        <textarea
+                            value={newNoteTitle}
+                            onChange={(e) => setNewNoteTitle(e.target.value)}
+                            placeholder={t('notePlaceholder') || 'Գրեք ձեր նշումը այստեղ...'}
+                            rows="4"
+                            className="w-full bg-[#070a14]/90 border border-white/15 rounded-2xl p-3 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] backdrop-blur-xl transition resize-none"
+                            autoFocus
+                        ></textarea>
+
+                        <div className="flex justify-end gap-2.5 mt-1">
+                            <button
+                                type="button"
+                                onClick={() => setIsAddingOpen(false)}
+                                className="px-4 py-2 rounded-xl text-xs font-semibold text-gray-300 hover:text-white bg-white/5 border border-white/10 transition cursor-pointer"
+                            >
+                                {t('cancel') || 'Չեղարկել'}
+                            </button>
+                            <button
+                                type="submit"
+                                className="px-5 py-2 rounded-xl text-xs font-semibold text-white bg-emerald-600/50 border border-emerald-500/60 hover:bg-emerald-600/70 shadow-[0_0_15px_rgba(16,185,129,0.4)] transition cursor-pointer"
+                            >
+                                {t('save') || 'Պահպանել'}
+                            </button>
+                        </div>
+                    </form>
+                </div>
             )}
 
             <div className="w-full space-y-3">

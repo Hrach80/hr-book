@@ -128,10 +128,10 @@ export default function DocsPage() {
             {toast.show && (
                 <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 animate-bounce transition-all duration-300">
                     <div className={`px-5 py-3 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl border flex items-center gap-3 text-sm font-semibold ${toast.type === 'error'
-                            ? 'bg-red-950/90 border-red-500/40 text-red-200'
-                            : toast.type === 'info'
-                                ? 'bg-amber-950/90 border-amber-500/40 text-amber-200'
-                                : 'bg-emerald-950/90 border-emerald-500/40 text-emerald-200'
+                        ? 'bg-red-950/90 border-red-500/40 text-red-200'
+                        : toast.type === 'info'
+                            ? 'bg-amber-950/90 border-amber-500/40 text-amber-200'
+                            : 'bg-emerald-950/90 border-emerald-500/40 text-emerald-200'
                         }`}>
                         <Sparkles size={18} className="text-purple-400 flex-shrink-0" />
                         <span>{toast.message}</span>

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Pencil, KeyRound, Plus, Folder, User, Search, Database, HardDrive, RefreshCw, Activity } from 'lucide-react';
+import { Pencil, KeyRound, Plus, Folder, User, Search, Database, HardDrive, RefreshCw, Activity, Car, FileText } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+
 
 export default function Dashboard() {
     const { t } = useLanguage();
@@ -116,36 +117,53 @@ export default function Dashboard() {
                 </div>
             </div>
 
-            {/* Ներքևի նավիգացիոն մենյու (Dashboard / Home էջի համար) */}
-            <footer className="fixed bottom-2 left-0 right-0 mx-auto max-w-md px-4 z-50">
-                <div className="border border-white/10 rounded-3xl p-2.5 shadow-[0_15px_35px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.15)] bg-[#070a14]/90 backdrop-blur-2xl">
+            {/* Ներքևի նավիգացիոն մենյու (Footer) */}
+            <footer className="fixed bottom-2.5 left-0 right-0 mx-auto max-w-md px-4 z-40 box-border">
+                <div className="border border-white/10 rounded-3xl p-2.5 shadow-[0_15px_35px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.15)] bg-[#070a14]/90 backdrop-blur-2xl box-border">
                     <nav className="grid grid-cols-4 gap-2 text-center">
 
-                        {/* Home (Ակտիվ է այս էջում) */}
-                        <Link to="/" className="flex flex-col items-center justify-center py-2 px-2 rounded-2xl text-blue-400 bg-blue-600/20 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.25)] transition-all duration-300 hover:scale-105">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="drop-shadow-[0_0_6px_rgba(59,130,246,0.8)]">
+                        {/* 1. Home */}
+                        <Link to="/" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 ${location.pathname === '/'
+                                ? 'text-blue-400 bg-blue-600/20 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.25)]'
+                                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                            }`}>
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={location.pathname === '/' ? 'drop-shadow-[0_0_6px_rgba(59,130,246,0.8)]' : ''}>
                                 <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
                                 <polyline points="9 22 9 12 15 12 15 22" />
                             </svg>
-                            <span className="text-[10px] mt-1 font-semibold tracking-wide">{t('home') || 'Home'}</span>
+                            <span className={`text-[10px] mt-1 ${location.pathname === '/' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('home') || 'Home'}</span>
                         </Link>
 
-                        {/* Search */}
-                        <Link to="/search" className="flex flex-col items-center justify-center py-2 px-2 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 transition-all duration-300 hover:scale-105 group">
-                            <Search size={22} className="group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all" />
-                            <span className="text-[10px] mt-1 font-medium">{t('search') || 'Search'}</span>
+                        {/* 2. Search */}
+                        <Link to="/search" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 group ${location.pathname === '/search'
+                                ? 'text-blue-400 bg-blue-600/20 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.25)]'
+                                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                            }`}>
+                            <Search size={22} className={location.pathname === '/search' ? 'drop-shadow-[0_0_6px_rgba(59,130,246,0.8)]' : 'group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all'} />
+                            <span className={`text-[10px] mt-1 ${location.pathname === '/search' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('search') || 'Search'}</span>
                         </Link>
 
-                        {/* Add */}
-                        <Link to="/notes" className="flex flex-col items-center justify-center py-2 px-2 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 transition-all duration-300 hover:scale-105 group">
-                            <Plus size={22} className="group-hover:drop-shadow-[0_0_8px_rgba(16,185,129,0.5)] transition-all" />
-                            <span className="text-[10px] mt-1 font-medium">{t('add') || 'Add'}</span>
+                        {/* 3. Medical */}
+                        <Link to="/medical" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 group ${location.pathname === '/medical'
+                                ? 'text-red-400 bg-red-600/20 border border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.25)]'
+                                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                            }`}>
+                            <Activity size={22} className={location.pathname === '/medical' ? 'drop-shadow-[0_0_6px_rgba(239,68,68,0.8)]' : 'group-hover:drop-shadow-[0_0_6px_rgba(239,68,68,0.8)] transition-all'} />
+                            <span className={`text-[10px] mt-1 ${location.pathname === '/medical' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('medical') || 'Բժշկական'}</span>
                         </Link>
 
-                        {/* Profile */}
-                        <Link to="/auth" className="flex flex-col items-center justify-center py-2 px-2 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 transition-all duration-300 hover:scale-105 group">
-                            <User size={22} className="group-hover:drop-shadow-[0_0_8px_rgba(59,130,246,0.5)] transition-all" />
-                            <span className="text-[10px] mt-1 font-medium">{t('profile') || 'Profile'}</span>
+                        {/* 4. Car (Մեքենա) */}
+                        <Link to="/car-docs" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 group ${location.pathname === '/car-docs'
+                                ? 'text-blue-400 bg-blue-600/20 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.25)]'
+                                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                            }`}>
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={location.pathname === '/car-docs' ? 'drop-shadow-[0_0_6px_rgba(59,130,246,0.8)]' : 'group-hover:drop-shadow-[0_0_8px_rgba(59,130,246,0.5)] transition-all'}>
+                                <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L18.7 10c-.4-.7-1.1-1.2-2-1.2h-9.4c-.9 0-1.6.5-2 1.2L3.5 11.1C2.7 11.3 2 12.1 2 13v3c0 .6.4 1 1 1h2" />
+                                <circle cx="7" cy="17" r="2" />
+                                <circle cx="17" cy="17" r="2" />
+                                <path d="M5 11l1.5-4.5C6.9 5.8 7.7 5.3 8.5 5.3h7c.8 0 1.6.5 2 1.2L19 11" />
+                            </svg>
+                            <span className={`text-[10px] mt-1 ${location.pathname === '/car-docs' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('car') || 'Մեքենա'}</span>
                         </Link>
 
                     </nav>

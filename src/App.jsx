@@ -10,8 +10,7 @@ import SettingsPage from './pages/SettingsPage';
 import AuthPage from './pages/AuthPage';
 
 import Navbar from './components/Navbar';
-import WorldClockWidget from './components/WorldClockWidget';
-import CurrencyWidget from './components/CurrencyWidget';
+import WidgetsDock from './components/WidgetsDock'; // <-- Նոր միավորված վահանակը (Dock)
 
 function App() {
   return (
@@ -19,9 +18,8 @@ function App() {
       <Router>
         <div className="min-h-screen bg-[#0b0f19] text-white transition-colors duration-300 relative overflow-x-hidden">
 
-          {/* Ձախ անկյունում ֆիքսված իկոնաները */}
-          <WorldClockWidget />
-          <CurrencyWidget />
+          {/* Միավորված ձախ կողային վահանակ՝ Ժամացույցի և Փոխարժեքի իկոնաներով */}
+          <WidgetsDock />
 
           {/* Միասնական Նավբար բոլոր էջերի համար */}
           <Navbar />

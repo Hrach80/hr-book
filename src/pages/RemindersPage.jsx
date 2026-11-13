@@ -10,7 +10,7 @@ export default function RemindersPage() {
     const [reminders, setReminders] = useState([]);
     const [title, setTitle] = useState('');
     const [eventDate, setEventDate] = useState('');
-    const [alertOffset, setAlertOffset] = useState('1'); // օրեր առաջ (դեֆոլտ՝ 1 օր)
+    const [alertOffset, setAlertOffset] = useState('1');
 
     const [showForm, setShowForm] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -21,7 +21,6 @@ export default function RemindersPage() {
         fetchReminders();
     }, []);
 
-    // Ձայնային ազդանշան (Web Audio API)
     const playAlertSound = () => {
         try {
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -29,8 +28,8 @@ export default function RemindersPage() {
             const gainNode = audioCtx.createGain();
 
             oscillator.type = 'sine';
-            oscillator.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5 նոտա
-            oscillator.frequency.setValueAtTime(880, audioCtx.currentTime + 0.15); // A5 նոտա
+            oscillator.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+            oscillator.frequency.setValueAtTime(880, audioCtx.currentTime + 0.15);
 
             gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
@@ -148,25 +147,38 @@ export default function RemindersPage() {
     const getStatusStyle = (eventDateStr) => {
         const now = new Date();
         const eventDate = new Date(eventDateStr);
-        const diffDays = Math.ceil((eventDate - now) / (1000 * 60 * 60 * 24));
+
+        const nowDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const eventDateOnly = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
+
+        const diffTime = eventDateOnly - nowDateOnly;
+        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
         if (diffDays < 0) {
-            return { text: t('expired') || 'Ժամկետն անցել է', color: 'text-red-400 bg-red-500/10 border-red-500/30' };
+            return { text: t('expired') || 'Ժամկետն անցել է', color: 'text-red-400 bg-red-500/15 border-red-500/40' };
         } else if (diffDays === 0) {
-            return { text: t('today') || 'Այսօր է!', color: 'text-amber-400 bg-amber-500/10 border-amber-500/30 animate-pulse' };
+            return { text: t('today') || 'Այսօր է!', color: 'text-amber-400 bg-amber-500/15 border-amber-500/40 animate-pulse' };
         } else {
-            return { text: (t('leftDays') || 'Մնաց {days} օր').replace('{days}', diffDays), color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' };
+            return { text: (t('leftDays') || 'Մնաց {days} օր').replace('{days}', diffDays), color: 'text-emerald-400 bg-emerald-500/15 border-emerald-500/40' };
         }
     };
 
+    const upcomingCount = reminders.filter(item => {
+        const now = new Date();
+        const eventDate = new Date(item.event_date);
+        const nowDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const eventDateOnly = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
+        return eventDateOnly >= nowDateOnly;
+    }).length;
+
     return (
-        <div className="font-sans pb-40 w-full max-w-md mx-auto px-4 pt-4 text-white relative box-border overflow-x-hidden flex flex-col items-center">
+        <div className="font-sans pb-44 w-full max-w-lg mx-auto px-5 pt-6 text-white relative box-border overflow-x-hidden flex flex-col items-center">
 
             {/* Toast ծանուցում */}
             {toast.show && (
                 <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 animate-bounce transition-all duration-300">
-                    <div className="px-5 py-3 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl border bg-emerald-950/90 border-emerald-500/40 text-emerald-200 flex items-center gap-3 text-sm font-semibold">
-                        <Sparkles size={18} className="text-blue-400 flex-shrink-0" />
+                    <div className="px-5 py-3 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl border bg-emerald-950/90 border-emerald-500/40 text-emerald-200 flex items-center gap-3 text-base font-semibold">
+                        <Sparkles size={20} className="text-blue-400 flex-shrink-0" />
                         <span>{toast.message}</span>
                     </div>
                 </div>
@@ -174,14 +186,14 @@ export default function RemindersPage() {
 
             {/* Ակտիվ հիշեցումների ծանուցում */}
             {activeAlerts.length > 0 && (
-                <div className="w-full mb-5 p-4 rounded-3xl bg-amber-950/40 border border-amber-500/40 backdrop-blur-xl shadow-[0_10px_30px_rgba(245,158,11,0.15)]">
-                    <div className="flex items-center gap-2 text-amber-400 font-bold text-xs uppercase tracking-wider mb-2">
-                        <Bell size={16} className="animate-bounce" />
+                <div className="w-full mb-6 p-5 rounded-3xl bg-amber-950/40 border border-amber-500/40 backdrop-blur-xl shadow-[0_10px_30px_rgba(245,158,11,0.15)]">
+                    <div className="flex items-center gap-2 text-amber-400 font-bold text-sm uppercase tracking-wider mb-2.5">
+                        <Bell size={18} className="animate-bounce" />
                         <span>{t('attentionDueEvents') || 'Ուշադրություն՝ Մոտեցող իրադարձություններ'}</span>
                     </div>
-                    <div className="space-y-1">
+                    <div className="space-y-1.5">
                         {activeAlerts.map(a => (
-                            <div key={a.id} className="text-xs text-gray-200 flex justify-between items-center">
+                            <div key={a.id} className="text-sm text-gray-200 flex justify-between items-center">
                                 <span className="font-semibold">• {a.title}</span>
                                 <span className="text-amber-300 font-mono">{new Date(a.event_date).toLocaleDateString()}</span>
                             </div>
@@ -190,33 +202,34 @@ export default function RemindersPage() {
                 </div>
             )}
 
-            {/* Վերնագիր */}
-            <div className="w-full flex items-center justify-between mb-5 px-1 box-border">
-                <Link to="/" className="p-3 rounded-2xl bg-white/5 border border-white/10 text-gray-300 hover:text-white transition shadow-md flex items-center justify-center">
-                    <ArrowLeft size={20} />
+            {/* Վերնագիր (մաքրված և հարմարեցված) */}
+            <div className="w-full flex items-center justify-between mb-6 px-1 box-border">
+                <Link to="/" className="p-3.5 rounded-2xl bg-white/5 border border-white/10 text-gray-300 hover:text-white transition shadow-md flex items-center justify-center">
+                    <ArrowLeft size={22} />
                 </Link>
-                <h1 className="text-base font-bold text-white tracking-wider uppercase text-center flex items-center gap-2">
-                    <Bell size={20} className="text-amber-400" />
+
+                <h1 className="text-lg font-bold text-white tracking-wider uppercase text-center flex items-center gap-2.5">
+                    <Bell size={22} className="text-amber-400" />
                     <span>{t('remindersTitle') || 'Հիշեցումներ'}</span>
                 </h1>
 
                 <button
                     onClick={() => { setShowForm(!showForm); setTitle(''); setEventDate(''); }}
-                    className="p-3 rounded-2xl border transition shadow-lg flex items-center justify-center cursor-pointer bg-blue-600/20 border-blue-500/40 text-blue-300 shadow-[0_0_15px_rgba(59,130,246,0.3)]"
+                    className="p-3.5 rounded-2xl border transition shadow-lg flex items-center justify-center cursor-pointer bg-blue-600/20 border-blue-500/40 text-blue-300 shadow-[0_0_15px_rgba(59,130,246,0.3)]"
                 >
-                    {showForm ? <X size={20} /> : <Plus size={20} />}
+                    {showForm ? <X size={22} /> : <Plus size={22} />}
                 </button>
             </div>
 
             {/* Ավելացման Ֆորմա */}
             {showForm && (
-                <form onSubmit={addReminder} className="w-full box-border glass-card p-5 rounded-3xl border border-blue-500/40 bg-[#0b0f19]/95 backdrop-blur-2xl shadow-[0_15px_35px_rgba(0,0,0,0.8)] mb-5">
-                    <h3 className="text-xs font-bold text-blue-400 uppercase tracking-wider mb-4 px-1 flex items-center gap-2">
-                        <Clock size={16} />
+                <form onSubmit={addReminder} className="w-full box-border glass-card p-6 rounded-3xl border border-blue-500/40 bg-[#0b0f19]/95 backdrop-blur-2xl shadow-[0_15px_35px_rgba(0,0,0,0.8)] mb-6">
+                    <h3 className="text-sm font-bold text-blue-400 uppercase tracking-wider mb-4 px-1 flex items-center gap-2">
+                        <Clock size={18} />
                         <span>{t('newReminder') || 'Նոր կարևոր հիշեցում'}</span>
                     </h3>
 
-                    <div className="w-full space-y-4 box-border">
+                    <div className="w-full space-y-4.5 box-border">
                         <div>
                             <label className="text-xs text-gray-400 mb-1.5 block">{t('reminderName') || 'Իրադարձության անվանում'}</label>
                             <input
@@ -224,18 +237,18 @@ export default function RemindersPage() {
                                 placeholder={t('reminderNamePlaceholder') || 'օր. Մամայի ծնունդ, Ապահովագրություն...'}
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
-                                className="w-full box-border bg-[#070a14]/90 border border-white/15 rounded-2xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]"
+                                className="w-full box-border bg-[#070a14]/90 border border-white/15 rounded-2xl px-4 py-3.5 text-base text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]"
                                 required
                             />
                         </div>
 
-                        <div>
+                        <div className="w-full box-border">
                             <label className="text-xs text-gray-400 mb-1.5 block">{t('reminderDate') || 'Ամսաթիվ և ժամ'}</label>
                             <input
                                 type="datetime-local"
                                 value={eventDate}
                                 onChange={(e) => setEventDate(e.target.value)}
-                                className="w-full box-border bg-[#070a14]/90 border border-white/15 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]"
+                                className="w-full box-border max-w-full bg-[#070a14]/90 border border-white/15 rounded-2xl px-4 py-3.5 text-base text-white focus:outline-none focus:border-blue-500/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] appearance-none"
                                 required
                             />
                         </div>
@@ -245,7 +258,7 @@ export default function RemindersPage() {
                             <select
                                 value={alertOffset}
                                 onChange={(e) => setAlertOffset(e.target.value)}
-                                className="w-full box-border bg-[#070a14]/90 border border-white/15 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]"
+                                className="w-full box-border bg-[#070a14]/90 border border-white/15 rounded-2xl px-4 py-3.5 text-base text-white focus:outline-none focus:border-blue-500/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]"
                             >
                                 <option value="0">{t('offsetZero') || 'Հենց իրադարձության օրը'}</option>
                                 <option value="1">{t('offsetOne') || '1 օր առաջ'}</option>
@@ -255,17 +268,17 @@ export default function RemindersPage() {
                         </div>
                     </div>
 
-                    <div className="w-full flex items-center justify-end gap-3.5 mt-5 px-1 box-border">
+                    <div className="w-full flex items-center justify-end gap-4 mt-6 px-1 box-border">
                         <button
                             type="button"
                             onClick={() => { setShowForm(false); setTitle(''); setEventDate(''); }}
-                            className="px-5 py-2.5 rounded-xl text-xs font-semibold text-gray-300 hover:text-white bg-white/5 border border-white/10 transition cursor-pointer"
+                            className="px-6 py-3 rounded-xl text-sm font-semibold text-gray-300 hover:text-white bg-white/5 border border-white/10 transition cursor-pointer"
                         >
                             {t('cancel') || 'Չեղարկել'}
                         </button>
                         <button
                             type="submit"
-                            className="px-6 py-2.5 rounded-xl text-xs font-semibold text-white bg-blue-600/50 border border-blue-500/60 hover:bg-blue-600/70 shadow-[0_0_12px_rgba(59,130,246,0.4)] transition cursor-pointer"
+                            className="px-7 py-3 rounded-xl text-sm font-semibold text-white bg-blue-600/50 border border-blue-500/60 hover:bg-blue-600/70 shadow-[0_0_12px_rgba(59,130,246,0.4)] transition cursor-pointer"
                         >
                             {t('save') || 'Պահպանել'}
                         </button>
@@ -274,33 +287,33 @@ export default function RemindersPage() {
             )}
 
             {/* Հիշեցումների Ցանկ */}
-            <div className="w-full space-y-3.5 box-border px-1">
+            <div className="w-full space-y-4 box-border px-1">
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-20">
-                        <div className="w-14 h-14 rounded-3xl bg-[#0b0f19] border border-white/10 shadow-[0_15px_35px_rgba(0,0,0,0.9)] flex items-center justify-center animate-[pulse_2s_infinite]">
-                            <Bell size={26} className="text-amber-400 animate-pulse" />
+                        <div className="w-16 h-16 rounded-3xl bg-[#0b0f19] border border-white/10 shadow-[0_15px_35px_rgba(0,0,0,0.9)] flex items-center justify-center animate-[pulse_2s_infinite]">
+                            <Bell size={30} className="text-amber-400 animate-pulse" />
                         </div>
                     </div>
                 ) : reminders.length === 0 ? (
-                    <div className="text-center py-12 text-gray-400 text-sm font-medium bg-white/5 rounded-2xl border border-white/5">
+                    <div className="text-center py-14 text-gray-400 text-base font-medium bg-white/5 rounded-2xl border border-white/5">
                         {t('noReminders') || 'Հիշեցումներ դեռևս չկան'}
                     </div>
                 ) : (
                     reminders.map(item => {
                         const status = getStatusStyle(item.event_date);
                         return (
-                            <div key={item.id} className="w-full box-border glass-card px-4 py-3.5 rounded-2xl border border-white/10 bg-gradient-to-br from-[#0b0f19]/90 to-[#070a12]/95 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.6)] flex items-center justify-between gap-3 group transition hover:border-amber-500/50">
-                                <div className="flex items-center gap-3 min-w-0 flex-1">
-                                    <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 flex-shrink-0">
-                                        <Calendar size={18} />
+                            <div key={item.id} className="w-full box-border glass-card px-5 py-4.5 rounded-3xl border border-white/10 bg-gradient-to-br from-[#0b0f19]/90 to-[#070a12]/95 backdrop-blur-xl shadow-[0_12px_35px_rgba(0,0,0,0.6)] flex items-center justify-between gap-4 group transition hover:border-amber-500/50">
+                                <div className="flex items-center gap-4 min-w-0 flex-1">
+                                    <div className="w-11 h-11 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 flex-shrink-0">
+                                        <Calendar size={20} />
                                     </div>
                                     <div className="min-w-0 flex-1">
-                                        <h4 className="text-sm text-gray-100 font-semibold truncate">{item.title}</h4>
-                                        <div className="flex items-center gap-2 mt-1">
-                                            <span className="text-[11px] text-gray-400 font-mono">
+                                        <h4 className="text-base text-gray-100 font-semibold truncate">{item.title}</h4>
+                                        <div className="flex items-center gap-3 mt-1.5 flex-wrap">
+                                            <span className="text-xs text-gray-400 font-mono">
                                                 {new Date(item.event_date).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
                                             </span>
-                                            <span className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${status.color}`}>
+                                            <span className={`text-xs px-2.5 py-0.5 rounded-full border font-medium ${status.color}`}>
                                                 {status.text}
                                             </span>
                                         </div>
@@ -308,10 +321,10 @@ export default function RemindersPage() {
                                 </div>
                                 <button
                                     onClick={(e) => deleteReminder(item.id, e)}
-                                    className="text-gray-400 hover:text-red-400 p-2 rounded-xl hover:bg-red-500/15 transition cursor-pointer flex items-center justify-center flex-shrink-0"
+                                    className="text-gray-400 hover:text-red-400 p-2.5 rounded-xl hover:bg-red-500/15 transition cursor-pointer flex items-center justify-center flex-shrink-0"
                                     title={t('delete') || 'Ջնջել'}
                                 >
-                                    <Trash2 size={18} />
+                                    <Trash2 size={20} />
                                 </button>
                             </div>
                         );
@@ -345,12 +358,19 @@ export default function RemindersPage() {
                             <span className={`text-[10px] mt-1 ${location.pathname === '/search' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('search') || 'Search'}</span>
                         </Link>
 
-                        {/* 3. Reminders (Հիշեցումներ) */}
-                        <Link to="/reminders" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 group ${location.pathname === '/reminders'
+                        {/* 3. Reminders (Հիշեցումներ) + Կարմիր բեջ ֆուտերում */}
+                        <Link to="/reminders" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 group relative ${location.pathname === '/reminders'
                             ? 'text-amber-400 bg-amber-600/20 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.25)]'
                             : 'text-gray-400 hover:text-white hover:bg-white/5'
                             }`}>
-                            <Bell size={22} className={location.pathname === '/reminders' ? 'drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]' : 'group-hover:drop-shadow-[0_0_8px_rgba(245,158,11,0.5)] transition-all'} />
+                            <div className="relative">
+                                <Bell size={22} className={location.pathname === '/reminders' ? 'drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]' : 'group-hover:drop-shadow-[0_0_8px_rgba(245,158,11,0.5)] transition-all'} />
+                                {upcomingCount > 0 && (
+                                    <span className="absolute -top-1.5 -right-2 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full border border-[#070a14] shadow">
+                                        {upcomingCount}
+                                    </span>
+                                )}
+                            </div>
                             <span className={`text-[10px] mt-1 ${location.pathname === '/reminders' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('remindersTab') || 'Հիշեցումներ'}</span>
                         </Link>
 

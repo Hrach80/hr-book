@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { LanguageProvider } from './context/LanguageContext';
+import { supabase } from './services/supabaseClient';
+import { subscribeUserToPush } from './utils/pushService'; // <-- Ներմուծում ենք Push ծառայությունը
 import Dashboard from './pages/Dashboard';
 import NotesPage from './pages/NotesPage';
 import PasswordsPage from './pages/PasswordsPage';
 import MedicalPage from './pages/MedicalPage';
-import DocsPage from './pages/DocsPage';         // <-- Ընդհանուր փաստաթղթերի էջը
+import DocsPage from './pages/DocsPage';           // <-- Ընդհանուր փաստաթղթերի էջը
 import CarDocsPage from './pages/CarDocsPage';   // <-- Մեքենայի փաստաթղթերի էջը
 import SettingsPage from './pages/SettingsPage';
 import AuthPage from './pages/AuthPage';
@@ -13,7 +15,95 @@ import Navbar from './components/Navbar';
 import WidgetsDock from './components/WidgetsDock';
 import Search from './pages/Search';
 import RemindersPage from './pages/RemindersPage';
+
 function App() {
+
+  // Ձայնային ազդանշանի ֆունկցիա (Web Audio API)
+  const playAlertSound = () => {
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5 նոտա
+
+      gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.0);
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + 1.0);
+    } catch (e) {
+      console.error('Audio play error:', e);
+    }
+  };
+
+  // Հիշեցումների ֆոնային/ժամային ստուգման տրամաբանություն
+  useEffect(() => {
+    // Գրանցում ենք push բանալիները բրաուզերում, եթե թույլտվությունը կա
+    if (Notification.permission === 'granted') {
+      subscribeUserToPush();
+    }
+
+    const checkRemindersAndNotify = async () => {
+      try {
+        const { data, error } = await supabase.from('reminders').select('*');
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          const now = new Date();
+          const lastAlertDate = sessionStorage.getItem('last_reminder_alert');
+          const todayStr = now.toDateString();
+
+          // Փնտրում ենք իրադարձություն, որին մնացել է 0-ից 24 ժամ (1 օր)
+          const urgentEvent = data.find(item => {
+            const eventDate = new Date(item.event_date);
+            const diffTime = eventDate - now;
+            const diffHours = diffTime / (1000 * 60 * 60);
+
+            // Եթե մնացել է 0-ից 24 ժամ և օրը դեռ չի անցել
+            return diffHours >= 0 && diffHours <= 24;
+          });
+
+          if (urgentEvent && lastAlertDate !== todayStr) {
+            // 1. Միացնում ենք ձայնային ազդանշանը (երբ հավելվածը բաց է)
+            playAlertSound();
+
+            // 2. Ուղարկում ենք բրաուզերային/համակարգային ծանուցում
+            if (Notification.permission === 'granted') {
+              navigator.serviceWorker.ready.then(registration => {
+                registration.showNotification('⚠️ Մոտեցող իրադարձություն', {
+                  body: `${urgentEvent.title || 'Հիշեցում'}-ին մնացել է մոտ 1 օր:`,
+                  icon: '/favicon.ico',
+                  badge: '/favicon.ico',
+                  vibrate: [300, 100, 300]
+                });
+              });
+            }
+
+            // Հիշում ենք, որ այսօր արդեն ազդանշանը տրվել է
+            sessionStorage.setItem('last_reminder_alert', todayStr);
+          }
+        }
+      } catch (e) {
+        console.error('Error checking reminders for notification:', e);
+      }
+    };
+
+    // Ստուգել միանգամից բացելիս
+    checkRemindersAndNotify();
+
+    // Ստուգել ժամը մեկ անգամ (3600000 մվ = 1 ժամ)
+    const interval = setInterval(() => {
+      checkRemindersAndNotify();
+    }, 60 * 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <LanguageProvider>
       <Router>
@@ -32,11 +122,11 @@ function App() {
               <Route path="/notes" element={<NotesPage />} />
               <Route path="/passwords" element={<PasswordsPage />} />
               <Route path="/medical" element={<MedicalPage />} />
-              <Route path="/docs" element={<DocsPage />} />             {/* Ընդհանուր փաստաթղթեր */}
+              <Route path="/docs" element={<DocsPage />} />            {/* Ընդհանուր փաստաթղթեր */}
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/search" element={<Search />} />
-              <Route path="/car-docs" element={<CarDocsPage />} />     {/* Մեքենայի փաստաթղթեր */}
+              <Route path="/car-docs" element={<CarDocsPage />} />    {/* Մեքենայի փաստաթղթեր */}
               <Route path="/reminders" element={<RemindersPage />} />
             </Routes>
           </main>

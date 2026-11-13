@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search as SearchIcon, Pencil, KeyRound, Plus, Folder, ArrowLeft, User } from 'lucide-react';
+import { Search as SearchIcon, Pencil, KeyRound, Plus, Folder, ArrowLeft, User, Bell } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function Search() {
@@ -86,8 +86,8 @@ export default function Search() {
 
                         {/* 1. Home */}
                         <Link to="/" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 ${location.pathname === '/'
-                                ? 'text-blue-400 bg-blue-600/20 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.25)]'
-                                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                            ? 'text-blue-400 bg-blue-600/20 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.25)]'
+                            : 'text-gray-400 hover:text-white hover:bg-white/5'
                             }`}>
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
@@ -98,26 +98,26 @@ export default function Search() {
 
                         {/* 2. Search */}
                         <Link to="/search" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 ${location.pathname === '/search'
-                                ? 'text-blue-400 bg-blue-600/20 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.25)]'
-                                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                            ? 'text-blue-400 bg-blue-600/20 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.25)]'
+                            : 'text-gray-400 hover:text-white hover:bg-white/5'
                             }`}>
                             <SearchIcon size={22} className={location.pathname === '/search' ? 'drop-shadow-[0_0_6px_rgba(59,130,246,0.8)]' : 'transition-all'} />
                             <span className={`text-[10px] mt-1 ${location.pathname === '/search' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('search') || 'Search'}</span>
                         </Link>
 
-                        {/* 3. Add / Notes */}
-                        <Link to="/notes" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 group ${location.pathname === '/notes'
-                                ? 'text-emerald-400 bg-emerald-600/20 border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.25)]'
-                                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                        {/* 3. Reminders (Հիշեցումներ) - Որոնումից հետո */}
+                        <Link to="/reminders" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 group ${location.pathname === '/reminders'
+                            ? 'text-amber-400 bg-amber-600/20 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.25)]'
+                            : 'text-gray-400 hover:text-white hover:bg-white/5'
                             }`}>
-                            <Plus size={22} className="group-hover:drop-shadow-[0_0_8px_rgba(16,185,129,0.5)] transition-all" />
-                            <span className={`text-[10px] mt-1 ${location.pathname === '/notes' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('add') || 'Add'}</span>
+                            <Bell size={22} className={location.pathname === '/reminders' ? 'drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]' : 'group-hover:drop-shadow-[0_0_8px_rgba(245,158,11,0.5)] transition-all'} />
+                            <span className={`text-[10px] mt-1 ${location.pathname === '/reminders' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('remindersTab') || 'Հիշեցումներ'}</span>
                         </Link>
 
                         {/* 4. Car (Մեքենա) */}
                         <Link to="/car-docs" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 group ${location.pathname === '/car-docs'
-                                ? 'text-blue-400 bg-blue-600/20 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.25)]'
-                                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                            ? 'text-blue-400 bg-blue-600/20 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.25)]'
+                            : 'text-gray-400 hover:text-white hover:bg-white/5'
                             }`}>
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={location.pathname === '/car-docs' ? 'drop-shadow-[0_0_6px_rgba(59,130,246,0.8)]' : 'group-hover:drop-shadow-[0_0_8px_rgba(59,130,246,0.5)] transition-all'}>
                                 <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L18.7 10c-.4-.7-1.1-1.2-2-1.2h-9.4c-.9 0-1.6.5-2 1.2L3.5 11.1C2.7 11.3 2 12.1 2 13v3c0 .6.4 1 1 1h2" />

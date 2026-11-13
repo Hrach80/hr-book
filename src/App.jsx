@@ -12,7 +12,7 @@ import AuthPage from './pages/AuthPage';
 import Navbar from './components/Navbar';
 import WidgetsDock from './components/WidgetsDock';
 import Search from './pages/Search';
-
+import RemindersPage from './pages/RemindersPage';
 function App() {
   return (
     <LanguageProvider>
@@ -37,6 +37,7 @@ function App() {
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/search" element={<Search />} />
               <Route path="/car-docs" element={<CarDocsPage />} />     {/* Մեքենայի փաստաթղթեր */}
+              <Route path="/reminders" element={<RemindersPage />} />
             </Routes>
           </main>
 

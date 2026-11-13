@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Plus, Activity, Trash2, Edit3, X, Calendar, Paperclip, ExternalLink, Search, User, Sparkles, Upload, CheckCircle2, Share2, AlertCircle } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { ArrowLeft, Plus, Activity, Trash2, Edit3, X, Calendar, Paperclip, ExternalLink, Search, User, Sparkles, Upload, CheckCircle2, Share2, AlertCircle, Bell } from 'lucide-react';
 import { supabase } from '../services/supabaseClient';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function MedicalPage() {
     const { t } = useLanguage();
-    const [records, setRecords] = useState([]);
+    const location = useLocation();
 
+    const [records, setRecords] = useState([]);
     const [title, setTitle] = useState('');
     const [diagnosis, setDiagnosis] = useState('');
     const [treatment, setTreatment] = useState('');
@@ -15,6 +16,9 @@ export default function MedicalPage() {
     const [treatmentDate, setTreatmentDate] = useState(new Date().toISOString().split('T')[0]);
     const [fileUrl, setFileUrl] = useState('');
     const [uploading, setUploading] = useState(false);
+
+    // Հիշեցումների չանցած քանակը ֆուտերի բեջի համար
+    const [upcomingCount, setUpcomingCount] = useState(0);
 
     const [showForm, setShowForm] = useState(false);
     const [editingId, setEditingId] = useState(null);
@@ -25,7 +29,31 @@ export default function MedicalPage() {
 
     useEffect(() => {
         fetchMedicalRecords();
+        fetchRemindersCount();
     }, []);
+
+    // Բազայից կարդում ենք մոտեցող հիշեցումների քանակը ֆուտերի համար
+    const fetchRemindersCount = async () => {
+        try {
+            const { data, error } = await supabase.from('reminders').select('event_date');
+            if (error) throw error;
+
+            if (data) {
+                const now = new Date();
+                const nowDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+                const count = data.filter(item => {
+                    const eventDate = new Date(item.event_date);
+                    const eventDateOnly = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
+                    return eventDateOnly >= nowDateOnly;
+                }).length;
+
+                setUpcomingCount(count);
+            }
+        } catch (e) {
+            console.error('Error fetching reminders count:', e);
+        }
+    };
 
     const showToast = (message, type = 'success') => {
         setToast({ show: true, message, type });
@@ -489,28 +517,58 @@ export default function MedicalPage() {
             <footer className="fixed bottom-2.5 left-0 right-0 mx-auto max-w-md px-4 z-40 box-border">
                 <div className="border border-white/10 rounded-3xl p-2.5 shadow-[0_15px_35px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.15)] bg-[#070a14]/90 backdrop-blur-2xl box-border">
                     <nav className="grid grid-cols-4 gap-2 text-center">
-                        <Link to="/" className="flex flex-col items-center justify-center py-2 px-2 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 transition-all duration-300 hover:scale-105">
+
+                        {/* 1. Home */}
+                        <Link to="/" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 ${location.pathname === '/'
+                            ? 'text-blue-400 bg-blue-600/20 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.25)]'
+                            : 'text-gray-400 hover:text-white hover:bg-white/5'
+                            }`}>
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
                                 <polyline points="9 22 9 12 15 12 15 22" />
                             </svg>
-                            <span className="text-[10px] mt-1 font-medium">{t('home') || 'Home'}</span>
+                            <span className={`text-[10px] mt-1 ${location.pathname === '/' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('home') || 'Home'}</span>
                         </Link>
 
-                        <Link to="/search" className="flex flex-col items-center justify-center py-2 px-2 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 transition-all duration-300 hover:scale-105 group">
-                            <Search size={22} className="group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all" />
-                            <span className="text-[10px] mt-1 font-medium">{t('search') || 'Search'}</span>
+                        {/* 2. Search */}
+                        <Link to="/search" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 group ${location.pathname === '/search'
+                            ? 'text-blue-400 bg-blue-600/20 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.25)]'
+                            : 'text-gray-400 hover:text-white hover:bg-white/5'
+                            }`}>
+                            <Search size={22} className={location.pathname === '/search' ? 'drop-shadow-[0_0_6px_rgba(59,130,246,0.8)]' : 'group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all'} />
+                            <span className={`text-[10px] mt-1 ${location.pathname === '/search' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('search') || 'Search'}</span>
                         </Link>
 
-                        <Link to="/medical" className="flex flex-col items-center justify-center py-2 px-2 rounded-2xl text-red-400 bg-red-600/20 border border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.25)] transition-all duration-300 hover:scale-105">
-                            <Activity size={22} className="drop-shadow-[0_0_6px_rgba(239,68,68,0.8)]" />
-                            <span className="text-[10px] mt-1 font-semibold tracking-wide">Բժշկական</span>
+                        {/* 3. Reminders (Հիշեցումներ) + Կարմիր բեջ */}
+                        <Link to="/reminders" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 group relative ${location.pathname === '/reminders'
+                            ? 'text-amber-400 bg-amber-600/20 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.25)]'
+                            : 'text-gray-400 hover:text-white hover:bg-white/5'
+                            }`}>
+                            <div className="relative">
+                                <Bell size={22} className={location.pathname === '/reminders' ? 'drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]' : 'group-hover:drop-shadow-[0_0_8px_rgba(245,158,11,0.5)] transition-all'} />
+                                {upcomingCount > 0 && (
+                                    <span className="absolute -top-1.5 -right-2 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full border border-[#070a14] shadow">
+                                        {upcomingCount}
+                                    </span>
+                                )}
+                            </div>
+                            <span className={`text-[10px] mt-1 ${location.pathname === '/reminders' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('remindersTab') || 'Հիշեցումներ'}</span>
                         </Link>
 
-                        <Link to="/auth" className="flex flex-col items-center justify-center py-2 px-2 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 transition-all duration-300 hover:scale-105 group">
-                            <User size={22} className="group-hover:drop-shadow-[0_0_8px_rgba(59,130,246,0.5)] transition-all" />
-                            <span className="text-[10px] mt-1 font-medium">{t('profile') || 'Profile'}</span>
+                        {/* 4. Car / Profile կամ Մեքենա (ըստ ձեր հիմնական սխեմայի) */}
+                        <Link to="/car-docs" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 group ${location.pathname === '/car-docs'
+                            ? 'text-blue-400 bg-blue-600/20 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.25)]'
+                            : 'text-gray-400 hover:text-white hover:bg-white/5'
+                            }`}>
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={location.pathname === '/car-docs' ? 'drop-shadow-[0_0_6px_rgba(59,130,246,0.8)]' : 'group-hover:drop-shadow-[0_0_8px_rgba(59,130,246,0.5)] transition-all'}>
+                                <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9L18.7 10c-.4-.7-1.1-1.2-2-1.2h-9.4c-.9 0-1.6.5-2 1.2L3.5 11.1C2.7 11.3 2 12.1 2 13v3c0 .6.4 1 1 1h2" />
+                                <circle cx="7" cy="17" r="2" />
+                                <circle cx="17" cy="17" r="2" />
+                                <path d="M5 11l1.5-4.5C6.9 5.8 7.7 5.3 8.5 5.3h7c.8 0 1.6.5 2 1.2L19 11" />
+                            </svg>
+                            <span className={`text-[10px] mt-1 ${location.pathname === '/car-docs' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('car') || 'Մեքենա'}</span>
                         </Link>
+
                     </nav>
                 </div>
             </footer>

@@ -6,10 +6,15 @@ import { useLanguage } from '../context/LanguageContext';
 
 export default function CarDocsPage() {
     const { t } = useLanguage();
+    const location = useLocation();
+
     const [docs, setDocs] = useState([]);
     const [name, setName] = useState('');
     const [fileUrl, setFileUrl] = useState('');
     const [uploading, setUploading] = useState(false);
+
+    // Հիշեցումների չանցած քանակը ֆուտերի բեջի համար
+    const [upcomingCount, setUpcomingCount] = useState(0);
 
     // VIN կոդ և տեխնիկական տվյալներ (2024 Kia EV6 Light Long Range RWD)
     const [vinData, setVinData] = useState({
@@ -26,7 +31,31 @@ export default function CarDocsPage() {
 
     useEffect(() => {
         fetchCarDocuments();
+        fetchRemindersCount();
     }, []);
+
+    // Բազայից կարդում ենք մոտեցող հիշեցումների քանակը ֆուտերի համար
+    const fetchRemindersCount = async () => {
+        try {
+            const { data, error } = await supabase.from('reminders').select('event_date');
+            if (error) throw error;
+
+            if (data) {
+                const now = new Date();
+                const nowDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+                const count = data.filter(item => {
+                    const eventDate = new Date(item.event_date);
+                    const eventDateOnly = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
+                    return eventDateOnly >= nowDateOnly;
+                }).length;
+
+                setUpcomingCount(count);
+            }
+        } catch (e) {
+            console.error('Error fetching reminders count:', e);
+        }
+    };
 
     const showToast = (message, type = 'success') => {
         setToast({ show: true, message, type });
@@ -373,12 +402,19 @@ export default function CarDocsPage() {
                             <span className={`text-[10px] mt-1 ${location.pathname === '/search' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('search') || 'Search'}</span>
                         </Link>
 
-                        {/* 3. Reminders (Հիշեցումներ) */}
-                        <Link to="/reminders" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 group ${location.pathname === '/reminders'
+                        {/* 3. Reminders (Հիշեցումներ) + Կարմիր բեջ ֆուտերում */}
+                        <Link to="/reminders" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 group relative ${location.pathname === '/reminders'
                             ? 'text-amber-400 bg-amber-600/20 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.25)]'
                             : 'text-gray-400 hover:text-white hover:bg-white/5'
                             }`}>
-                            <Bell size={22} className={location.pathname === '/reminders' ? 'drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]' : 'group-hover:drop-shadow-[0_0_8px_rgba(245,158,11,0.5)] transition-all'} />
+                            <div className="relative">
+                                <Bell size={22} className={location.pathname === '/reminders' ? 'drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]' : 'group-hover:drop-shadow-[0_0_8px_rgba(245,158,11,0.5)] transition-all'} />
+                                {upcomingCount > 0 && (
+                                    <span className="absolute -top-1.5 -right-2 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full border border-[#070a14] shadow">
+                                        {upcomingCount}
+                                    </span>
+                                )}
+                            </div>
                             <span className={`text-[10px] mt-1 ${location.pathname === '/reminders' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('remindersTab') || 'Հիշեցումներ'}</span>
                         </Link>
 

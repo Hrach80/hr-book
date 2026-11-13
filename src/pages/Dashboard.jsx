@@ -1,20 +1,51 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { Pencil, KeyRound, Plus, Folder, User, Search, Database, HardDrive, RefreshCw, Activity, Car, FileText, Bell } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
-
+import { supabase } from '../services/supabaseClient'; // <--- Համոզվեք, որ այս import-ը կա
 
 export default function Dashboard() {
     const { t } = useLanguage();
+    const location = useLocation(); // <--- Համոզվեք, որ useLocation-ն էլ կա, որ ֆուտերի ակտիվ էջը ճիշտ որոշվի
 
     // Ռեսուրսների օգտագործման վիճակ (Supabase Free Tier մետրիկաներ)
     const [dbUsageMB, setDbUsageMB] = useState(45.2);
     const [storageUsageMB, setStorageUsageMB] = useState(128.5);
     const [isLoading, setIsLoading] = useState(false);
 
-    const dbLimitMB = 500;  // Supabase Free Tier Բազայի լիմիտը (500 ՄԲ)
-    const storageLimitMB = 1024; // Supabase Free Tier Պահոցի լիմիտը (1 ԳԲ)
+    // Հիշեցումների չանցած քանակը ֆուտերի բեջի համար
+    const [upcomingCount, setUpcomingCount] = useState(0);
+
+    const dbLimitMB = 500;
+    const storageLimitMB = 1024;
+
+    // Բազայից կարդում ենք մոտեցող հիշեցումների քանակը
+    useEffect(() => {
+        const fetchRemindersCount = async () => {
+            try {
+                const { data, error } = await supabase.from('reminders').select('event_date');
+                if (error) throw error;
+
+                if (data) {
+                    const now = new Date();
+                    const nowDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+                    const count = data.filter(item => {
+                        const eventDate = new Date(item.event_date);
+                        const eventDateOnly = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
+                        return eventDateOnly >= nowDateOnly;
+                    }).length;
+
+                    setUpcomingCount(count);
+                }
+            } catch (e) {
+                console.error('Error fetching reminders count:', e);
+            }
+        };
+
+        fetchRemindersCount();
+    }, []);
 
     // Վերլուծական գրաֆիկի տվյալներ
     const chartData = [
@@ -143,12 +174,19 @@ export default function Dashboard() {
                             <span className={`text-[10px] mt-1 ${location.pathname === '/search' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('search') || 'Search'}</span>
                         </Link>
 
-                        {/* 3. Reminders (Հիշեցումներ) - Որոնումից հետո */}
-                        <Link to="/reminders" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 group ${location.pathname === '/reminders'
+                        {/* 3. Reminders (Հիշեցումներ) + Կարմիր բեջ ֆուտերում */}
+                        <Link to="/reminders" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 group relative ${location.pathname === '/reminders'
                             ? 'text-amber-400 bg-amber-600/20 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.25)]'
                             : 'text-gray-400 hover:text-white hover:bg-white/5'
                             }`}>
-                            <Bell size={22} className={location.pathname === '/reminders' ? 'drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]' : 'group-hover:drop-shadow-[0_0_8px_rgba(245,158,11,0.5)] transition-all'} />
+                            <div className="relative">
+                                <Bell size={22} className={location.pathname === '/reminders' ? 'drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]' : 'group-hover:drop-shadow-[0_0_8px_rgba(245,158,11,0.5)] transition-all'} />
+                                {upcomingCount > 0 && (
+                                    <span className="absolute -top-1.5 -right-2 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full border border-[#070a14] shadow">
+                                        {upcomingCount}
+                                    </span>
+                                )}
+                            </div>
                             <span className={`text-[10px] mt-1 ${location.pathname === '/reminders' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('remindersTab') || 'Հիշեցումներ'}</span>
                         </Link>
 

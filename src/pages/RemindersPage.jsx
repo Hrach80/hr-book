@@ -174,6 +174,18 @@ export default function RemindersPage() {
     return (
         <div className="font-sans pb-44 w-full max-w-[calc(100vw-6px)] mx-auto px-[3px] pt-6 text-white relative box-border overflow-x-hidden flex flex-col items-center">
 
+            {/* Inline 3D պտույտի CSS անիմացիա նախազգուշացնող իկոնայի համար */}
+            <style>{`
+                @keyframes rotateYAxis {
+                    0% { transform: perspective(300px) rotateY(0deg); }
+                    100% { transform: perspective(300px) rotateY(360deg); }
+                }
+                .globe-spin {
+                    animation: rotateYAxis 4s linear infinite;
+                    transform-style: preserve-3d;
+                }
+            `}</style>
+
             {/* Toast ծանուցում */}
             {toast.show && (
                 <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 animate-bounce transition-all duration-300">
@@ -184,23 +196,26 @@ export default function RemindersPage() {
                 </div>
             )}
 
-            {/* Ֆանտաստիկ Sci-Fi ոճի ծանուցման վահանակ (Cyberpunk HUD style) */}
+            {/* Ֆանտաստիկ Sci-Fi ոճի ծանուցման վահանակ (Cyberpunk HUD style + Մեծ և առանցքի շուրջ 3D պտտվող ShieldAlert իկոնա) */}
             {activeAlerts.length > 0 && (
                 <div className="w-full mb-6 p-5 rounded-3xl bg-[#030712]/90 border border-cyan-500/50 backdrop-blur-2xl shadow-[0_0_25px_rgba(6,182,212,0.25),inset_0_0_15px_rgba(6,182,212,0.15)] relative overflow-hidden">
                     <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-[pulse_2s_infinite]"></div>
 
-                    <div className="flex items-center gap-2.5 text-cyan-400 font-bold text-sm uppercase tracking-widest mb-3">
-                        <ShieldAlert size={20} className="animate-spin text-cyan-400" />
+                    <div className="flex items-center gap-3 text-cyan-400 font-bold text-sm uppercase tracking-widest mb-3">
+                        <div className="p-1.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center">
+                            {/* Անընդհատ իր առանցքի շուրջ (երկրագնդի նման) պտտվող նախազգուշացնող իկոնա */}
+                            <ShieldAlert size={28} className="text-cyan-300 globe-spin" />
+                        </div>
                         <span className="drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]">{t('attentionDueEvents') || 'ՀԱՄԱԿԱՐԳԻ ԶԳՈՒՇԱՑՈՒՄ • Մոտեցող իրադարձություններ'}</span>
                     </div>
                     <div className="space-y-2">
                         {activeAlerts.map(a => (
-                            <div key={a.id} className="text-sm text-gray-200 flex justify-between items-center bg-cyan-950/30 border border-cyan-500/20 px-3.5 py-2 rounded-xl">
-                                <span className="font-semibold text-cyan-100 flex items-center gap-2">
-                                    <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                            <div key={a.id} className="text-sm text-gray-200 flex justify-between items-center bg-cyan-950/30 border border-cyan-500/20 px-3.5 py-2.5 rounded-xl">
+                                <span className="font-semibold text-cyan-100 flex items-center gap-2.5">
+                                    <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
                                     {a.title}
                                 </span>
-                                <span className="text-cyan-300 font-mono text-xs px-2 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/30">
+                                <span className="text-cyan-300 font-mono text-xs px-2.5 py-1 rounded bg-cyan-500/10 border border-cyan-500/30">
                                     {new Date(a.event_date).toLocaleDateString()}
                                 </span>
                             </div>

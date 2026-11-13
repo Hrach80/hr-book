@@ -1,23 +1,51 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Plus, Folder, ExternalLink, Trash2, X, Upload, CheckCircle2, Sparkles, Search, User, Activity } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { ArrowLeft, Plus, Folder, ExternalLink, Trash2, X, Upload, CheckCircle2, Sparkles, Search, User, Activity, Bell } from 'lucide-react';
 import { supabase } from '../services/supabaseClient';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function DocsPage() {
     const { t } = useLanguage();
+    const location = useLocation();
+
     const [docs, setDocs] = useState([]);
     const [name, setName] = useState('');
     const [fileUrl, setFileUrl] = useState('');
     const [uploading, setUploading] = useState(false);
-
     const [showForm, setShowForm] = useState(false);
     const [loading, setLoading] = useState(true);
     const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
 
+    // Հիշեցումների չանցած քանակը ֆուտերի բեջի համար
+    const [upcomingCount, setUpcomingCount] = useState(0);
+
     useEffect(() => {
         fetchDocuments();
+        fetchRemindersCount();
     }, []);
+
+    // Բազայից կարդում ենք մոտեցող հիշեցումների քանակը ֆուտերի համար
+    const fetchRemindersCount = async () => {
+        try {
+            const { data, error } = await supabase.from('reminders').select('event_date');
+            if (error) throw error;
+
+            if (data) {
+                const now = new Date();
+                const nowDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+                const count = data.filter(item => {
+                    const eventDate = new Date(item.event_date);
+                    const eventDateOnly = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
+                    return eventDateOnly >= nowDateOnly;
+                }).length;
+
+                setUpcomingCount(count);
+            }
+        } catch (e) {
+            console.error('Error fetching reminders count:', e);
+        }
+    };
 
     const showToast = (message, type = 'success') => {
         setToast({ show: true, message, type });
@@ -277,28 +305,53 @@ export default function DocsPage() {
             <footer className="fixed bottom-2.5 left-0 right-0 mx-auto max-w-md px-4 z-40 box-border">
                 <div className="border border-white/10 rounded-3xl p-2.5 shadow-[0_15px_35px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.15)] bg-[#070a14]/90 backdrop-blur-2xl box-border">
                     <nav className="grid grid-cols-4 gap-2 text-center">
-                        <Link to="/" className="flex flex-col items-center justify-center py-2 px-2 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 transition-all duration-300 hover:scale-105">
+
+                        {/* 1. Home */}
+                        <Link to="/" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 ${location.pathname === '/'
+                            ? 'text-blue-400 bg-blue-600/20 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.25)]'
+                            : 'text-gray-400 hover:text-white hover:bg-white/5'
+                            }`}>
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
                                 <polyline points="9 22 9 12 15 12 15 22" />
                             </svg>
-                            <span className="text-[10px] mt-1 font-medium">{t('home') || 'Home'}</span>
+                            <span className={`text-[10px] mt-1 ${location.pathname === '/' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('home') || 'Home'}</span>
                         </Link>
 
-                        <Link to="/search" className="flex flex-col items-center justify-center py-2 px-2 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 transition-all duration-300 hover:scale-105 group">
-                            <Search size={22} className="group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all" />
-                            <span className="text-[10px] mt-1 font-medium">{t('search') || 'Search'}</span>
+                        {/* 2. Search */}
+                        <Link to="/search" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 group ${location.pathname === '/search'
+                            ? 'text-blue-400 bg-blue-600/20 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.25)]'
+                            : 'text-gray-400 hover:text-white hover:bg-white/5'
+                            }`}>
+                            <Search size={22} className={location.pathname === '/search' ? 'drop-shadow-[0_0_6px_rgba(59,130,246,0.8)]' : 'group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all'} />
+                            <span className={`text-[10px] mt-1 ${location.pathname === '/search' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('search') || 'Search'}</span>
                         </Link>
 
-                        <Link to="/medical" className="flex flex-col items-center justify-center py-2 px-2 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 transition-all duration-300 hover:scale-105 group">
-                            <Activity size={22} className="group-hover:drop-shadow-[0_0_6px_rgba(239,68,68,0.8)] transition-all" />
-                            <span className="text-[10px] mt-1 font-medium">{t('medical') || 'Բժշկական'}</span>
+                        {/* 3. Reminders (Հիշեցումներ) + Կարմիր բեջ */}
+                        <Link to="/reminders" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 group relative ${location.pathname === '/reminders'
+                            ? 'text-amber-400 bg-amber-600/20 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.25)]'
+                            : 'text-gray-400 hover:text-white hover:bg-white/5'
+                            }`}>
+                            <div className="relative">
+                                <Bell size={22} className={location.pathname === '/reminders' ? 'drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]' : 'group-hover:drop-shadow-[0_0_8px_rgba(245,158,11,0.5)] transition-all'} />
+                                {upcomingCount > 0 && (
+                                    <span className="absolute -top-1.5 -right-2 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full border border-[#070a14] shadow">
+                                        {upcomingCount}
+                                    </span>
+                                )}
+                            </div>
+                            <span className={`text-[10px] mt-1 ${location.pathname === '/reminders' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('remindersTab') || 'Հիշեցումներ'}</span>
                         </Link>
 
-                        <Link to="/auth" className="flex flex-col items-center justify-center py-2 px-2 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 transition-all duration-300 hover:scale-105 group">
-                            <User size={22} className="group-hover:drop-shadow-[0_0_8px_rgba(59,130,246,0.5)] transition-all" />
-                            <span className="text-[10px] mt-1 font-medium">{t('profile') || 'Profile'}</span>
+                        {/* 4. Medical / Բժշկական կամ Մեքենա */}
+                        <Link to="/medical" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 group ${location.pathname === '/medical'
+                            ? 'text-red-400 bg-red-600/20 border border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.25)]'
+                            : 'text-gray-400 hover:text-white hover:bg-white/5'
+                            }`}>
+                            <Activity size={22} className={location.pathname === '/medical' ? 'drop-shadow-[0_0_6px_rgba(239,68,68,0.8)]' : 'group-hover:drop-shadow-[0_0_6px_rgba(239,68,68,0.8)] transition-all'} />
+                            <span className={`text-[10px] mt-1 ${location.pathname === '/medical' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('medical') || 'Բժշկական'}</span>
                         </Link>
+
                     </nav>
                 </div>
             </footer>

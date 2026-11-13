@@ -2,13 +2,13 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { LanguageProvider } from './context/LanguageContext';
 import { supabase } from './services/supabaseClient';
-import { subscribeUserToPush } from './utils/pushService'; // <-- Ներմուծում ենք Push ծառայությունը
+import { subscribeUserToPush } from './utils/pushService';
 import Dashboard from './pages/Dashboard';
 import NotesPage from './pages/NotesPage';
 import PasswordsPage from './pages/PasswordsPage';
 import MedicalPage from './pages/MedicalPage';
-import DocsPage from './pages/DocsPage';           // <-- Ընդհանուր փաստաթղթերի էջը
-import CarDocsPage from './pages/CarDocsPage';   // <-- Մեքենայի փաստաթղթերի էջը
+import DocsPage from './pages/DocsPage';           // Ընդհանուր փաստաթղթերի էջը
+import CarDocsPage from './pages/CarDocsPage';   // Մեքենայի փաստաթղթերի էջը
 import SettingsPage from './pages/SettingsPage';
 import AuthPage from './pages/AuthPage';
 import Navbar from './components/Navbar';
@@ -43,9 +43,11 @@ function App() {
 
   // Հիշեցումների ֆոնային/ժամային ստուգման տրամաբանություն
   useEffect(() => {
-    // Գրանցում ենք push բանալիները բրաուզերում, եթե թույլտվությունը կա
+    // Գրանցում ենք push բանալիները ֆոնային ռեժիմով (առանց էկրանը կախելու)
     if (Notification.permission === 'granted') {
-      subscribeUserToPush();
+      setTimeout(() => {
+        subscribeUserToPush().catch(err => console.error('Push sub error:', err));
+      }, 1000);
     }
 
     const checkRemindersAndNotify = async () => {
@@ -64,24 +66,23 @@ function App() {
             const diffTime = eventDate - now;
             const diffHours = diffTime / (1000 * 60 * 60);
 
-            // Եթե մնացել է 0-ից 24 ժամ և օրը դեռ չի անցել
             return diffHours >= 0 && diffHours <= 24;
           });
 
           if (urgentEvent && lastAlertDate !== todayStr) {
-            // 1. Միացնում ենք ձայնային ազդանշանը (երբ հավելվածը բաց է)
+            // 1. Միացնում ենք ձայնային ազդանշանը
             playAlertSound();
 
             // 2. Ուղարկում ենք բրաուզերային/համակարգային ծանուցում
-            if (Notification.permission === 'granted') {
+            if (Notification.permission === 'granted' && 'serviceWorker' in navigator) {
               navigator.serviceWorker.ready.then(registration => {
                 registration.showNotification('⚠️ Մոտեցող իրադարձություն', {
                   body: `${urgentEvent.title || 'Հիշեցում'}-ին մնացել է մոտ 1 օր:`,
-                  icon: '/favicon.ico',
-                  badge: '/favicon.ico',
+                  icon: '/favicon.svg',
+                  badge: '/favicon.svg',
                   vibrate: [300, 100, 300]
                 });
-              });
+              }).catch(err => console.log('SW ready error:', err));
             }
 
             // Հիշում ենք, որ այսօր արդեն ազդանշանը տրվել է
@@ -93,15 +94,20 @@ function App() {
       }
     };
 
-    // Ստուգել միանգամից բացելիս
-    checkRemindersAndNotify();
+    // Ստուգել մի փոքր ուշացումով, որպեսզի էջի առաջին բեռնումը չարգելափակվի
+    const initialTimer = setTimeout(() => {
+      checkRemindersAndNotify();
+    }, 1500);
 
     // Ստուգել ժամը մեկ անգամ (3600000 մվ = 1 ժամ)
     const interval = setInterval(() => {
       checkRemindersAndNotify();
     }, 60 * 60 * 1000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearTimeout(initialTimer);
+      clearInterval(interval);
+    };
   }, []);
 
   return (
@@ -122,11 +128,11 @@ function App() {
               <Route path="/notes" element={<NotesPage />} />
               <Route path="/passwords" element={<PasswordsPage />} />
               <Route path="/medical" element={<MedicalPage />} />
-              <Route path="/docs" element={<DocsPage />} />            {/* Ընդհանուր փաստաթղթեր */}
+              <Route path="/docs" element={<DocsPage />} />           {/* Ընդհանուր փաստաթղթեր */}
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/search" element={<Search />} />
-              <Route path="/car-docs" element={<CarDocsPage />} />    {/* Մեքենայի փաստաթղթեր */}
+              <Route path="/car-docs" element={<CarDocsPage />} />   {/* Մեքենայի փաստաթղթեր */}
               <Route path="/reminders" element={<RemindersPage />} />
             </Routes>
           </main>

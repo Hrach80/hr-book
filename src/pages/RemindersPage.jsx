@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ArrowLeft, Plus, Bell, Calendar, Clock, Trash2, X, Sparkles, Search } from 'lucide-react';
+import { ArrowLeft, Plus, Bell, Calendar, Clock, Trash2, X, Sparkles, Search, ShieldAlert } from 'lucide-react';
 import { supabase } from '../services/supabaseClient';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -172,7 +172,7 @@ export default function RemindersPage() {
     }).length;
 
     return (
-        <div className="font-sans pb-44 w-full max-w-lg mx-auto px-5 pt-6 text-white relative box-border overflow-x-hidden flex flex-col items-center">
+        <div className="font-sans pb-44 w-full max-w-[calc(100vw-6px)] mx-auto px-[3px] pt-6 text-white relative box-border overflow-x-hidden flex flex-col items-center">
 
             {/* Toast ծանուցում */}
             {toast.show && (
@@ -184,25 +184,32 @@ export default function RemindersPage() {
                 </div>
             )}
 
-            {/* Ակտիվ հիշեցումների ծանուցում */}
+            {/* Ֆանտաստիկ Sci-Fi ոճի ծանուցման վահանակ (Cyberpunk HUD style) */}
             {activeAlerts.length > 0 && (
-                <div className="w-full mb-6 p-5 rounded-3xl bg-amber-950/40 border border-amber-500/40 backdrop-blur-xl shadow-[0_10px_30px_rgba(245,158,11,0.15)]">
-                    <div className="flex items-center gap-2 text-amber-400 font-bold text-sm uppercase tracking-wider mb-2.5">
-                        <Bell size={18} className="animate-bounce" />
-                        <span>{t('attentionDueEvents') || 'Ուշադրություն՝ Մոտեցող իրադարձություններ'}</span>
+                <div className="w-full mb-6 p-5 rounded-3xl bg-[#030712]/90 border border-cyan-500/50 backdrop-blur-2xl shadow-[0_0_25px_rgba(6,182,212,0.25),inset_0_0_15px_rgba(6,182,212,0.15)] relative overflow-hidden">
+                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-[pulse_2s_infinite]"></div>
+
+                    <div className="flex items-center gap-2.5 text-cyan-400 font-bold text-sm uppercase tracking-widest mb-3">
+                        <ShieldAlert size={20} className="animate-spin text-cyan-400" />
+                        <span className="drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]">{t('attentionDueEvents') || 'ՀԱՄԱԿԱՐԳԻ ԶԳՈՒՇԱՑՈՒՄ • Մոտեցող իրադարձություններ'}</span>
                     </div>
-                    <div className="space-y-1.5">
+                    <div className="space-y-2">
                         {activeAlerts.map(a => (
-                            <div key={a.id} className="text-sm text-gray-200 flex justify-between items-center">
-                                <span className="font-semibold">• {a.title}</span>
-                                <span className="text-amber-300 font-mono">{new Date(a.event_date).toLocaleDateString()}</span>
+                            <div key={a.id} className="text-sm text-gray-200 flex justify-between items-center bg-cyan-950/30 border border-cyan-500/20 px-3.5 py-2 rounded-xl">
+                                <span className="font-semibold text-cyan-100 flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                                    {a.title}
+                                </span>
+                                <span className="text-cyan-300 font-mono text-xs px-2 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/30">
+                                    {new Date(a.event_date).toLocaleDateString()}
+                                </span>
                             </div>
                         ))}
                     </div>
                 </div>
             )}
 
-            {/* Վերնագիր (մաքրված և հարմարեցված) */}
+            {/* Վերնագիր */}
             <div className="w-full flex items-center justify-between mb-6 px-1 box-border">
                 <Link to="/" className="p-3.5 rounded-2xl bg-white/5 border border-white/10 text-gray-300 hover:text-white transition shadow-md flex items-center justify-center">
                     <ArrowLeft size={22} />

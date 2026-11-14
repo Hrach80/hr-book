@@ -167,7 +167,8 @@ export const translations = {
         birthdayHint: "Համակարգն ամեն տարի ավտոմատ կհիշեցնի այս օրը և կհաշվի տարիքը։",
         addBirthdayBtn: "Ավելացնել ծնունդ",
         addReminderTooltip: "Ավելացնել հիշեցում",
-        addBirthdayTooltip: "Ավելացնել ծննդյան օր"
+        addBirthdayTooltip: "Ավելացնել ծննդյան օր",
+        birthdaySaved: "🎂 Ծննդյան օրը հաջողությամբ պահպանվեց!"
 
     },
     ru: {

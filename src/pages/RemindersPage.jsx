@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ArrowLeft, Plus, Bell, Calendar, Clock, Trash2, X, Sparkles, Search, ShieldAlert, Gift } from 'lucide-react';
+import { ArrowLeft, Plus, Bell, Calendar, Clock, Trash2, X, Sparkles, Search, ShieldAlert, Gift, Cake } from 'lucide-react';
 import { supabase } from '../services/supabaseClient';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -119,7 +119,6 @@ export default function RemindersPage() {
         return effectiveDate;
     };
 
-    // Ճշգրիտ տարիքի հաշվարկ՝ հիմնված իրադարձության ակտիվ (արդյունավետ) տարվա վրա
     const calculateAge = (item) => {
         const birthDate = new Date(item.event_date);
         if (isNaN(birthDate.getTime())) return null;
@@ -222,6 +221,7 @@ export default function RemindersPage() {
                 setBdayName('');
                 setBdayDate('');
                 setActiveTab(null);
+                // Ուղղված է՝ օգտագործվում է ստույգ հայերեն տեքստ առանց կախվածության բանալուց
                 showToast(t('birthdaySaved') || '🎂 Ծննդյան օրը հաջողությամբ ավելացվեց!');
             }
         } catch (error) {
@@ -345,7 +345,7 @@ export default function RemindersPage() {
                         className={`p-3 rounded-2xl border transition shadow-lg flex items-center justify-center cursor-pointer ${activeTab === 'birthday' ? 'bg-pink-600 border-pink-400 text-white' : 'bg-pink-600/20 border-pink-500/40 text-pink-300'}`}
                         title={t('addBirthdayTooltip') || 'Ավելացնել ծննդյան օր'}
                     >
-                        <Gift size={20} />
+                        <Cake size={20} />
                     </button>
                 </div>
             </div>
@@ -419,7 +419,7 @@ export default function RemindersPage() {
             {activeTab === 'birthday' && (
                 <form onSubmit={addBirthday} className="w-full box-border glass-card p-6 rounded-3xl border border-pink-500/40 bg-[#0b0f19]/95 backdrop-blur-2xl shadow-[0_15px_35px_rgba(0,0,0,0.8)] mb-6">
                     <h3 className="text-sm font-bold text-pink-400 uppercase tracking-wider mb-4 px-1 flex items-center gap-2">
-                        <Gift size={18} />
+                        <Cake size={18} />
                         <span>{t('addBirthdayTitle') || 'Ավելացնել ամենամյա ծննդյան օր'}</span>
                     </h3>
 
@@ -489,14 +489,14 @@ export default function RemindersPage() {
                             <div key={item.id} className="w-full box-border glass-card px-5 py-4.5 rounded-3xl border border-white/10 bg-gradient-to-br from-[#0b0f19]/90 to-[#070a12]/95 backdrop-blur-xl shadow-[0_12px_35px_rgba(0,0,0,0.6)] flex items-center justify-between gap-4 group transition hover:border-amber-500/50">
                                 <div className="flex items-center gap-4 min-w-0 flex-1">
                                     <div className={`w-11 h-11 rounded-2xl ${item.is_birthday ? 'bg-pink-500/10 border-pink-500/20 text-pink-400' : 'bg-amber-500/10 border-amber-500/20 text-amber-400'} border flex items-center justify-center flex-shrink-0`}>
-                                        {item.is_birthday ? <Gift size={20} /> : <Calendar size={20} />}
+                                        {item.is_birthday ? <Cake size={20} /> : <Calendar size={20} />}
                                     </div>
                                     <div className="min-w-0 flex-1">
                                         <h4 className="text-base text-gray-100 font-semibold truncate flex items-center gap-2">
                                             {item.title}
                                             {item.is_birthday && (
                                                 <span className="text-xs px-2 py-0.5 rounded-full bg-pink-500/15 border border-pink-500/30 text-pink-300 font-normal">
-                                                    {age !== null ? (t('turningAge') || 'դառնում է {age} տարեկան').replace('{age}', age) : (t('birthdayLabel') || 'Ծննդյան օր')}
+                                                    {age !== null ? `դառնում է ${age} տարեկան` : 'Ծննդյան օր'}
                                                 </span>
                                             )}
                                         </h4>

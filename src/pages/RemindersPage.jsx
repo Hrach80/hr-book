@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ArrowLeft, Plus, Bell, Calendar, Clock, Trash2, X, Sparkles, Search, ShieldAlert } from 'lucide-react';
+import { ArrowLeft, Plus, Bell, Calendar, Clock, Trash2, X, Sparkles, Search, ShieldAlert, Gift } from 'lucide-react';
 import { supabase } from '../services/supabaseClient';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -8,22 +8,53 @@ export default function RemindersPage() {
     const { t } = useLanguage();
     const location = useLocation();
     const [reminders, setReminders] = useState([]);
+
+    const [activeTab, setActiveTab] = useState(null); // 'reminder' | 'birthday' | null
+
+    // Սովորական հիշեցման դաշտեր
     const [title, setTitle] = useState('');
     const [eventDate, setEventDate] = useState('');
     const [alertOffset, setAlertOffset] = useState('1');
 
-    const [showForm, setShowForm] = useState(false);
+    // Ծննդյան օրվա դաշտեր
+    const [bdayName, setBdayName] = useState('');
+    const [bdayDate, setBdayDate] = useState(''); // YYYY-MM-DD
+
     const [loading, setLoading] = useState(true);
     const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
     const [activeAlerts, setActiveAlerts] = useState([]);
 
+    const hasInteracted = useRef(false);
+
     useEffect(() => {
+        const handleUserGesture = () => {
+            hasInteracted.current = true;
+            window.removeEventListener('click', handleUserGesture);
+            window.removeEventListener('keydown', handleUserGesture);
+            window.removeEventListener('touchstart', handleUserGesture);
+        };
+
+        window.addEventListener('click', handleUserGesture);
+        window.addEventListener('keydown', handleUserGesture);
+        window.addEventListener('touchstart', handleUserGesture);
+
         fetchReminders();
+
+        return () => {
+            window.removeEventListener('click', handleUserGesture);
+            window.removeEventListener('keydown', handleUserGesture);
+            window.removeEventListener('touchstart', handleUserGesture);
+        };
     }, []);
 
     const playAlertSound = () => {
+        if (!hasInteracted.current) return;
+
         try {
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) return;
+
+            const audioCtx = new AudioCtx();
             const oscillator = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
 
@@ -40,7 +71,7 @@ export default function RemindersPage() {
             oscillator.start();
             oscillator.stop(audioCtx.currentTime + 0.6);
         } catch (e) {
-            console.error('Ձայնի նվագարկման սխալ:', e);
+            // Լռությամբ կլանում ենք սխալը
         }
     };
 
@@ -71,12 +102,42 @@ export default function RemindersPage() {
         }
     };
 
+    const getEffectiveEventDate = (item) => {
+        const now = new Date();
+        const originalDate = new Date(item.event_date);
+
+        if (!item.is_birthday) {
+            return originalDate;
+        }
+
+        let effectiveDate = new Date(now.getFullYear(), originalDate.getMonth(), originalDate.getDate(), originalDate.getHours(), originalDate.getMinutes());
+
+        if (effectiveDate < new Date(now.getFullYear(), now.getMonth(), now.getDate())) {
+            effectiveDate.setFullYear(now.getFullYear() + 1);
+        }
+
+        return effectiveDate;
+    };
+
+    // Ճշգրիտ տարիքի հաշվարկ՝ հիմնված իրադարձության ակտիվ (արդյունավետ) տարվա վրա
+    const calculateAge = (item) => {
+        const birthDate = new Date(item.event_date);
+        if (isNaN(birthDate.getTime())) return null;
+
+        const effectiveDate = getEffectiveEventDate(item);
+        const targetYear = effectiveDate.getFullYear();
+        const birthYear = birthDate.getFullYear();
+
+        let age = targetYear - birthYear;
+        return age >= 0 ? age : null;
+    };
+
     const checkDueReminders = (list) => {
         const now = new Date();
         const triggered = [];
 
         list.forEach(item => {
-            const eventTime = new Date(item.event_date);
+            const eventTime = getEffectiveEventDate(item);
             const diffTime = eventTime - now;
             const diffDays = diffTime / (1000 * 60 * 60 * 24);
             const offsetDays = parseFloat(item.alert_offset || 1);
@@ -109,6 +170,7 @@ export default function RemindersPage() {
                     title: title.trim(),
                     event_date: eventDate,
                     alert_offset: parseInt(alertOffset),
+                    is_birthday: false,
                     user_id: user.id
                 }])
                 .select();
@@ -116,12 +178,51 @@ export default function RemindersPage() {
             if (error) throw error;
 
             if (data) {
-                const updated = [...reminders, data[0]].sort((a, b) => new Date(a.event_date) - new Date(b.event_date));
+                const updated = [...reminders, data[0]].sort((a, b) => getEffectiveEventDate(a) - getEffectiveEventDate(b));
                 setReminders(updated);
                 setTitle('');
                 setEventDate('');
-                setShowForm(false);
+                setActiveTab(null);
                 showToast(t('reminderSaved') || 'Հիշեցումը հաջողությամբ պահպանվեց!');
+            }
+        } catch (error) {
+            showToast('Սխալ ավելացնելիս: ' + error.message, 'error');
+        }
+    };
+
+    const addBirthday = async (e) => {
+        e.preventDefault();
+        if (!bdayName.trim() || !bdayDate) return;
+
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                showToast(t('loginRequired') || 'Խնդրում ենք նախ մուտք գործել համակարգ', 'error');
+                return;
+            }
+
+            const fullDateTime = `${bdayDate}T09:00`;
+
+            const { data, error } = await supabase
+                .from('reminders')
+                .insert([{
+                    title: bdayName.trim(),
+                    event_date: fullDateTime,
+                    alert_offset: 1,
+                    is_birthday: true,
+                    user_id: user.id
+                }])
+                .select();
+
+            if (error) throw error;
+
+            if (data) {
+                const updated = [...reminders, data[0]].sort((a, b) => getEffectiveEventDate(a) - getEffectiveEventDate(b));
+                setReminders(updated);
+                setBdayName('');
+                setBdayDate('');
+                setActiveTab(null);
+                showToast(t('birthdaySaved') || '🎂 Ծննդյան օրը հաջողությամբ ավելացվեց!');
             }
         } catch (error) {
             showToast('Սխալ ավելացնելիս: ' + error.message, 'error');
@@ -144,9 +245,9 @@ export default function RemindersPage() {
         }
     };
 
-    const getStatusStyle = (eventDateStr) => {
+    const getStatusStyle = (item) => {
         const now = new Date();
-        const eventDate = new Date(eventDateStr);
+        const eventDate = getEffectiveEventDate(item);
 
         const nowDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const eventDateOnly = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
@@ -165,7 +266,7 @@ export default function RemindersPage() {
 
     const upcomingCount = reminders.filter(item => {
         const now = new Date();
-        const eventDate = new Date(item.event_date);
+        const eventDate = getEffectiveEventDate(item);
         const nowDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const eventDateOnly = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
         return eventDateOnly >= nowDateOnly;
@@ -174,7 +275,6 @@ export default function RemindersPage() {
     return (
         <div className="font-sans pb-44 w-full max-w-[calc(100vw-6px)] mx-auto px-[3px] pt-6 text-white relative box-border overflow-x-hidden flex flex-col items-center">
 
-            {/* Inline 3D պտույտի CSS անիմացիա նախազգուշացնող իկոնայի համար */}
             <style>{`
                 @keyframes rotateYAxis {
                     0% { transform: perspective(300px) rotateY(0deg); }
@@ -186,7 +286,6 @@ export default function RemindersPage() {
                 }
             `}</style>
 
-            {/* Toast ծանուցում */}
             {toast.show && (
                 <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 animate-bounce transition-all duration-300">
                     <div className="px-5 py-3 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl border bg-emerald-950/90 border-emerald-500/40 text-emerald-200 flex items-center gap-3 text-base font-semibold">
@@ -196,14 +295,12 @@ export default function RemindersPage() {
                 </div>
             )}
 
-            {/* Ֆանտաստիկ Sci-Fi ոճի ծանուցման վահանակ (Cyberpunk HUD style + Մեծ և առանցքի շուրջ 3D պտտվող ShieldAlert իկոնա) */}
             {activeAlerts.length > 0 && (
                 <div className="w-full mb-6 p-5 rounded-3xl bg-[#030712]/90 border border-cyan-500/50 backdrop-blur-2xl shadow-[0_0_25px_rgba(6,182,212,0.25),inset_0_0_15px_rgba(6,182,212,0.15)] relative overflow-hidden">
                     <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-[pulse_2s_infinite]"></div>
 
                     <div className="flex items-center gap-3 text-cyan-400 font-bold text-sm uppercase tracking-widest mb-3">
                         <div className="p-1.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center">
-                            {/* Անընդհատ իր առանցքի շուրջ (երկրագնդի նման) պտտվող նախազգուշացնող իկոնա */}
                             <ShieldAlert size={28} className="text-cyan-300 globe-spin" />
                         </div>
                         <span className="drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]">{t('attentionDueEvents') || 'ՀԱՄԱԿԱՐԳԻ ԶԳՈՒՇԱՑՈՒՄ • Մոտեցող իրադարձություններ'}</span>
@@ -213,10 +310,10 @@ export default function RemindersPage() {
                             <div key={a.id} className="text-sm text-gray-200 flex justify-between items-center bg-cyan-950/30 border border-cyan-500/20 px-3.5 py-2.5 rounded-xl">
                                 <span className="font-semibold text-cyan-100 flex items-center gap-2.5">
                                     <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
-                                    {a.title}
+                                    {a.title} {a.is_birthday && '🎂'}
                                 </span>
                                 <span className="text-cyan-300 font-mono text-xs px-2.5 py-1 rounded bg-cyan-500/10 border border-cyan-500/30">
-                                    {new Date(a.event_date).toLocaleDateString()}
+                                    {getEffectiveEventDate(a).toLocaleDateString()}
                                 </span>
                             </div>
                         ))}
@@ -224,27 +321,37 @@ export default function RemindersPage() {
                 </div>
             )}
 
-            {/* Վերնագիր */}
-            <div className="w-full flex items-center justify-between mb-6 px-1 box-border">
-                <Link to="/" className="p-3.5 rounded-2xl bg-white/5 border border-white/10 text-gray-300 hover:text-white transition shadow-md flex items-center justify-center">
+            {/* Վերնագիր և Երկու առանձին ավելացման կոճակներ */}
+            <div className="w-full flex items-center justify-between mb-6 px-1 box-border gap-2">
+                <Link to="/" className="p-3.5 rounded-2xl bg-white/5 border border-white/10 text-gray-300 hover:text-white transition shadow-md flex items-center justify-center flex-shrink-0">
                     <ArrowLeft size={22} />
                 </Link>
 
-                <h1 className="text-lg font-bold text-white tracking-wider uppercase text-center flex items-center gap-2.5">
-                    <Bell size={22} className="text-amber-400" />
+                <h1 className="text-sm sm:text-lg font-bold text-white tracking-wider uppercase text-center flex items-center gap-2">
+                    <Bell size={20} className="text-amber-400" />
                     <span>{t('remindersTitle') || 'Հիշեցումներ'}</span>
                 </h1>
 
-                <button
-                    onClick={() => { setShowForm(!showForm); setTitle(''); setEventDate(''); }}
-                    className="p-3.5 rounded-2xl border transition shadow-lg flex items-center justify-center cursor-pointer bg-blue-600/20 border-blue-500/40 text-blue-300 shadow-[0_0_15px_rgba(59,130,246,0.3)]"
-                >
-                    {showForm ? <X size={22} /> : <Plus size={22} />}
-                </button>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => { setActiveTab(activeTab === 'reminder' ? null : 'reminder'); }}
+                        className={`p-3 rounded-2xl border transition shadow-lg flex items-center justify-center cursor-pointer ${activeTab === 'reminder' ? 'bg-blue-600 border-blue-400 text-white' : 'bg-blue-600/20 border-blue-500/40 text-blue-300'}`}
+                        title={t('addReminderTooltip') || 'Ավելացնել հիշեցում'}
+                    >
+                        <Plus size={20} />
+                    </button>
+                    <button
+                        onClick={() => { setActiveTab(activeTab === 'birthday' ? null : 'birthday'); }}
+                        className={`p-3 rounded-2xl border transition shadow-lg flex items-center justify-center cursor-pointer ${activeTab === 'birthday' ? 'bg-pink-600 border-pink-400 text-white' : 'bg-pink-600/20 border-pink-500/40 text-pink-300'}`}
+                        title={t('addBirthdayTooltip') || 'Ավելացնել ծննդյան օր'}
+                    >
+                        <Gift size={20} />
+                    </button>
+                </div>
             </div>
 
-            {/* Ավելացման Ֆորմա */}
-            {showForm && (
+            {/* 1. Սովորական Հիշեցման Ավելացման Ֆորմա */}
+            {activeTab === 'reminder' && (
                 <form onSubmit={addReminder} className="w-full box-border glass-card p-6 rounded-3xl border border-blue-500/40 bg-[#0b0f19]/95 backdrop-blur-2xl shadow-[0_15px_35px_rgba(0,0,0,0.8)] mb-6">
                     <h3 className="text-sm font-bold text-blue-400 uppercase tracking-wider mb-4 px-1 flex items-center gap-2">
                         <Clock size={18} />
@@ -256,7 +363,7 @@ export default function RemindersPage() {
                             <label className="text-xs text-gray-400 mb-1.5 block">{t('reminderName') || 'Իրադարձության անվանում'}</label>
                             <input
                                 type="text"
-                                placeholder={t('reminderNamePlaceholder') || 'օր. Մամայի ծնունդ, Ապահովագրություն...'}
+                                placeholder={t('reminderNamePlaceholder') || 'օր. Ապահովագրություն, Հանդիպում...'}
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
                                 className="w-full box-border bg-[#070a14]/90 border border-white/15 rounded-2xl px-4 py-3.5 text-base text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]"
@@ -293,7 +400,7 @@ export default function RemindersPage() {
                     <div className="w-full flex items-center justify-end gap-4 mt-6 px-1 box-border">
                         <button
                             type="button"
-                            onClick={() => { setShowForm(false); setTitle(''); setEventDate(''); }}
+                            onClick={() => setActiveTab(null)}
                             className="px-6 py-3 rounded-xl text-sm font-semibold text-gray-300 hover:text-white bg-white/5 border border-white/10 transition cursor-pointer"
                         >
                             {t('cancel') || 'Չեղարկել'}
@@ -303,6 +410,58 @@ export default function RemindersPage() {
                             className="px-7 py-3 rounded-xl text-sm font-semibold text-white bg-blue-600/50 border border-blue-500/60 hover:bg-blue-600/70 shadow-[0_0_12px_rgba(59,130,246,0.4)] transition cursor-pointer"
                         >
                             {t('save') || 'Պահպանել'}
+                        </button>
+                    </div>
+                </form>
+            )}
+
+            {/* 2. Ծննդյան Օրվա Ավելացման Ֆորմա */}
+            {activeTab === 'birthday' && (
+                <form onSubmit={addBirthday} className="w-full box-border glass-card p-6 rounded-3xl border border-pink-500/40 bg-[#0b0f19]/95 backdrop-blur-2xl shadow-[0_15px_35px_rgba(0,0,0,0.8)] mb-6">
+                    <h3 className="text-sm font-bold text-pink-400 uppercase tracking-wider mb-4 px-1 flex items-center gap-2">
+                        <Gift size={18} />
+                        <span>{t('addBirthdayTitle') || 'Ավելացնել ամենամյա ծննդյան օր'}</span>
+                    </h3>
+
+                    <div className="w-full space-y-4.5 box-border">
+                        <div>
+                            <label className="text-xs text-gray-400 mb-1.5 block">{t('fullNameLabel') || 'Անուն Ազգանուն'}</label>
+                            <input
+                                type="text"
+                                placeholder={t('fullNamePlaceholder') || 'օր. Արմեն Վարդանյան'}
+                                value={bdayName}
+                                onChange={(e) => setBdayName(e.target.value)}
+                                className="w-full box-border bg-[#070a14]/90 border border-white/15 rounded-2xl px-4 py-3.5 text-base text-white placeholder-gray-500 focus:outline-none focus:border-pink-500/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]"
+                                required
+                            />
+                        </div>
+
+                        <div className="w-full box-border">
+                            <label className="text-xs text-gray-400 mb-1.5 block">{t('birthDateLabel') || 'Ծննդյան ամսաթիվ (օր, ամիս, տարի)'}</label>
+                            <input
+                                type="date"
+                                value={bdayDate}
+                                onChange={(e) => setBdayDate(e.target.value)}
+                                className="w-full box-border max-w-full bg-[#070a14]/90 border border-white/15 rounded-2xl px-4 py-3.5 text-base text-white focus:outline-none focus:border-pink-500/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] appearance-none"
+                                required
+                            />
+                            <p className="text-[11px] text-gray-400 mt-1">{t('birthdayHint') || 'Համակարգն ամեն տարի ավտոմատ կհիշեցնի այս օրը և կհաշվի տարիքը։'}</p>
+                        </div>
+                    </div>
+
+                    <div className="w-full flex items-center justify-end gap-4 mt-6 px-1 box-border">
+                        <button
+                            type="button"
+                            onClick={() => setActiveTab(null)}
+                            className="px-6 py-3 rounded-xl text-sm font-semibold text-gray-300 hover:text-white bg-white/5 border border-white/10 transition cursor-pointer"
+                        >
+                            {t('cancel') || 'Չեղարկել'}
+                        </button>
+                        <button
+                            type="submit"
+                            className="px-7 py-3 rounded-xl text-sm font-semibold text-white bg-pink-600/50 border border-pink-500/60 hover:bg-pink-600/70 shadow-[0_0_12px_rgba(236,72,153,0.4)] transition cursor-pointer"
+                        >
+                            {t('addBirthdayBtn') || 'Ավելացնել ծնունդ'}
                         </button>
                     </div>
                 </form>
@@ -322,18 +481,28 @@ export default function RemindersPage() {
                     </div>
                 ) : (
                     reminders.map(item => {
-                        const status = getStatusStyle(item.event_date);
+                        const status = getStatusStyle(item);
+                        const effectiveDate = getEffectiveEventDate(item);
+                        const age = item.is_birthday ? calculateAge(item) : null;
+
                         return (
                             <div key={item.id} className="w-full box-border glass-card px-5 py-4.5 rounded-3xl border border-white/10 bg-gradient-to-br from-[#0b0f19]/90 to-[#070a12]/95 backdrop-blur-xl shadow-[0_12px_35px_rgba(0,0,0,0.6)] flex items-center justify-between gap-4 group transition hover:border-amber-500/50">
                                 <div className="flex items-center gap-4 min-w-0 flex-1">
-                                    <div className="w-11 h-11 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 flex-shrink-0">
-                                        <Calendar size={20} />
+                                    <div className={`w-11 h-11 rounded-2xl ${item.is_birthday ? 'bg-pink-500/10 border-pink-500/20 text-pink-400' : 'bg-amber-500/10 border-amber-500/20 text-amber-400'} border flex items-center justify-center flex-shrink-0`}>
+                                        {item.is_birthday ? <Gift size={20} /> : <Calendar size={20} />}
                                     </div>
                                     <div className="min-w-0 flex-1">
-                                        <h4 className="text-base text-gray-100 font-semibold truncate">{item.title}</h4>
+                                        <h4 className="text-base text-gray-100 font-semibold truncate flex items-center gap-2">
+                                            {item.title}
+                                            {item.is_birthday && (
+                                                <span className="text-xs px-2 py-0.5 rounded-full bg-pink-500/15 border border-pink-500/30 text-pink-300 font-normal">
+                                                    {age !== null ? (t('turningAge') || 'դառնում է {age} տարեկան').replace('{age}', age) : (t('birthdayLabel') || 'Ծննդյան օր')}
+                                                </span>
+                                            )}
+                                        </h4>
                                         <div className="flex items-center gap-3 mt-1.5 flex-wrap">
                                             <span className="text-xs text-gray-400 font-mono">
-                                                {new Date(item.event_date).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                                                {effectiveDate.toLocaleDateString([], { dateStyle: 'medium' })}
                                             </span>
                                             <span className={`text-xs px-2.5 py-0.5 rounded-full border font-medium ${status.color}`}>
                                                 {status.text}
@@ -359,7 +528,6 @@ export default function RemindersPage() {
                 <div className="border border-white/10 rounded-3xl p-2.5 shadow-[0_15px_35px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.15)] bg-[#070a14]/90 backdrop-blur-2xl">
                     <nav className="grid grid-cols-4 gap-2 text-center">
 
-                        {/* 1. Home */}
                         <Link to="/" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 ${location.pathname === '/'
                             ? 'text-blue-400 bg-blue-600/20 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.25)]'
                             : 'text-gray-400 hover:text-white hover:bg-white/5'
@@ -371,7 +539,6 @@ export default function RemindersPage() {
                             <span className={`text-[10px] mt-1 ${location.pathname === '/' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('home') || 'Home'}</span>
                         </Link>
 
-                        {/* 2. Search */}
                         <Link to="/search" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 ${location.pathname === '/search'
                             ? 'text-blue-400 bg-blue-600/20 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.25)]'
                             : 'text-gray-400 hover:text-white hover:bg-white/5'
@@ -380,7 +547,6 @@ export default function RemindersPage() {
                             <span className={`text-[10px] mt-1 ${location.pathname === '/search' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('search') || 'Search'}</span>
                         </Link>
 
-                        {/* 3. Reminders (Հիշեցումներ) + Կարմիր բեջ ֆուտերում */}
                         <Link to="/reminders" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 group relative ${location.pathname === '/reminders'
                             ? 'text-amber-400 bg-amber-600/20 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.25)]'
                             : 'text-gray-400 hover:text-white hover:bg-white/5'
@@ -396,7 +562,6 @@ export default function RemindersPage() {
                             <span className={`text-[10px] mt-1 ${location.pathname === '/reminders' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('remindersTab') || 'Հիշեցումներ'}</span>
                         </Link>
 
-                        {/* 4. Car (Մեքենա) */}
                         <Link to="/car-docs" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 group ${location.pathname === '/car-docs'
                             ? 'text-blue-400 bg-blue-600/20 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.25)]'
                             : 'text-gray-400 hover:text-white hover:bg-white/5'
@@ -413,6 +578,7 @@ export default function RemindersPage() {
                     </nav>
                 </div>
             </footer>
+
         </div>
     );
 }

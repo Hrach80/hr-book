@@ -158,6 +158,16 @@ export const translations = {
         today: "Այսօր է!",
         leftDays: "Մնաց {days} օր",
         loginRequired: "Խնդրում ենք նախ մուտք գործել համակարգ",
+        turningAge: "դառնում է {age} տարեկան",
+        birthdayLabel: "Ծննդյան օր",
+        addBirthdayTitle: "Ավելացնել ամենամյա ծննդյան օր",
+        fullNameLabel: "Անուն Ազգանուն",
+        fullNamePlaceholder: "օր. Արմեն Վարդանյան",
+        birthDateLabel: "Ծննդյան ամսաթիվ (օր, ամիս, տարի)",
+        birthdayHint: "Համակարգն ամեն տարի ավտոմատ կհիշեցնի այս օրը և կհաշվի տարիքը։",
+        addBirthdayBtn: "Ավելացնել ծնունդ",
+        addReminderTooltip: "Ավելացնել հիշեցում",
+        addBirthdayTooltip: "Ավելացնել ծննդյան օր"
 
     },
     ru: {
@@ -320,6 +330,17 @@ export const translations = {
         today: "Сегодня!",
         leftDays: "Осталось {days} дн.",
         loginRequired: "Пожалуйста, войдите в систему",
+        turningAge: "исполняется {age} лет",
+        birthdayLabel: "День рождения",
+        addBirthdayTitle: "Добавить ежегодный день рождения",
+        fullNameLabel: "Имя Фамилия",
+        fullNamePlaceholder: "напр. Армен Варданян",
+        birthDateLabel: "Дата рождения (день, месяц, год)",
+        birthdayHint: "Система будет автоматически напоминать об этом дне каждый год и считать возраст.",
+        addBirthdayBtn: "Добавить день рождения",
+        addReminderTooltip: "Добавить напоминание",
+        addBirthdayTooltip: "Добавить день рождения",
+        birthdaySaved: "🎂 День рождения успешно сохранен!"
     },
     en: {
         title: 'My Assistant',
@@ -480,5 +501,15 @@ export const translations = {
         today: "Today!",
         leftDays: "{days} days left",
         loginRequired: "Please log in first",
+        turningAge: "turning {age} years old",
+        birthdayLabel: "Birthday",
+        addBirthdayTitle: "Add Annual Birthday",
+        fullNameLabel: "Full Name",
+        fullNamePlaceholder: "e.g. John Doe",
+        birthDateLabel: "Birth Date (Day, Month, Year)",
+        birthdayHint: "The system will automatically remind you each year and calculate the age.",
+        addBirthdayBtn: "Add Birthday",
+        addReminderTooltip: "Add Reminder",
+        addBirthdayTooltip: "Add Birthday"
     }
 };

@@ -1,60 +1,186 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Search as SearchIcon, Pencil, KeyRound, Plus, Folder, ArrowLeft, User, Bell } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Search as SearchIcon, Pencil, KeyRound, Plus, Folder, ArrowLeft, Bell, Cake, Car } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { supabase } from '../services/supabaseClient';
 
 export default function Search() {
     const { t } = useLanguage();
     const location = useLocation();
+    const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
 
-    // Հիշեցումների չանցած քանակը ֆուտերի բեջի համար
+    const [allItems, setAllItems] = useState([]);
+    const [loading, setLoading] = useState(false);
     const [upcomingCount, setUpcomingCount] = useState(0);
 
-    // Բազայից կարդում ենք մոտեցող հիշեցումների քանակը ֆուտերի համար
+    const getEffectiveEventDate = (item) => {
+        const now = new Date();
+        const originalDate = new Date(item.event_date);
+        if (isNaN(originalDate.getTime())) return now;
+
+        if (!item.is_birthday) {
+            return originalDate;
+        }
+
+        let effectiveDate = new Date(now.getFullYear(), originalDate.getMonth(), originalDate.getDate(), originalDate.getHours(), originalDate.getMinutes());
+
+        if (effectiveDate < new Date(now.getFullYear(), now.getMonth(), now.getDate())) {
+            effectiveDate.setFullYear(now.getFullYear() + 1);
+        }
+
+        return effectiveDate;
+    };
+
+    // Բեռնում ենք տվյալները բոլոր աղյուսակներից միաժամանակ
     useEffect(() => {
-        const fetchRemindersCount = async () => {
+        const fetchAllData = async () => {
+            setLoading(true);
             try {
-                const { data, error } = await supabase.from('reminders').select('event_date');
-                if (error) throw error;
+                const [
+                    remindersRes,
+                    carDocsRes,
+                    documentsRes,
+                    medicalRes,
+                    notesRes,
+                    passwordsRes
+                ] = await Promise.all([
+                    supabase.from('reminders').select('*'),
+                    supabase.from('car_documents').select('*'),
+                    supabase.from('documents').select('*'),
+                    supabase.from('medical_records').select('*'),
+                    supabase.from('notes').select('*'),
+                    supabase.from('passwords').select('*')
+                ]);
 
-                if (data) {
+                let combined = [];
+
+                // 1. Reminders & Birthdays (Գնում է /reminders էջ)
+                if (remindersRes.data) {
+                    remindersRes.data.forEach(item => {
+                        combined.push({
+                            id: `reminder-${item.id}`,
+                            title: item.title || 'Անհայտ հիշեցում',
+                            preview: item.is_birthday ? '🎂 Ծննդյան օրվա հիշեցում' : '🔔 Հիշեցում',
+                            date: item.event_date ? new Date(item.event_date).toLocaleDateString() : '',
+                            type: 'reminders',
+                            path: '/reminders', // Սեղմելիս գնում է հիշեցումների էջ
+                            icon: item.is_birthday ? Cake : Bell,
+                            color: item.is_birthday ? 'text-pink-400 bg-pink-500/10 border-pink-500/30' : 'text-blue-400 bg-blue-500/10 border-blue-500/30'
+                        });
+                    });
+
                     const now = new Date();
-                    const nowDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-                    const count = data.filter(item => {
-                        const eventDate = new Date(item.event_date);
-                        const eventDateOnly = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
+                    const activeOrUpcoming = remindersRes.data.filter(item => {
+                        if (!item.event_date) return false;
+                        const eventTime = getEffectiveEventDate(item);
+                        const nowDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                        const eventDateOnly = new Date(eventTime.getFullYear(), eventTime.getMonth(), eventTime.getDate());
                         return eventDateOnly >= nowDateOnly;
-                    }).length;
-
-                    setUpcomingCount(count);
+                    });
+                    setUpcomingCount(activeOrUpcoming.length);
                 }
-            } catch (e) {
-                console.error('Error fetching reminders count:', e);
+
+                // 2. Car Documents (Գնում է /car-docs էջ)
+                if (carDocsRes.data) {
+                    carDocsRes.data.forEach(item => {
+                        combined.push({
+                            id: `car-${item.id}`,
+                            title: item.title || item.name || 'Մեքենայի փաստաթուղթ',
+                            preview: item.description || 'Ավտոմեքենայի բաժին',
+                            date: item.created_at ? new Date(item.created_at).toLocaleDateString() : '',
+                            type: 'car-docs',
+                            path: '/car-docs', // Սեղմելիս գնում է մեքենայի էջ
+                            icon: Car,
+                            color: 'text-blue-400 bg-blue-500/10 border-blue-500/30'
+                        });
+                    });
+                }
+
+                // 3. Documents (Կարող եք փոխել հղումը, եթե ունեք առանձին փաստաթղթերի էջ)
+                if (documentsRes.data) {
+                    documentsRes.data.forEach(item => {
+                        combined.push({
+                            id: `doc-${item.id}`,
+                            title: item.title || 'Փաստաթուղթ',
+                            preview: item.description || 'Ֆայլ / Փաստաթուղթ',
+                            date: item.created_at ? new Date(item.created_at).toLocaleDateString() : '',
+                            type: 'documents',
+                            path: '/', // Կարող եք փոխել ըստ ձեր երթուղու (routing)
+                            icon: Folder,
+                            color: 'text-amber-400 bg-amber-500/10 border-amber-500/30'
+                        });
+                    });
+                }
+
+                // 4. Medical Records
+                if (medicalRes.data) {
+                    medicalRes.data.forEach(item => {
+                        combined.push({
+                            id: `medical-${item.id}`,
+                            title: item.title || item.diagnosis || 'Բժշկական գրառում',
+                            preview: item.notes || 'Բժշկական բաժին',
+                            date: item.created_at ? new Date(item.created_at).toLocaleDateString() : '',
+                            type: 'medical',
+                            path: '/',
+                            icon: Plus,
+                            color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30'
+                        });
+                    });
+                }
+
+                // 5. Notes
+                if (notesRes.data) {
+                    notesRes.data.forEach(item => {
+                        combined.push({
+                            id: `note-${item.id}`,
+                            title: item.title || 'Նշում',
+                            preview: item.content || item.preview || 'Անձնական նշում',
+                            date: item.created_at ? new Date(item.created_at).toLocaleDateString() : '',
+                            type: 'notes',
+                            path: '/',
+                            icon: Pencil,
+                            color: 'text-blue-400 bg-blue-500/10 border-blue-500/30'
+                        });
+                    });
+                }
+
+                // 6. Passwords
+                if (passwordsRes.data) {
+                    passwordsRes.data.forEach(item => {
+                        combined.push({
+                            id: `pass-${item.id}`,
+                            title: item.title || item.service_name || 'Գաղտնաբառ',
+                            preview: item.username || item.account || 'Գաղտնաբառերի բաժին',
+                            date: item.created_at ? new Date(item.created_at).toLocaleDateString() : '',
+                            type: 'passwords',
+                            path: '/',
+                            icon: KeyRound,
+                            color: 'text-gray-300 bg-gray-500/10 border-gray-500/30'
+                        });
+                    });
+                }
+
+                setAllItems(combined);
+            } catch (error) {
+                console.error('Error fetching search data:', error);
+            } finally {
+                setLoading(false);
             }
         };
 
-        fetchRemindersCount();
+        fetchAllData();
     }, []);
 
-    // Մոդելավորված տվյալներ բոլոր հնարավոր գրառումներից
-    const allItems = [
-        { id: 1, type: 'notes', title: 'Առաջիկա անելիքներ', preview: 'Գնել նոր պահեստամասեր EV6-ի համար...', date: '2026-06-05', icon: Pencil, color: 'text-blue-400' },
-        { id: 2, type: 'passwords', title: 'Gmail հաշիվ', preview: 'hrachyavagarshakyan@gmail.com', date: '2026-05-20', icon: KeyRound, color: 'text-gray-300' },
-        { id: 3, type: 'medical', title: 'Անալիզների պատասխաններ', preview: 'Ընդհանուր արյան քննություն նորմալ է...', date: '2026-04-15', icon: Plus, color: 'text-emerald-400' },
-        { id: 4, type: 'documents', title: 'Անձնագրի պատճեն', preview: 'PDF ֆայլ, 2.4 ՄԲ', date: '2026-03-10', icon: Folder, color: 'text-amber-400' },
-    ];
-
-    // Ֆիլտրում ենք միայն այն դեպքում, երբ որոնման տողը դատարկ չէ
     const filteredItems = searchQuery.trim() ? allItems.filter(item => {
-        return item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            item.preview.toLowerCase().includes(searchQuery.toLowerCase());
+        const titleMatch = item.title?.toLowerCase().includes(searchQuery.toLowerCase());
+        const previewMatch = item.preview?.toLowerCase().includes(searchQuery.toLowerCase());
+        const dateMatch = item.date?.includes(searchQuery);
+        return titleMatch || previewMatch || dateMatch;
     }) : [];
 
     return (
-        <div className="font-sans pb-28 max-w-3xl mx-auto px-4 pt-2">
+        <div className="font-sans pb-28 max-w-3xl mx-auto px-4 pt-2 text-white">
 
             {/* Վերնագիր և Վերադարձ */}
             <div className="flex items-center justify-between mb-4">
@@ -74,21 +200,26 @@ export default function Search() {
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder={t('searchPlaceholder') || 'Որոնել նշումներ, գաղտնաբառեր...'}
+                    placeholder={t('searchPlaceholder') || 'Որոնել ամեն ինչից (հիշեցումներ, մեքենա, նշումներ...)'}
                     className="w-full bg-[#0b0f19]/80 border border-white/15 rounded-2xl py-3 pl-12 pr-4 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/60 shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] backdrop-blur-xl transition"
                 />
             </div>
 
-            {/* Արդյունքների ցուցադրում միայն որոնում կատարելիս */}
+            {/* Արդյունքների ցուցադրում */}
             {searchQuery.trim() !== '' && (
                 <div className="space-y-3">
-                    {filteredItems.length > 0 ? (
+                    {loading ? (
+                        <div className="text-center py-10 text-blue-400 animate-pulse text-sm">
+                            Որոնում բոլոր բաժիններում...
+                        </div>
+                    ) : filteredItems.length > 0 ? (
                         filteredItems.map(item => {
-                            const IconComponent = item.icon;
+                            const IconComponent = item.icon || Bell;
                             return (
                                 <div
                                     key={item.id}
-                                    className="glass-card p-4 rounded-2xl border border-white/10 bg-gradient-to-br from-[#0b0f19]/90 to-[#070a12]/95 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.6)] transition hover:border-white/30 flex items-center gap-3.5 group cursor-pointer"
+                                    onClick={() => navigate(item.path || '/')} // Սեղմելիս տեղափոխում է համապատասխան էջ
+                                    className="glass-card p-4 rounded-2xl border border-white/10 bg-gradient-to-br from-[#0b0f19]/90 to-[#070a12]/95 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.6)] transition hover:border-white/30 flex items-center gap-3.5 group cursor-pointer hover:scale-[1.01]"
                                 >
                                     <div className={`w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center ${item.color} shadow-[0_0_10px_rgba(0,0,0,0.5)] group-hover:scale-110 transition-transform`}>
                                         <IconComponent size={20} />

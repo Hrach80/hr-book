@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Pencil, KeyRound, Plus, Folder, Search as SearchIcon, Database, HardDrive, RefreshCw, Activity, Bell, FileText } from 'lucide-react';
+import { Pencil, KeyRound, Plus, Folder, Search as SearchIcon, Database, HardDrive, RefreshCw, Activity, Bell } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { supabase } from '../services/supabaseClient';
@@ -17,7 +17,6 @@ export default function Dashboard() {
     // Հիշեցումների (ներառյալ ծննդյան օրեր) և նշումների վիճակներ
     const [upcomingCount, setUpcomingCount] = useState(0);
     const [notesCount, setNotesCount] = useState(0);
-    const [recentNotes, setRecentNotes] = useState([]);
 
     const dbLimitMB = 500;
     const storageLimitMB = 1024;
@@ -66,8 +65,6 @@ export default function Dashboard() {
 
                 if (notesRes.data) {
                     setNotesCount(notesRes.data.length);
-                    const sortedNotes = [...notesRes.data].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-                    setRecentNotes(sortedNotes.slice(0, 3));
                 }
             } catch (error) {
                 console.error('Error fetching dashboard data:', error);
@@ -96,7 +93,7 @@ export default function Dashboard() {
     };
 
     return (
-        /* px-4 sm:px-8 - լիովին հավասարեցված է Նավբարի արտաքին պադինգներին */
+        /* px-4 sm:px-8 - լիովին համապատասխանեցված է նավբարի եզրային հեռավորություններին */
         <div className="font-sans pb-32 w-full px-4 sm:px-8 pt-2 animate-softFadeScale text-white">
             <div className="max-w-xl mx-auto">
 
@@ -142,33 +139,6 @@ export default function Dashboard() {
                         </div>
                     </Link>
                 </div>
-
-                {/* Նշումների ծանուցումների կամ վերջին գրառումների բլոկ */}
-                {recentNotes.length > 0 && (
-                    <div className="p-4 sm:p-5 rounded-3xl border border-blue-500/20 bg-gradient-to-br from-[#0b0f19]/90 via-[#101726]/80 to-[#070a12]/95 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] mb-4 space-y-3">
-                        <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
-                            <span className="text-xs font-bold text-cyan-400 tracking-wider uppercase flex items-center gap-2">
-                                <FileText size={14} />
-                                Վերջին նշումները & Ծանուցումները
-                            </span>
-                            <Link to="/notes" className="text-[11px] text-cyan-400 hover:underline">
-                                Բոլորը ({notesCount}) →
-                            </Link>
-                        </div>
-                        <div className="space-y-2">
-                            {recentNotes.map((note) => (
-                                <div key={note.id} className="p-2.5 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center justify-between text-xs">
-                                    <span className="text-gray-200 font-medium truncate max-w-[70%]">
-                                        {note.title || note.content || 'Առանց վերնագրի նշում'}
-                                    </span>
-                                    <span className="text-[10px] text-gray-400">
-                                        {note.created_at ? new Date(note.created_at).toLocaleDateString('hy-AM') : ''}
-                                    </span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
 
                 {/* Supabase Ռեսուրսների Վերլուծական Վահանակ */}
                 <div className="p-4 sm:p-6 rounded-3xl border border-blue-500/30 bg-gradient-to-b from-[#06142e] via-[#0b1f3d] to-[#040914] shadow-[0_20px_50px_rgba(0,0,0,0.9),inset_0_1px_2px_rgba(255,255,255,0.25)] mb-4 relative overflow-hidden">
@@ -223,7 +193,7 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* Ներքևի նավիգացիոն մենյու (Ֆուտեր) */}
+                {/* Ներքևի նավիգացիոն մենյու (Ֆուտեր) - Համապատասխանեցված եզրերով */}
                 <footer className="fixed bottom-4 left-0 right-0 mx-auto max-w-xl px-4 sm:px-8 z-50">
                     <div className="border border-white/10 rounded-3xl p-2.5 shadow-[0_15px_35px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.15)] bg-[#070a14]/90 backdrop-blur-2xl">
                         <nav className="grid grid-cols-4 gap-2 text-center">

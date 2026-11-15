@@ -7,7 +7,7 @@ import Dashboard from './pages/Dashboard';
 import NotesPage from './pages/NotesPage';
 import PasswordsPage from './pages/PasswordsPage';
 import MedicalPage from './pages/MedicalPage';
-import DocsPage from './pages/DocsPage';           // Ընդհանուր փաստաթղթերի էջը
+import DocsPage from './pages/DocsPage';          // Ընդհանուր փաստաթղթերի էջը
 import CarDocsPage from './pages/CarDocsPage';   // Մեքենայի փաստաթղթերի էջը
 import SettingsPage from './pages/SettingsPage';
 import AuthPage from './pages/AuthPage';
@@ -128,7 +128,7 @@ function App() {
               <Route path="/notes" element={<NotesPage />} />
               <Route path="/passwords" element={<PasswordsPage />} />
               <Route path="/medical" element={<MedicalPage />} />
-              <Route path="/docs" element={<DocsPage />} />           {/* Ընդհանուր փաստաթղթեր */}
+              <Route path="/docs" element={<DocsPage />} />          {/* Ընդհանուր փաստաթղթեր */}
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/search" element={<Search />} />

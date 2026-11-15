@@ -3,9 +3,6 @@ import { Globe, DollarSign, Maximize2, X, TrendingUp, TrendingDown, LayoutGrid, 
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 import { useLanguage } from '../context/LanguageContext';
 
-// ==========================================
-// 1. ՀԱՍՏԱՏՈՒՆՆԵՐ ԵՎ ՏՎՅԱԼՆԵՐԻ ԲԱԶԱ (TIMEZONES)
-// ==========================================
 const TIMEZONES = [
     { label: 'Yerevan (GMT+4)', short: 'Yerevan', value: 'Asia/Yerevan' },
     { label: 'Antwerp / Brussels', short: 'Antwerp', value: 'Europe/Brussels' },
@@ -21,14 +18,9 @@ const TIMEZONES = [
 
 export default function WidgetsDock() {
     const { t } = useLanguage();
-
-    // ==========================================
-    // 2. ԸՆԴՀԱՆՈՒՐ STATE-ԵՐ ԵՎ ՎԻՃԱԿՆԵՐ
-    // ==========================================
     const [isDockOpen, setIsDockOpen] = useState(false);
     const [activeModal, setActiveModal] = useState(null);
 
-    // Ժամացույցների հետ կապված state-եր
     const [time, setTime] = useState(new Date());
     const [selectedZones, setSelectedZones] = useState([
         'Asia/Yerevan',
@@ -37,7 +29,6 @@ export default function WidgetsDock() {
     ]);
     const [expandedZoneIndex, setExpandedZoneIndex] = useState(null);
 
-    // Տարադրամների հետ կապված state-եր (Իրական ժամանակի տվյալներ)
     const [currencies, setCurrencies] = useState([
         { code: 'USD/AMD', name: 'US Dollar (Market)', rate: '402.50', change: '+0.30%', isUp: true, color: '#10b981', data: [{ v: 400 }, { v: 401.5 }, { v: 400.8 }, { v: 402.2 }, { v: 401.3 }, { v: 402.5 }] },
         { code: 'EUR/AMD', name: 'Euro (Market)', rate: '429.20', change: '-0.15%', isUp: false, color: '#3b82f6', data: [{ v: 431.5 }, { v: 430 }, { v: 430.8 }, { v: 429.5 }, { v: 429.8 }, { v: 429.2 }] },
@@ -45,9 +36,6 @@ export default function WidgetsDock() {
         { code: 'GEL/AMD', name: 'Georgian Lari', rate: '148.80', change: '+0.20%', isUp: true, color: '#ec4899', data: [{ v: 147.9 }, { v: 148.4 }, { v: 148.1 }, { v: 148.6 }, { v: 148.3 }, { v: 148.8 }] },
     ]);
 
-    // ==========================================
-    // 3. ՖՈՒՆԿՑԻԱՆԵՐ ԵՎ API ՀՐԱՎԵՐՆԵՐ
-    // ==========================================
     useEffect(() => {
         const timer = setInterval(() => setTime(new Date()), 1000);
         return () => clearInterval(timer);
@@ -114,14 +102,10 @@ export default function WidgetsDock() {
     };
 
     return (
-        <div className="relative z-[90]">
+        <div className="relative z-[90] w-full flex flex-col items-center mb-4">
 
-            {/* ==========================================
-            4. ԷԿՐԱՆԻ ԿԵՆՏՐՈՆՈՒՄ՝ ԻՋԵՑՎԱԾ ԵՎՍ 6px (top-[87px] / sm:top-[95px])
-            ========================================== */}
-            <div className="fixed left-1/2 -translate-x-1/2 top-[87px] sm:top-[95px] flex flex-col items-center">
-
-                {/* Հորիզոնական գլխավոր կոճակ */}
+            {/* Հորիզոնական գլխավոր կոճակը Նավբարի տակ */}
+            <div className="relative flex flex-col items-center">
                 <button
                     type="button"
                     onClick={() => setIsDockOpen(!isDockOpen)}
@@ -135,71 +119,50 @@ export default function WidgetsDock() {
                     <ChevronDown size={12} className={`text-gray-300 transition-transform duration-300 ${isDockOpen ? 'rotate-180' : ''}`} />
                 </button>
 
-                {/* Բացվող հորիզոնական իկոնաների ցանկ (Դեպի ներքև) */}
+                {/* Բացվող հորիզոնական իկոնաների ցանկ */}
                 {isDockOpen && (
-                    <div className="absolute top-10 flex items-center gap-2 p-1.5 rounded-2xl border border-white/20 bg-[#0b0f19]/85 backdrop-blur-xl shadow-[0_10px_35px_rgba(0,0,0,0.7),inset_0_1px_1px_rgba(255,255,255,0.25)] animate-[fadeIn_0.3s_ease-out]">
-
-                        {/* Ժամացույցի իկոնա */}
+                    <div className="absolute top-10 z-50 flex items-center gap-2 p-1.5 rounded-2xl border border-white/20 bg-[#0b0f19]/95 backdrop-blur-xl shadow-[0_10px_35px_rgba(0,0,0,0.7),inset_0_1px_1px_rgba(255,255,255,0.25)] animate-[fadeIn_0.3s_ease-out]">
                         <button
                             type="button"
                             onClick={() => {
                                 setActiveModal('clock');
                                 setIsDockOpen(false);
                             }}
-                            className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500/35 to-indigo-500/25 border border-white/25 text-blue-300 hover:border-blue-400/90 hover:scale-105 transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.5)] flex items-center justify-center cursor-pointer active:scale-95 group"
+                            className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500/35 to-indigo-500/25 border border-white/25 text-blue-300 hover:border-blue-400/90 hover:scale-105 transition-all duration-300 flex items-center justify-center cursor-pointer active:scale-95 group"
                             title="World Clocks"
                         >
                             <Globe size={16} className="group-hover:rotate-45 transition-transform duration-500 drop-shadow-[0_0_8px_rgba(59,130,246,0.9)]" />
                         </button>
 
-                        {/* Տարադրամի իկոնա */}
                         <button
                             type="button"
                             onClick={() => {
                                 setActiveModal('currency');
                                 setIsDockOpen(false);
                             }}
-                            className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500/35 to-teal-500/25 border border-white/25 text-emerald-300 hover:border-emerald-400/90 hover:scale-105 transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.5)] flex items-center justify-center cursor-pointer active:scale-95 group"
+                            className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500/35 to-teal-500/25 border border-white/25 text-emerald-300 hover:border-emerald-400/90 hover:scale-105 transition-all duration-300 flex items-center justify-center cursor-pointer active:scale-95 group"
                             title="Market Rates"
                         >
                             <DollarSign size={16} className="group-hover:scale-110 transition-transform duration-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.9)]" />
                         </button>
-
                     </div>
                 )}
-
             </div>
 
-
-            {/* ==========================================
-            5. ԺԱՄԱՑՈՒՅՑՆԵՐԻ ՄԵԾ ՊԱՏՈՒՀԱՆ (Օպտիմալացված հեռախոսի և փոքր չափսերի համար)
-            ========================================== */}
+            {/* Մոդալ պատուհաններ (Ժամացույց և Տարադրամ) */}
             {activeModal === 'clock' && (
-                <div
-                    className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md"
-                    onClick={() => setActiveModal(null)}
-                >
-                    <div
-                        className="relative w-full max-w-md glass-card p-4 sm:p-5 rounded-3xl border border-white/20 bg-gradient-to-br from-[#0b0f19]/95 via-[#101726]/90 to-[#070a12]/98 shadow-[0_20px_60px_rgba(0,0,0,0.95)] backdrop-blur-2xl animate-[fadeIn_0.3s_ease-out]"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        {/* Վերնագիր և փակելու կոճակ */}
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md" onClick={() => setActiveModal(null)}>
+                    <div className="relative w-full max-w-md glass-card p-4 sm:p-5 rounded-3xl border border-white/20 bg-gradient-to-br from-[#0b0f19]/95 via-[#101726]/90 to-[#070a12]/98 shadow-[0_20px_60px_rgba(0,0,0,0.95)] backdrop-blur-2xl" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-between mb-3 border-b border-white/10 pb-2">
                             <div className="w-6"></div>
                             <div className="flex items-center gap-2 text-blue-400 text-xs sm:text-sm font-semibold tracking-wider uppercase">
                                 <Globe size={16} />
                                 <span>{t('worldClocks') || 'World Clocks'}</span>
                             </div>
-                            <button
-                                type="button"
-                                onClick={() => setActiveModal(null)}
-                                className="text-gray-400 hover:text-white p-1 rounded-xl hover:bg-white/15 transition cursor-pointer"
-                            >
+                            <button type="button" onClick={() => setActiveModal(null)} className="text-gray-400 hover:text-white p-1 rounded-xl hover:bg-white/15 transition cursor-pointer">
                                 <X size={16} />
                             </button>
                         </div>
-
-                        {/* Ժամացույցների ցանկը */}
                         <div className="flex flex-col gap-2.5 relative z-10">
                             {selectedZones.map((zone, index) => {
                                 const { hours, minutes, seconds, dateStr } = getTimeComponents(zone);
@@ -209,28 +172,19 @@ export default function WidgetsDock() {
                                 const currentObj = TIMEZONES.find(item => item.value === zone);
 
                                 return (
-                                    <div
-                                        key={index}
-                                        onClick={() => setExpandedZoneIndex(index)}
-                                        className="flex items-center justify-between p-3 rounded-2xl bg-white/[0.02] border border-white/10 backdrop-blur-xl hover:border-blue-500/50 cursor-pointer transition group"
-                                    >
+                                    <div key={index} onClick={() => setExpandedZoneIndex(index)} className="flex items-center justify-between p-3 rounded-2xl bg-white/[0.02] border border-white/10 backdrop-blur-xl hover:border-blue-500/50 cursor-pointer transition group">
                                         <div className="flex items-center gap-3">
-                                            {/* Նրբագեղ անալոգային կլոր ժամացույց */}
                                             <div className="relative w-10 h-10 rounded-full border border-white/20 bg-gradient-to-b from-[#060911] to-[#0b101d] flex items-center justify-center shadow-[inset_0_2px_6px_rgba(0,0,0,0.9)]">
                                                 <div className="absolute w-1.5 h-1.5 rounded-full bg-blue-400 z-30"></div>
                                                 <div className="absolute w-0.5 bg-blue-400 rounded-full origin-bottom z-20" style={{ height: '10px', bottom: '50%', transform: `rotate(${hourDeg}deg)` }}></div>
                                                 <div className="absolute w-[1px] bg-cyan-300 rounded-full origin-bottom z-20" style={{ height: '13px', bottom: '50%', transform: `rotate(${minuteDeg}deg)` }}></div>
                                                 <div className="absolute w-[0.5px] bg-red-400 rounded-full origin-bottom z-20" style={{ height: '15px', bottom: '50%', transform: `rotate(${secondDeg}deg)` }}></div>
                                             </div>
-
                                             <div>
-                                                <p className="text-xs sm:text-sm font-bold text-white">
-                                                    {currentObj ? currentObj.label : zone}
-                                                </p>
+                                                <p className="text-xs sm:text-sm font-bold text-white">{currentObj ? currentObj.label : zone}</p>
                                                 <p className="text-[10px] text-gray-400">{dateStr}</p>
                                             </div>
                                         </div>
-
                                         <div className="flex items-center gap-3">
                                             <span className="text-sm sm:text-base font-extrabold text-blue-300 tracking-wider">
                                                 {String(hours).padStart(2, '0')}:{String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
@@ -247,47 +201,26 @@ export default function WidgetsDock() {
                 </div>
             )}
 
-
-            {/* ==========================================
-            6. ՏԱՐԱԴՐԱՄՆԵՐԻ ՄԵԾ ՊԱՏՈՒՀԱՆ (Օպտիմալացված հեռախոսի և փոքր չափսերի համար)
-            ========================================== */}
             {activeModal === 'currency' && (
-                <div
-                    className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md"
-                    onClick={() => setActiveModal(null)}
-                >
-                    <div
-                        className="relative w-full max-w-md glass-card p-4 sm:p-5 rounded-3xl border border-white/20 bg-gradient-to-br from-[#0b0f19]/95 via-[#101726]/90 to-[#070a12]/98 shadow-[0_20px_60px_rgba(0,0,0,0.95)] backdrop-blur-2xl animate-[fadeIn_0.3s_ease-out]"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        {/* Վերնագիր և փակելու կոճակ */}
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md" onClick={() => setActiveModal(null)}>
+                    <div className="relative w-full max-w-md glass-card p-4 sm:p-5 rounded-3xl border border-white/20 bg-gradient-to-br from-[#0b0f19]/95 via-[#101726]/90 to-[#070a12]/98 shadow-[0_20px_60px_rgba(0,0,0,0.95)] backdrop-blur-2xl" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-between mb-3 border-b border-white/10 pb-2">
                             <div className="w-6"></div>
                             <div className="flex items-center gap-2 text-emerald-400 text-xs sm:text-sm font-semibold tracking-wider uppercase">
                                 <DollarSign size={16} />
                                 <span>{t('liveRates') || 'Armenian Market Rates'}</span>
                             </div>
-                            <button
-                                type="button"
-                                onClick={() => setActiveModal(null)}
-                                className="text-gray-400 hover:text-white p-1 rounded-xl hover:bg-white/15 transition cursor-pointer"
-                            >
+                            <button type="button" onClick={() => setActiveModal(null)} className="text-gray-400 hover:text-white p-1 rounded-xl hover:bg-white/15 transition cursor-pointer">
                                 <X size={16} />
                             </button>
                         </div>
-
-                        {/* Տարադրամների ցանկը */}
                         <div className="space-y-2.5">
                             {currencies.map((item, index) => (
-                                <div
-                                    key={index}
-                                    className="flex items-center justify-between p-3 rounded-2xl bg-white/[0.03] border border-white/10"
-                                >
+                                <div key={index} className="flex items-center justify-between p-3 rounded-2xl bg-white/[0.03] border border-white/10">
                                     <div className="flex flex-col w-28">
                                         <span className="font-bold text-white text-xs sm:text-sm">{item.code}</span>
                                         <span className="text-[10px] text-gray-400">{item.name}</span>
                                     </div>
-
                                     <div className="w-20 sm:w-32 h-7 mx-2">
                                         <ResponsiveContainer width="100%" height="100%">
                                             <AreaChart data={item.data} margin={{ top: 2, right: 0, left: 0, bottom: 2 }}>
@@ -301,7 +234,6 @@ export default function WidgetsDock() {
                                             </AreaChart>
                                         </ResponsiveContainer>
                                     </div>
-
                                     <div className="flex items-center gap-2.5 text-right">
                                         <span className="font-bold text-white text-xs sm:text-sm">{item.rate} ֏</span>
                                         <div className="flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-lg border" style={{ color: item.color, backgroundColor: `${item.color}15`, borderColor: `${item.color}40` }}>
@@ -316,35 +248,16 @@ export default function WidgetsDock() {
                 </div>
             )}
 
-
-            {/* ==========================================
-            7. ԺԱՄԱՅԻՆ ԳՈՏՈՒ ՓՈՓՈԽՄԱՆ ԵՆԹԱՊԱՏՈՒՀԱՆ (Modal)
-            ========================================== */}
             {expandedZoneIndex !== null && (
-                <div
-                    className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn"
-                    onClick={() => setExpandedZoneIndex(null)}
-                >
-                    <div
-                        className="relative w-full max-w-xs glass-card p-5 rounded-3xl bg-[#0b0f19] border border-blue-500/30 shadow-[0_0_40px_rgba(59,130,246,0.3)] flex flex-col items-center"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <button
-                            type="button"
-                            onClick={() => setExpandedZoneIndex(null)}
-                            className="absolute top-3 right-3 text-gray-300 hover:text-white p-1"
-                        >
+                <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn" onClick={() => setExpandedZoneIndex(null)}>
+                    <div className="relative w-full max-w-xs glass-card p-5 rounded-3xl bg-[#0b0f19] border border-blue-500/30 shadow-[0_0_40px_rgba(59,130,246,0.3)] flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
+                        <button type="button" onClick={() => setExpandedZoneIndex(null)} className="absolute top-3 right-3 text-gray-300 hover:text-white p-1">
                             <X size={16} />
                         </button>
-
-                        <span className="text-[11px] font-semibold text-blue-400 tracking-wider uppercase mb-3">
-                            Փոխել ժամային գոտին
-                        </span>
-
+                        <span className="text-[11px] font-semibold text-blue-400 tracking-wider uppercase mb-3">Փոխել ժամային գոտին</span>
                         <div className="w-full mb-4 text-center">
                             <p className="text-xs text-gray-300">Ընտրեք նոր քաղաք կամ գոտի #{expandedZoneIndex + 1}-ի համար</p>
                         </div>
-
                         <div className="w-full">
                             <select
                                 value={selectedZones[expandedZoneIndex]}

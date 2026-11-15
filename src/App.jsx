@@ -12,10 +12,9 @@ import CarDocsPage from './pages/CarDocsPage';   // Մեքենայի փաստա�
 import SettingsPage from './pages/SettingsPage';
 import AuthPage from './pages/AuthPage';
 import Navbar from './components/Navbar';
-import WidgetsDock from './components/WidgetsDock';
 import Search from './pages/Search';
 import RemindersPage from './pages/RemindersPage';
-import Footer from './components/Footer';          // <--- Ներմուծում ենք մեր ընդհանուր ֆուտերը
+import Footer from './components/Footer';          // <--- Ընդհանուր ֆուտերի բաղադրիչը
 
 function App() {
 
@@ -109,9 +108,6 @@ function App() {
       <Router>
         {/* pb-40-ը ապահովում է, որ ոչ մի էջի բովանդակություն չփակվի ֆուտերով */}
         <div className="min-h-screen bg-[#0b0f19] text-white transition-colors duration-300 relative overflow-x-hidden pb-40">
-
-          {/* Միավորված ձախ կողային վահանակ */}
-          <WidgetsDock />
 
           {/* Միասնական Նավբար բոլոր էջերի համար */}
           <Navbar />

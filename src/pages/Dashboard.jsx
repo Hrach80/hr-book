@@ -4,6 +4,7 @@ import { Pencil, KeyRound, Plus, Folder, Search, Database, HardDrive, RefreshCw,
 import { useLanguage } from '../context/LanguageContext';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { supabase } from '../services/supabaseClient';
+import WidgetsDock from '../components/WidgetsDock'; // <--- Ներմուծում ենք վիջեթների վահանակը
 
 export default function Dashboard() {
     const { t } = useLanguage();
@@ -93,10 +94,13 @@ export default function Dashboard() {
     };
 
     return (
-        <div className="font-sans pb-32 w-full text-white animate-softFadeScale">
+        <div className="font-sans w-full text-white animate-softFadeScale">
+
+            {/* 🎯 Վիջեթների վահանակը (Ժամացույցներ և Տարադրամներ) - Աշխատում է միայն Դաշբորդում */}
+            <WidgetsDock />
 
             {/* Հորիզոնական դիրքով վիջեթների պատուհան */}
-            <div className="grid grid-cols-2 gap-3.5 mb-5">
+            <div className="grid grid-cols-2 gap-3.5 mb-5 mt-4">
                 <Link to="/notes" className="glass-card p-4 rounded-2xl flex items-center gap-3.5 shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-blue-500/30 bg-gradient-to-r from-blue-600/15 via-blue-900/5 to-transparent backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-blue-500/60 group relative">
                     <div className="w-11 h-11 rounded-xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0 group-hover:scale-110 transition-transform">
                         <Pencil size={22} className="drop-shadow-[0_0_8px_rgba(59,130,246,0.6)]" />
@@ -191,7 +195,6 @@ export default function Dashboard() {
                 </div>
             </div>
 
-        
         </div>
     );
 }

@@ -93,9 +93,9 @@ export default function Dashboard() {
     };
 
     return (
-        /* px-4 sm:px-8 - լիովին համապատասխանեցված է նավբարի եզրային հեռավորություններին */
-        <div className="font-sans pb-32 w-full px-4 sm:px-8 pt-2 animate-softFadeScale text-white">
-            <div className="max-w-xl mx-auto">
+        /* Շտկվեց գլխավոր կոնտեյների դասերը, որպեսզի լիովին համապատասխանի մյուս էջերին */
+        <div className="font-sans pb-36 w-full px-4 sm:px-8 pt-2 animate-softFadeScale text-white">
+            <div className="max-w-xl mx-auto w-full">
 
                 {/* Հորիզոնական դիրքով վիջեթների պատուհան */}
                 <div className="grid grid-cols-2 gap-3.5 mb-5">
@@ -193,8 +193,8 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* Ներքևի նավիգացիոն մենյու (Ֆուտեր) - Համապատասխանեցված եզրերով */}
-                <footer className="fixed bottom-4 left-0 right-0 mx-auto max-w-xl px-4 sm:px-8 z-50">
+                {/* Ներքևի նավիգացիոն մենյու (Ֆուտեր) - Ճշգրիտ հավասարեցված Search էջի ոճով */}
+                <footer className="fixed bottom-4 left-0 right-0 mx-auto max-w-md px-4 z-50">
                     <div className="border border-white/10 rounded-3xl p-2.5 shadow-[0_15px_35px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.15)] bg-[#070a14]/90 backdrop-blur-2xl">
                         <nav className="grid grid-cols-4 gap-2 text-center">
 

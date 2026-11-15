@@ -3,15 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { Settings } from 'lucide-react';
 
 export default function Navbar() {
-    const navigate = useNavigate();
+    const useNavigateInstance = useNavigate();
 
     return (
-        <header className="w-full px-4 sm:px-8 py-3.5 mb-6">
-            <div className="max-w-7xl mx-auto px-5 sm:px-6 py-4 rounded-2xl sm:rounded-3xl border border-white/10 bg-gradient-to-r from-[#0b0f19]/90 via-[#101726]/80 to-[#070a12]/95 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] flex items-center justify-between">
+        <header className="w-full px-4 sm:px-6 py-3.5 mb-4">
+            {/* max-w-xl - հավասարեցված է Դաշբորդի և մյուս էջերի լայնությանը */}
+            <div className="max-w-xl mx-auto px-4 sm:px-6 py-3 rounded-2xl sm:rounded-3xl border border-white/10 bg-gradient-to-r from-[#0b0f19]/90 via-[#101726]/80 to-[#070a12]/95 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] flex items-center justify-between">
 
                 {/* Ձախ անկյուն՝ Մեծացված ձեռագիր HV notebook գրառումը (Գլխավոր էջ) */}
                 <div
-                    onClick={() => navigate('/')}
+                    onClick={() => useNavigateInstance('/')}
                     className="flex items-center gap-3 group cursor-pointer p-1"
                     title="Գլխավոր էջ"
                 >
@@ -27,7 +28,7 @@ export default function Navbar() {
                 {/* Աջ անկյուն՝ Կարգավորումների կոճակ */}
                 <div className="flex items-center gap-3">
                     <button
-                        onClick={() => navigate('/settings')}
+                        onClick={() => useNavigateInstance('/settings')}
                         className="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-white/[0.04] border border-white/10 text-gray-200 hover:bg-white/[0.09] hover:border-cyan-500/50 hover:text-white transition-all duration-300 shadow-md cursor-pointer group active:scale-95"
                         title="Կարգավորումներ"
                     >

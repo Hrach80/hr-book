@@ -68,13 +68,14 @@ export default function Dashboard() {
     };
 
     return (
-        <div className="font-sans pb-32 max-w-md mx-auto px-4 pt-4 sm:pt-6 animate-softFadeScale text-white">
+        /* max-w-xl - հավասարեցված է Նավբարի և մյուս էջերի (օր. Settings) լայնությանը */
+        <div className="font-sans pb-32 max-w-xl mx-auto px-4 pt-4 sm:pt-6 animate-softFadeScale text-white">
 
-            {/* Հորիզոնական դիրքով վիջեթների պատուհան (4 հիմնական բաժինները) */}
-            <div className="grid grid-cols-2 gap-3 mb-4">
-                <Link to="/notes" className="glass-card p-3.5 rounded-2xl flex items-center gap-3 shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-blue-500/30 bg-gradient-to-r from-blue-600/15 via-blue-900/5 to-transparent backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-blue-500/60 group">
-                    <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0 group-hover:scale-110 transition-transform">
-                        <Pencil size={20} className="drop-shadow-[0_0_8px_rgba(59,130,246,0.6)]" />
+            {/* Հորիզոնական դիրքով վիջեթների պատուհան */}
+            <div className="grid grid-cols-2 gap-3.5 mb-5">
+                <Link to="/notes" className="glass-card p-4 rounded-2xl flex items-center gap-3.5 shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-blue-500/30 bg-gradient-to-r from-blue-600/15 via-blue-900/5 to-transparent backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-blue-500/60 group">
+                    <div className="w-11 h-11 rounded-xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0 group-hover:scale-110 transition-transform">
+                        <Pencil size={22} className="drop-shadow-[0_0_8px_rgba(59,130,246,0.6)]" />
                     </div>
                     <div className="overflow-hidden">
                         <span className="font-bold text-xs sm:text-sm text-white tracking-wide block truncate">{t('notes') || 'Notes'}</span>
@@ -82,9 +83,9 @@ export default function Dashboard() {
                     </div>
                 </Link>
 
-                <Link to="/passwords" className="glass-card p-3.5 rounded-2xl flex items-center gap-3 shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-white/10 bg-gradient-to-r from-white/[0.04] to-transparent backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-white/30 group">
-                    <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center text-gray-200 shrink-0 group-hover:scale-110 transition-transform">
-                        <KeyRound size={20} className="drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]" />
+                <Link to="/passwords" className="glass-card p-4 rounded-2xl flex items-center gap-3.5 shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-white/10 bg-gradient-to-r from-white/[0.04] to-transparent backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-white/30 group">
+                    <div className="w-11 h-11 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center text-gray-200 shrink-0 group-hover:scale-110 transition-transform">
+                        <KeyRound size={22} className="drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]" />
                     </div>
                     <div className="overflow-hidden">
                         <span className="font-bold text-xs sm:text-sm text-gray-200 tracking-wide block truncate">{t('passwords') || 'Passwords'}</span>
@@ -92,9 +93,9 @@ export default function Dashboard() {
                     </div>
                 </Link>
 
-                <Link to="/medical" className="glass-card p-3.5 rounded-2xl flex items-center gap-3 shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-white/10 bg-gradient-to-r from-white/[0.04] to-transparent backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-white/30 group">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0 group-hover:scale-110 transition-transform">
-                        <Plus size={20} className="drop-shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
+                <Link to="/medical" className="glass-card p-4 rounded-2xl flex items-center gap-3.5 shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-white/10 bg-gradient-to-r from-white/[0.04] to-transparent backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-white/30 group">
+                    <div className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0 group-hover:scale-110 transition-transform">
+                        <Plus size={22} className="drop-shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
                     </div>
                     <div className="overflow-hidden">
                         <span className="font-bold text-xs sm:text-sm text-gray-200 tracking-wide block truncate">{t('medical') || 'Medical'}</span>
@@ -102,9 +103,9 @@ export default function Dashboard() {
                     </div>
                 </Link>
 
-                <Link to="/docs" className="glass-card p-3.5 rounded-2xl flex items-center gap-3 shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-white/10 bg-gradient-to-r from-white/[0.04] to-transparent backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-white/30 group">
-                    <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0 group-hover:scale-110 transition-transform">
-                        <Folder size={20} className="drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
+                <Link to="/docs" className="glass-card p-4 rounded-2xl flex items-center gap-3.5 shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-white/10 bg-gradient-to-r from-white/[0.04] to-transparent backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-white/30 group">
+                    <div className="w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0 group-hover:scale-110 transition-transform">
+                        <Folder size={22} className="drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
                     </div>
                     <div className="overflow-hidden">
                         <span className="font-bold text-xs sm:text-sm text-gray-200 tracking-wide block truncate">{t('documents') || 'Documents'}</span>
@@ -114,9 +115,9 @@ export default function Dashboard() {
             </div>
 
             {/* Supabase Ռեսուրսների Վերլուծական Վահանակ */}
-            <div className="p-4 sm:p-5 rounded-3xl border border-blue-500/30 bg-gradient-to-b from-[#06142e] via-[#0b1f3d] to-[#040914] shadow-[0_20px_50px_rgba(0,0,0,0.9),inset_0_1px_2px_rgba(255,255,255,0.25)] mb-4 relative overflow-hidden">
+            <div className="p-4 sm:p-6 rounded-3xl border border-blue-500/30 bg-gradient-to-b from-[#06142e] via-[#0b1f3d] to-[#040914] shadow-[0_20px_50px_rgba(0,0,0,0.9),inset_0_1px_2px_rgba(255,255,255,0.25)] mb-4 relative overflow-hidden">
 
-                <div className="flex items-center justify-between mb-3.5 relative z-10 border-b border-blue-500/20 pb-3">
+                <div className="flex items-center justify-between mb-4 relative z-10 border-b border-blue-500/20 pb-3">
                     <span className="text-xs font-bold text-blue-200 tracking-wider uppercase flex items-center gap-2">
                         <div className="w-5 h-5 rounded-lg bg-blue-500/20 border border-blue-400/40 flex items-center justify-center text-blue-300 shadow-[0_0_10px_rgba(59,130,246,0.6)]">
                             <Activity size={12} />
@@ -133,9 +134,9 @@ export default function Dashboard() {
                 </div>
 
                 {/* Վերլուծական գրաֆիկ */}
-                <div className="w-full h-48 sm:h-52 relative z-10">
+                <div className="w-full h-52 sm:h-60 relative z-10">
                     <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={chartData} margin={{ top: 10, right: 5, left: -25, bottom: 0 }}>
+                        <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="rgba(59, 130, 246, 0.15)" />
                             <XAxis dataKey="time" stroke="#93c5fd" fontSize={10} tickLine={false} />
                             <YAxis stroke="#93c5fd" fontSize={10} tickLine={false} />
@@ -150,19 +151,19 @@ export default function Dashboard() {
                 </div>
 
                 {/* Մանրամասն տեքստային ցուցանիշներ */}
-                <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-blue-500/20 relative z-10 text-xs">
-                    <div className="flex items-center gap-2">
-                        <Database size={15} className="text-sky-400 drop-shadow-[0_0_6px_rgba(56,189,248,0.8)] shrink-0" />
+                <div className="grid grid-cols-2 gap-3 mt-4 pt-3.5 border-t border-blue-500/20 relative z-10 text-xs">
+                    <div className="flex items-center gap-2.5">
+                        <Database size={16} className="text-sky-400 drop-shadow-[0_0_6px_rgba(56,189,248,0.8)] shrink-0" />
                         <div className="overflow-hidden">
-                            <p className="text-blue-300/70 text-[9px] truncate">{t('databaseLimit') || 'Database (Max 500MB)'}</p>
-                            <p className="font-bold text-white text-[11px]">{dbUsageMB} MB <span className="text-[9px] text-sky-400">({Math.round((dbUsageMB / dbLimitMB) * 100)}%)</span></p>
+                            <p className="text-blue-300/70 text-[10px] truncate">{t('databaseLimit') || 'Database (Max 500MB)'}</p>
+                            <p className="font-bold text-white text-xs">{dbUsageMB} MB <span className="text-[10px] text-sky-400">({Math.round((dbUsageMB / dbLimitMB) * 100)}%)</span></p>
                         </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <HardDrive size={15} className="text-yellow-400 drop-shadow-[0_0_6px_rgba(250,204,21,0.8)] shrink-0" />
+                    <div className="flex items-center gap-2.5">
+                        <HardDrive size={16} className="text-yellow-400 drop-shadow-[0_0_6px_rgba(250,204,21,0.8)] shrink-0" />
                         <div className="overflow-hidden">
-                            <p className="text-blue-300/70 text-[9px] truncate">{t('storageLimit') || 'Storage (Max 1GB)'}</p>
-                            <p className="font-bold text-white text-[11px]">{storageUsageMB} MB <span className="text-[9px] text-yellow-400">({Math.round((storageUsageMB / storageLimitMB) * 100)}%)</span></p>
+                            <p className="text-blue-300/70 text-[10px] truncate">{t('storageLimit') || 'Storage (Max 1GB)'}</p>
+                            <p className="font-bold text-white text-xs">{storageUsageMB} MB <span className="text-[10px] text-yellow-400">({Math.round((storageUsageMB / storageLimitMB) * 100)}%)</span></p>
                         </div>
                     </div>
                 </div>
@@ -194,7 +195,7 @@ export default function Dashboard() {
                             <span className={`text-[10px] mt-1 ${location.pathname === '/search' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('search') || 'Search'}</span>
                         </Link>
 
-                        {/* 3. Reminders (Հիշեցումներ) */}
+                        {/* 3. Reminders */}
                         <Link to="/reminders" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 group relative ${location.pathname === '/reminders'
                             ? 'text-amber-400 bg-amber-600/20 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.25)]'
                             : 'text-gray-400 hover:text-white hover:bg-white/5'
@@ -210,7 +211,7 @@ export default function Dashboard() {
                             <span className={`text-[10px] mt-1 ${location.pathname === '/reminders' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('remindersTab') || 'Հիշեցումներ'}</span>
                         </Link>
 
-                        {/* 4. Car (Մեքենա) */}
+                        {/* 4. Car */}
                         <Link to="/car-docs" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 group ${location.pathname === '/car-docs'
                             ? 'text-blue-400 bg-blue-600/20 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.25)]'
                             : 'text-gray-400 hover:text-white hover:bg-white/5'

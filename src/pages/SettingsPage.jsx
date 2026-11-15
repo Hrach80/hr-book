@@ -44,7 +44,7 @@ export default function SettingsPage() {
     };
 
     return (
-        <div className="p-4 sm:p-6 max-w-xl mx-auto pb-24 font-sans text-white">
+        <div className="p-4 sm:p-6 max-w-xl mx-auto pb-24 font-sans text-white animate-softFadeScale">
 
             {/* Վերնագիր և Հետ գնալու կոճակ */}
             <div className="flex items-center mb-8">

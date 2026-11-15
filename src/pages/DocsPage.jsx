@@ -301,60 +301,7 @@ export default function DocsPage() {
                 )}
             </div>
 
-            {/* Ստորին նավիգացիա */}
-            <footer className="fixed bottom-2.5 left-0 right-0 mx-auto max-w-md px-4 z-40 box-border">
-                <div className="border border-white/10 rounded-3xl p-2.5 shadow-[0_15px_35px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.15)] bg-[#070a14]/90 backdrop-blur-2xl box-border">
-                    <nav className="grid grid-cols-4 gap-2 text-center">
-
-                        {/* 1. Home */}
-                        <Link to="/" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 ${location.pathname === '/'
-                            ? 'text-blue-400 bg-blue-600/20 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.25)]'
-                            : 'text-gray-400 hover:text-white hover:bg-white/5'
-                            }`}>
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                                <polyline points="9 22 9 12 15 12 15 22" />
-                            </svg>
-                            <span className={`text-[10px] mt-1 ${location.pathname === '/' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('home') || 'Home'}</span>
-                        </Link>
-
-                        {/* 2. Search */}
-                        <Link to="/search" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 group ${location.pathname === '/search'
-                            ? 'text-blue-400 bg-blue-600/20 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.25)]'
-                            : 'text-gray-400 hover:text-white hover:bg-white/5'
-                            }`}>
-                            <Search size={22} className={location.pathname === '/search' ? 'drop-shadow-[0_0_6px_rgba(59,130,246,0.8)]' : 'group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all'} />
-                            <span className={`text-[10px] mt-1 ${location.pathname === '/search' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('search') || 'Search'}</span>
-                        </Link>
-
-                        {/* 3. Reminders (Հիշեցումներ) + Կարմիր բեջ */}
-                        <Link to="/reminders" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 group relative ${location.pathname === '/reminders'
-                            ? 'text-amber-400 bg-amber-600/20 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.25)]'
-                            : 'text-gray-400 hover:text-white hover:bg-white/5'
-                            }`}>
-                            <div className="relative">
-                                <Bell size={22} className={location.pathname === '/reminders' ? 'drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]' : 'group-hover:drop-shadow-[0_0_8px_rgba(245,158,11,0.5)] transition-all'} />
-                                {upcomingCount > 0 && (
-                                    <span className="absolute -top-1.5 -right-2 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full border border-[#070a14] shadow">
-                                        {upcomingCount}
-                                    </span>
-                                )}
-                            </div>
-                            <span className={`text-[10px] mt-1 ${location.pathname === '/reminders' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('remindersTab') || 'Հիշեցումներ'}</span>
-                        </Link>
-
-                        {/* 4. Medical / Բժշկական կամ Մեքենա */}
-                        <Link to="/medical" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 group ${location.pathname === '/medical'
-                            ? 'text-red-400 bg-red-600/20 border border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.25)]'
-                            : 'text-gray-400 hover:text-white hover:bg-white/5'
-                            }`}>
-                            <Activity size={22} className={location.pathname === '/medical' ? 'drop-shadow-[0_0_6px_rgba(239,68,68,0.8)]' : 'group-hover:drop-shadow-[0_0_6px_rgba(239,68,68,0.8)] transition-all'} />
-                            <span className={`text-[10px] mt-1 ${location.pathname === '/medical' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('medical') || 'Բժշկական'}</span>
-                        </Link>
-
-                    </nav>
-                </div>
-            </footer>
+            
         </div>
     );
 }

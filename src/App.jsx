@@ -15,6 +15,7 @@ import Navbar from './components/Navbar';
 import WidgetsDock from './components/WidgetsDock';
 import Search from './pages/Search';
 import RemindersPage from './pages/RemindersPage';
+import Footer from './components/Footer';          // <--- Ներմուծում ենք մեր ընդհանուր ֆուտերը
 
 function App() {
 
@@ -43,7 +44,6 @@ function App() {
 
   // Հիշեցումների ֆոնային/ժամային ստուգման տրամաբանություն
   useEffect(() => {
-    // Գրանցում ենք push բանալիները ֆոնային ռեժիմով (առանց էկրանը կախելու)
     if (Notification.permission === 'granted') {
       setTimeout(() => {
         subscribeUserToPush().catch(err => console.error('Push sub error:', err));
@@ -60,7 +60,6 @@ function App() {
           const lastAlertDate = sessionStorage.getItem('last_reminder_alert');
           const todayStr = now.toDateString();
 
-          // Փնտրում ենք իրադարձություն, որին մնացել է 0-ից 24 ժամ (1 օր)
           const urgentEvent = data.find(item => {
             const eventDate = new Date(item.event_date);
             const diffTime = eventDate - now;
@@ -70,10 +69,8 @@ function App() {
           });
 
           if (urgentEvent && lastAlertDate !== todayStr) {
-            // 1. Միացնում ենք ձայնային ազդանշանը
             playAlertSound();
 
-            // 2. Ուղարկում ենք բրաուզերային/համակարգային ծանուցում
             if (Notification.permission === 'granted' && 'serviceWorker' in navigator) {
               navigator.serviceWorker.ready.then(registration => {
                 registration.showNotification('⚠️ Մոտեցող իրադարձություն', {
@@ -85,7 +82,6 @@ function App() {
               }).catch(err => console.log('SW ready error:', err));
             }
 
-            // Հիշում ենք, որ այսօր արդեն ազդանշանը տրվել է
             sessionStorage.setItem('last_reminder_alert', todayStr);
           }
         }
@@ -94,12 +90,10 @@ function App() {
       }
     };
 
-    // Ստուգել մի փոքր ուշացումով, որպեսզի էջի առաջին բեռնումը չարգելափակվի
     const initialTimer = setTimeout(() => {
       checkRemindersAndNotify();
     }, 1500);
 
-    // Ստուգել ժամը մեկ անգամ (3600000 մվ = 1 ժամ)
     const interval = setInterval(() => {
       checkRemindersAndNotify();
     }, 60 * 60 * 1000);
@@ -113,7 +107,8 @@ function App() {
   return (
     <LanguageProvider>
       <Router>
-        <div className="min-h-screen bg-[#0b0f19] text-white transition-colors duration-300 relative overflow-x-hidden">
+        {/* pb-40-ը ապահովում է, որ ոչ մի էջի բովանդակություն չփակվի ֆուտերով */}
+        <div className="min-h-screen bg-[#0b0f19] text-white transition-colors duration-300 relative overflow-x-hidden pb-40">
 
           {/* Միավորված ձախ կողային վահանակ */}
           <WidgetsDock />
@@ -136,6 +131,9 @@ function App() {
               <Route path="/reminders" element={<RemindersPage />} />
             </Routes>
           </main>
+
+          {/* 🌍 Ընդհանուր և անշարժ ֆուտեր բոլոր էջերի համար */}
+          <Footer />
 
         </div>
       </Router>

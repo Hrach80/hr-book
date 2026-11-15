@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Pencil, KeyRound, Plus, Folder, Search as SearchIcon, Database, HardDrive, RefreshCw, Activity, Bell } from 'lucide-react';
+import { Pencil, KeyRound, Plus, Folder, Search, Database, HardDrive, RefreshCw, Activity, Bell } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { supabase } from '../services/supabaseClient';
@@ -93,8 +93,8 @@ export default function Dashboard() {
     };
 
     return (
-        /* Ճիշտ նույն padding-ներն ու կառուցվածքը, ինչ մյուս աշխատող էջերում */
-        <div className="font-sans pb-32 max-w-xl mx-auto px-4 pt-2 text-white animate-softFadeScale">
+        /* Միանման max-w-xl mx-auto px-4 կառուցվածք մյուս էջերի հետ */
+        <div className="font-sans pb-32 max-w-xl mx-auto px-4 pt-4 text-white animate-softFadeScale">
 
             {/* Հորիզոնական դիրքով վիջեթների պատուհան */}
             <div className="grid grid-cols-2 gap-3.5 mb-5">
@@ -192,7 +192,7 @@ export default function Dashboard() {
                 </div>
             </div>
 
-            {/* Ներքևի նավիգացիոն մենյու (Ֆուտեր) - Ճիշտ Search էջի ֆիքսված կառուցվածքով */}
+            {/* Ներքևի նավիգացիոն մենյու (Ֆուտեր) - Ճիշտ Ռեմինդերների էջի ֆուտերի ոճով ու չափսերով */}
             <footer className="fixed bottom-4 left-0 right-0 mx-auto max-w-md px-4 z-50">
                 <div className="border border-white/10 rounded-3xl p-2.5 shadow-[0_15px_35px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.15)] bg-[#070a14]/90 backdrop-blur-2xl">
                     <nav className="grid grid-cols-4 gap-2 text-center">
@@ -214,7 +214,7 @@ export default function Dashboard() {
                             ? 'text-blue-400 bg-blue-600/20 border border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.25)]'
                             : 'text-gray-400 hover:text-white hover:bg-white/5'
                             }`}>
-                            <SearchIcon size={22} className={location.pathname === '/search' ? 'drop-shadow-[0_0_6px_rgba(59,130,246,0.8)]' : 'transition-all'} />
+                            <Search size={22} className={location.pathname === '/search' ? 'drop-shadow-[0_0_6px_rgba(59,130,246,0.8)]' : 'transition-all'} />
                             <span className={`text-[10px] mt-1 ${location.pathname === '/search' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('search') || 'Search'}</span>
                         </Link>
 

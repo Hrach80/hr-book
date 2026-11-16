@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Globe, DollarSign, Maximize2, X, TrendingUp, TrendingDown, LayoutGrid, ChevronDown, ChevronUp } from 'lucide-react';
+import {
+    Globe, DollarSign, Maximize2, X, TrendingUp, TrendingDown,
+    LayoutGrid, ChevronDown, ChevronUp, CloudSun, Wind, Droplets, Sun, CloudRain, Waves, Cloud, CloudLightning
+} from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
 const TIMEZONES = [
@@ -16,6 +19,58 @@ const TIMEZONES = [
     { label: 'Moscow', short: 'Moscow', value: 'Europe/Moscow' },
 ];
 
+const WEATHER_REGIONS = {
+    armenia: [
+        { name: 'Yerevan', temp: '+18°C', condition: 'Արևային', humidity: '45%', wind: '3 մ/վ', type: 'sun' },
+        { name: 'Gyumri', temp: '+13°C', condition: 'Փոփոխական', humidity: '55%', wind: '4 մ/վ', type: 'cloud' },
+        { name: 'Vanadzor', temp: '+15°C', condition: 'Արևային', humidity: '50%', wind: '2 մ/վ', type: 'sun' },
+        { name: 'Kapan', temp: '+19°C', condition: 'Տաք', humidity: '42%', wind: '3 մ/վ', type: 'sun' },
+        { name: 'Gavar', temp: '+12°C', condition: 'Ամպամած', humidity: '62%', wind: '5 մ/վ', type: 'cloud' },
+        { name: 'Hrazdan', temp: '+11°C', condition: 'Զով', humidity: '60%', wind: '4 մ/վ', type: 'cloud' },
+        { name: 'Artashat', temp: '+20°C', condition: 'Արևային', humidity: '40%', wind: '2 մ/վ', type: 'sun' },
+        { name: 'Armavir', temp: '+19°C', condition: 'Արևային', humidity: '41%', wind: '3 մ/վ', type: 'sun' },
+        { name: 'Ashtarak', temp: '+18°C', condition: 'Արևային', humidity: '43%', wind: '3 մ/վ', type: 'sun' },
+        { name: 'Ijevan', temp: '+17°C', condition: 'Անձրևային', humidity: '68%', wind: '3 մ/վ', type: 'rain' },
+        { name: 'Dilijan', temp: '+16°C', condition: 'Խոնավ', humidity: '65%', wind: '2 մ/վ', type: 'cloud' },
+        { name: 'Spitak', temp: '+13°C', condition: 'Փոփոխական', humidity: '58%', wind: '4 մ/վ', type: 'cloud' },
+        { name: 'Tashir', temp: '+12°C', condition: 'Ամպամած', humidity: '63%', wind: '4 մ/վ', type: 'cloud' },
+        { name: 'Sisian', temp: '+10°C', condition: 'Զով', humidity: '55%', wind: '6 մ/վ', type: 'cloud' },
+        { name: 'Goris', temp: '+15°C', condition: 'Արևային', humidity: '48%', wind: '3 մ/վ', type: 'sun' },
+        { name: 'Kajaran', temp: '+14°C', condition: 'Լեռնային', humidity: '52%', wind: '4 մ/վ', type: 'cloud' },
+        { name: 'Megri', temp: '+23°C', condition: 'Շոգ', humidity: '35%', wind: '2 մ/վ', type: 'sun' },
+        { name: 'Charentsavan', temp: '+13°C', condition: 'Ամպամած', humidity: '59%', wind: '4 մ/վ', type: 'cloud' },
+        { name: 'Abovyan', temp: '+15°C', condition: 'Արևային', humidity: '46%', wind: '3 մ/վ', type: 'sun' },
+        { name: 'Vedi', temp: '+19°C', condition: 'Արևային', humidity: '42%', wind: '3 մ/վ', type: 'sun' },
+        { name: 'Ararat', temp: '+20°C', condition: 'Արևային', humidity: '39%', wind: '2 մ/վ', type: 'sun' },
+        { name: 'Alaverdi', temp: '+16°C', condition: 'Ամպամած', humidity: '60%', wind: '3 մ/վ', type: 'cloud' },
+        { name: 'Stepanavan', temp: '+12°C', condition: 'Զով', humidity: '64%', wind: '4 մ/վ', type: 'cloud' },
+        { name: 'Jermuk', temp: '+9°C', condition: 'Լեռնային', humidity: '70%', wind: '5 մ/վ', type: 'cloud' },
+        { name: 'Vayk', temp: '+17°C', condition: 'Արևային', humidity: '48%', wind: '3 մ/վ', type: 'sun' },
+        { name: 'Tsaghkadzor', temp: '+10°C', condition: 'Ամպամած', humidity: '66%', wind: '5 մ/վ', type: 'cloud' },
+        { name: 'Sevan', temp: '+11°C', condition: 'Քամոտ', humidity: '65%', wind: '7 մ/վ', type: 'cloud' }
+    ],
+    georgia: [
+        { name: 'Kobuleti', temp: '+21°C', condition: 'Ծովային', humidity: '70%', wind: '4 մ/վ', type: 'waves' },
+        { name: 'Tbilisi', temp: '+19°C', condition: 'Արևային', humidity: '40%', wind: '3 մ/վ', type: 'sun' },
+        { name: 'Batumi', temp: '+20°C', condition: 'Խոնավ', humidity: '75%', wind: '5 մ/վ', type: 'rain' }
+    ],
+    europe: [
+        { name: 'Antwerp', temp: '+15°C', condition: 'Անձրևային', humidity: '80%', wind: '6 մ/վ', type: 'rain' },
+        { name: 'Brussels', temp: '+14°C', condition: 'Ամպամած', humidity: '72%', wind: '5 մ/վ', type: 'cloud' },
+        { name: 'Paris', temp: '+17°C', condition: 'Արևային', humidity: '50%', wind: '4 մ/վ', type: 'sun' },
+        { name: 'London', temp: '+13°C', condition: 'Ցող', humidity: '78%', wind: '6 մ/վ', type: 'rain' },
+        { name: 'Amsterdam', temp: '+14°C', condition: 'Քամոտ', humidity: '70%', wind: '7 մ/վ', type: 'cloud' }
+    ]
+};
+
+const AIR_QUALITY_DATA = [
+    { city: 'Yerevan', aqi: 38, status: 'Լավ / Good', color: '#10b981' },
+    { city: 'Kobuleti', aqi: 22, status: 'Գերազանց / Excellent', color: '#3b82f6' },
+    { city: 'Antwerp', aqi: 45, status: 'Լավ / Good', color: '#10b981' },
+    { city: 'Tbilisi', aqi: 58, status: 'Միջին / Moderate', color: '#f59e0b' },
+    { city: 'Paris', aqi: 62, status: 'Միջին / Moderate', color: '#f59e0b' }
+];
+
 export default function WidgetsDock() {
     const { t } = useLanguage();
     const navigate = useNavigate();
@@ -29,6 +84,13 @@ export default function WidgetsDock() {
         'America/Los_Angeles'
     ]);
     const [expandedZoneIndex, setExpandedZoneIndex] = useState(null);
+
+    const [weatherTab, setWeatherTab] = useState('georgia');
+    const [selectedWeatherCity, setSelectedWeatherCity] = useState({
+        armenia: 'Yerevan',
+        georgia: 'Kobuleti',
+        europe: 'Antwerp'
+    });
 
     const [expandedCurrencyCode, setExpandedCurrencyCode] = useState(null);
     const [timeFrame, setTimeFrame] = useState('daily');
@@ -170,6 +232,20 @@ export default function WidgetsDock() {
         navigate('/');
     };
 
+    const renderAnimatedWeatherIcon = (type) => {
+        switch (type) {
+            case 'sun':
+                return <Sun size={42} className="text-amber-400 animate-[spin_10s_linear_infinite]" />;
+            case 'rain':
+                return <CloudRain size={42} className="text-sky-300 animate-bounce" />;
+            case 'waves':
+                return <Waves size={42} className="text-cyan-400 animate-pulse" />;
+            case 'cloud':
+            default:
+                return <Cloud size={42} className="text-slate-300 animate-pulse" />;
+        }
+    };
+
     return (
         <div className="relative z-[999]">
             {/* Վիդջեթների գլխավոր կոճակ */}
@@ -181,38 +257,48 @@ export default function WidgetsDock() {
                     title="Վիդջեթների մենյու"
                 >
                     <LayoutGrid size={20} className="text-blue-300 drop-shadow-[0_0_12px_rgba(59,130,246,0.95)] group-hover:rotate-90 transition-transform duration-500" />
-                    <span className="text-xs sm:text-sm font-extrabold tracking-widest uppercase text-gray-100 group-hover:text-white select-none drop-shadow-md">
+                    <span className="text-xs sm:text-sm font-normal tracking-widest uppercase text-gray-100 group-hover:text-white select-none drop-shadow-md">
                         WIDGETS
                     </span>
                     <ChevronDown size={16} className={`text-gray-200 transition-transform duration-500 ${isDockOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {isDockOpen && (
-                    <div className="absolute top-[68px] left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-3.5 p-2.5 rounded-3xl border border-white/25 bg-[#0b0f19]/95 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_1px_2px_rgba(255,255,255,0.35)] transition-all duration-500 ease-out transform scale-100 opacity-100 pointer-events-auto whitespace-nowrap">
+                    <div className="absolute top-[68px] left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-3 p-2.5 rounded-3xl border border-white/25 bg-[#0b0f19]/95 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_1px_2px_rgba(255,255,255,0.35)] transition-all duration-500 ease-out transform scale-100 opacity-100 pointer-events-auto whitespace-nowrap">
                         <button
                             type="button"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setActiveModal('clock');
-                                setIsDockOpen(false);
-                            }}
-                            className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500/45 to-indigo-500/35 border border-white/35 text-blue-300 hover:border-blue-400 hover:scale-110 transition-all duration-300 shadow-[inset_0_1px_3px_rgba(255,255,255,0.7)] flex items-center justify-center cursor-pointer active:scale-95 group"
+                            onClick={(e) => { e.stopPropagation(); setActiveModal('clock'); setIsDockOpen(false); }}
+                            className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-500/45 to-indigo-500/35 border border-white/35 text-blue-300 hover:border-blue-400 hover:scale-110 transition-all duration-300 flex items-center justify-center cursor-pointer active:scale-95 group"
                             title="World Clocks"
                         >
-                            <Globe size={22} className="group-hover:rotate-45 transition-transform duration-500 drop-shadow-[0_0_12px_rgba(59,130,246,0.95)]" />
+                            <Globe size={20} className="group-hover:rotate-45 transition-transform duration-500" />
                         </button>
 
                         <button
                             type="button"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setActiveModal('currency');
-                                setIsDockOpen(false);
-                            }}
-                            className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500/45 to-teal-500/35 border border-white/35 text-emerald-300 hover:border-emerald-400 hover:scale-110 transition-all duration-300 shadow-[inset_0_1px_3px_rgba(255,255,255,0.7)] flex items-center justify-center cursor-pointer active:scale-95 group"
+                            onClick={(e) => { e.stopPropagation(); setActiveModal('currency'); setIsDockOpen(false); }}
+                            className="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-500/45 to-teal-500/35 border border-white/35 text-emerald-300 hover:border-emerald-400 hover:scale-110 transition-all duration-300 flex items-center justify-center cursor-pointer active:scale-95 group"
                             title="Market Rates"
                         >
-                            <DollarSign size={22} className="group-hover:scale-110 transition-transform duration-500 drop-shadow-[0_0_12px_rgba(16,185,129,0.95)]" />
+                            <DollarSign size={20} className="group-hover:scale-110 transition-transform duration-500" />
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); setActiveModal('weather'); setIsDockOpen(false); }}
+                            className="w-11 h-11 rounded-2xl bg-gradient-to-br from-sky-500/45 to-cyan-500/35 border border-white/35 text-sky-300 hover:border-sky-400 hover:scale-110 transition-all duration-300 flex items-center justify-center cursor-pointer active:scale-95 group"
+                            title="Weather"
+                        >
+                            <CloudSun size={20} className="group-hover:scale-110 transition-transform duration-500" />
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); setActiveModal('aqi'); setIsDockOpen(false); }}
+                            className="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-500/45 to-orange-500/35 border border-white/35 text-amber-300 hover:border-amber-400 hover:scale-110 transition-all duration-300 flex items-center justify-center cursor-pointer active:scale-95 group"
+                            title="Air Quality"
+                        >
+                            <Wind size={20} className="group-hover:scale-110 transition-transform duration-500" />
                         </button>
                     </div>
                 )}
@@ -224,17 +310,11 @@ export default function WidgetsDock() {
 
             {/* ԺԱՄԱՑՈՒՅՑՆԵՐԻ ՄՈԴԱԼ */}
             {activeModal === 'clock' && (
-                <div
-                    className="fixed inset-0 z-[1000] flex items-start justify-center pt-[90px] sm:pt-[110px] p-3 sm:p-6 bg-black/85 backdrop-blur-md transition-all duration-500 ease-out overflow-y-auto"
-                    onClick={handleCloseModal}
-                >
-                    <div
-                        className="relative w-full max-w-lg sm:max-w-2xl glass-card p-4 sm:p-8 rounded-3xl border border-white/25 bg-gradient-to-br from-[#0b0f19]/95 via-[#101726]/90 to-[#070a12]/98 shadow-[0_25px_70px_rgba(0,0,0,0.95)] backdrop-blur-2xl transition-all duration-500 ease-out transform scale-100 opacity-100 my-auto box-border"
-                        onClick={(e) => e.stopPropagation()}
-                    >
+                <div className="fixed inset-0 z-[1000] flex items-start justify-center pt-[90px] sm:pt-[110px] p-3 sm:p-6 bg-black/85 backdrop-blur-md overflow-y-auto" onClick={handleCloseModal}>
+                    <div className="relative w-full max-w-lg sm:max-w-2xl glass-card p-4 sm:p-8 rounded-3xl border border-white/25 bg-gradient-to-br from-[#0b0f19]/95 via-[#101726]/90 to-[#070a12]/98 shadow-[0_25px_70px_rgba(0,0,0,0.95)] my-auto box-border" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-between mb-4 sm:mb-6 border-b border-white/15 pb-3 sm:pb-4">
                             <div className="w-8 sm:w-10"></div>
-                            <div className="flex items-center gap-2 sm:gap-3 text-blue-400 text-sm sm:text-lg font-extrabold tracking-wider uppercase text-center">
+                            <div className="flex items-center gap-2 sm:gap-3 text-blue-400 text-sm sm:text-lg font-normal tracking-wider uppercase text-center">
                                 <Globe size={22} className="shrink-0" />
                                 <span>{t('worldClocks') || 'World Clocks'}</span>
                             </div>
@@ -242,7 +322,6 @@ export default function WidgetsDock() {
                                 <X size={20} />
                             </button>
                         </div>
-
                         <div className="flex flex-col gap-3 sm:gap-4 relative z-10 w-full box-border">
                             {selectedZones.map((zone, index) => {
                                 const { hours, minutes, seconds, dateStr } = getTimeComponents(zone);
@@ -252,8 +331,7 @@ export default function WidgetsDock() {
                                 const currentObj = TIMEZONES.find(item => item.value === zone);
 
                                 return (
-                                    <div key={index} onClick={() => setExpandedZoneIndex(index)} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3.5 sm:p-5 rounded-2xl bg-white/[0.04] border border-white/15 backdrop-blur-xl hover:border-blue-500/60 cursor-pointer transition gap-3 sm:gap-4 group w-full box-border">
-
+                                    <div key={index} onClick={() => setExpandedZoneIndex(index)} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3.5 sm:p-5 rounded-2xl bg-white/[0.04] border border-white/15 hover:border-blue-500/60 cursor-pointer transition gap-3 sm:gap-4 group w-full box-border">
                                         <div className="flex items-center gap-3 sm:gap-5 w-full sm:w-auto min-w-0">
                                             <div className="relative w-12 h-12 sm:w-16 sm:h-16 rounded-full border border-white/25 bg-gradient-to-b from-[#060911] to-[#0b101d] flex items-center justify-center shadow-[inset_0_3px_10px_rgba(0,0,0,0.9)] shrink-0">
                                                 <div className="absolute w-2 h-2 rounded-full bg-blue-400 z-30"></div>
@@ -262,20 +340,18 @@ export default function WidgetsDock() {
                                                 <div className="absolute w-[0.5px] bg-red-400 rounded-full origin-bottom z-20" style={{ height: '19px', bottom: '50%', transform: `rotate(${secondDeg}deg)` }}></div>
                                             </div>
                                             <div className="min-w-0 flex-1">
-                                                <p className="text-sm sm:text-lg font-bold text-white break-words leading-snug">{currentObj ? currentObj.label : zone}</p>
-                                                <p className="text-xs sm:text-sm text-gray-400 font-medium mt-0.5">{dateStr}</p>
+                                                <p className="text-sm sm:text-base font-normal text-white break-words leading-snug">{currentObj ? currentObj.label : zone}</p>
+                                                <p className="text-xs text-gray-400 font-light mt-0.5">{dateStr}</p>
                                             </div>
                                         </div>
-
                                         <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-0 border-white/10 box-border">
-                                            <span className="text-lg sm:text-2xl font-black text-blue-300 tracking-wider">
+                                            <span className="text-lg sm:text-xl font-normal text-blue-300 tracking-wider">
                                                 {String(hours).padStart(2, '0')}:{String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
                                             </span>
-                                            <div className="p-2 rounded-xl bg-white/5 border border-white/15 text-gray-400 group-hover:text-blue-400 group-hover:border-blue-500/50 transition shrink-0">
+                                            <div className="p-2 rounded-xl bg-white/5 border border-white/15 text-gray-400 group-hover:text-blue-400 transition shrink-0">
                                                 <Maximize2 size={14} />
                                             </div>
                                         </div>
-
                                     </div>
                                 );
                             })}
@@ -284,19 +360,13 @@ export default function WidgetsDock() {
                 </div>
             )}
 
-            {/* ՏԱՐԱԴՐԱՄՆԵՐԻ ՄՈԴԱԼ (Լիարժեք սիմետրիկ և հարմարեցված) */}
+            {/* ՏԱՐԱԴՐԱՄՆԵՐԻ ՄՈԴԱԼ */}
             {activeModal === 'currency' && (
-                <div
-                    className="fixed inset-0 z-[1000] flex items-start justify-center pt-[90px] sm:pt-[110px] p-3 sm:p-6 bg-black/85 backdrop-blur-md transition-all duration-500 ease-out overflow-y-auto"
-                    onClick={handleCloseModal}
-                >
-                    <div
-                        className="relative w-full max-w-lg sm:max-w-2xl glass-card p-4 sm:p-8 rounded-3xl border border-white/25 bg-gradient-to-br from-[#0b0f19]/95 via-[#101726]/90 to-[#070a12]/98 shadow-[0_25px_70px_rgba(0,0,0,0.95)] backdrop-blur-2xl transition-all duration-500 ease-out transform scale-100 opacity-100 my-auto box-border"
-                        onClick={(e) => e.stopPropagation()}
-                    >
+                <div className="fixed inset-0 z-[1000] flex items-start justify-center pt-[90px] sm:pt-[110px] p-3 sm:p-6 bg-black/85 backdrop-blur-md overflow-y-auto" onClick={handleCloseModal}>
+                    <div className="relative w-full max-w-lg sm:max-w-2xl glass-card p-4 sm:p-8 rounded-3xl border border-white/25 bg-gradient-to-br from-[#0b0f19]/95 via-[#101726]/90 to-[#070a12]/98 shadow-[0_25px_70px_rgba(0,0,0,0.95)] my-auto box-border" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-between mb-4 sm:mb-6 border-b border-white/15 pb-3 sm:pb-4">
                             <div className="w-8 sm:w-10"></div>
-                            <div className="flex items-center gap-2 sm:gap-3 text-emerald-400 text-sm sm:text-lg font-extrabold tracking-wider uppercase text-center">
+                            <div className="flex items-center gap-2 sm:gap-3 text-emerald-400 text-sm sm:text-lg font-normal tracking-wider uppercase text-center">
                                 <DollarSign size={22} className="shrink-0" />
                                 <span>{t('marketRatesTitle') || 'Տարադրամի փոխարժեք'}</span>
                             </div>
@@ -313,20 +383,15 @@ export default function WidgetsDock() {
                                 const convertedResult = (currentAmount * item.rate).toFixed(2);
 
                                 return (
-                                    <div
-                                        key={index}
-                                        onClick={() => setExpandedCurrencyCode(isExpanded ? null : item.code)}
-                                        className="p-3.5 sm:p-5 rounded-2xl bg-white/[0.04] border border-white/15 hover:border-emerald-500/50 cursor-pointer transition-all duration-300 w-full box-border"
-                                    >
+                                    <div key={index} onClick={() => setExpandedCurrencyCode(isExpanded ? null : item.code)} className="p-3.5 sm:p-5 rounded-2xl bg-white/[0.04] border border-white/15 hover:border-emerald-500/50 cursor-pointer transition-all duration-300 w-full box-border">
                                         <div className="flex items-center justify-between gap-3 w-full box-border">
                                             <div className="flex flex-col min-w-0 flex-1 pr-2">
-                                                <span className="font-extrabold text-white text-sm sm:text-lg truncate">{item.code}</span>
-                                                <span className="text-xs sm:text-sm text-gray-400 font-medium truncate">{item.name}</span>
+                                                <span className="font-normal text-white text-sm sm:text-base truncate">{item.code}</span>
+                                                <span className="text-xs text-gray-400 font-light truncate">{item.name}</span>
                                             </div>
-
                                             <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-                                                <span className="font-black text-white text-base sm:text-xl">{item.rate} ֏</span>
-                                                <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold px-2 py-1 rounded-xl border shrink-0" style={{ color: item.color, backgroundColor: `${item.color}15`, borderColor: `${item.color}40` }}>
+                                                <span className="font-medium text-white text-base sm:text-lg">{item.rate} ֏</span>
+                                                <div className="flex items-center gap-1.5 text-xs font-light px-2 py-1 rounded-xl border shrink-0" style={{ color: item.color, backgroundColor: `${item.color}15`, borderColor: `${item.color}40` }}>
                                                     {item.isUp ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
                                                     <span>{item.change}</span>
                                                 </div>
@@ -338,29 +403,10 @@ export default function WidgetsDock() {
 
                                         {isExpanded && (
                                             <div className="mt-4 pt-4 border-t border-white/10 space-y-4 cursor-default w-full box-border" onClick={(e) => e.stopPropagation()}>
-
                                                 <div className="flex justify-center gap-2 w-full">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setTimeFrame('daily')}
-                                                        className={`px-3 py-1 rounded-xl text-xs font-bold transition-all ${timeFrame === 'daily' ? 'bg-emerald-500 text-white' : 'bg-white/5 text-gray-400'}`}
-                                                    >
-                                                        {t('daily') || 'Օր'}
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setTimeFrame('quarter')}
-                                                        className={`px-3 py-1 rounded-xl text-xs font-bold transition-all ${timeFrame === 'quarter' ? 'bg-emerald-500 text-white' : 'bg-white/5 text-gray-400'}`}
-                                                    >
-                                                        {t('quarter') || 'Եռամսյակ'}
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setTimeFrame('yearly')}
-                                                        className={`px-3 py-1 rounded-xl text-xs font-bold transition-all ${timeFrame === 'yearly' ? 'bg-emerald-500 text-white' : 'bg-white/5 text-gray-400'}`}
-                                                    >
-                                                        {t('yearly') || 'Տարի'}
-                                                    </button>
+                                                    <button type="button" onClick={() => setTimeFrame('daily')} className={`px-3 py-1 rounded-xl text-xs font-light transition-all ${timeFrame === 'daily' ? 'bg-emerald-500 text-white' : 'bg-white/5 text-gray-400'}`}>{t('daily') || 'Օր'}</button>
+                                                    <button type="button" onClick={() => setTimeFrame('quarter')} className={`px-3 py-1 rounded-xl text-xs font-light transition-all ${timeFrame === 'quarter' ? 'bg-emerald-500 text-white' : 'bg-white/5 text-gray-400'}`}>{t('quarter') || 'Եռամսյակ'}</button>
+                                                    <button type="button" onClick={() => setTimeFrame('yearly')} className={`px-3 py-1 rounded-xl text-xs font-light transition-all ${timeFrame === 'yearly' ? 'bg-emerald-500 text-white' : 'bg-white/5 text-gray-400'}`}>{t('yearly') || 'Տարի'}</button>
                                                 </div>
 
                                                 <div className="w-full h-20 relative flex items-center bg-black/30 rounded-xl p-2 border border-white/10 box-border overflow-hidden">
@@ -372,32 +418,23 @@ export default function WidgetsDock() {
                                                             </linearGradient>
                                                         </defs>
                                                         <path d={`${currentPath} L 240 50 L 0 50 Z`} fill={`url(#svg-exp-grad-${index})`} />
-                                                        <path d={currentPath} fill="none" stroke={item.color} strokeWidth="3" strokeLinecap="round" />
-                                                        <circle cx="120" cy="20" r="4" fill={item.color} className="drop-shadow-[0_0_8px_rgba(255,255,255,0.9)]" />
+                                                        <path d={currentPath} fill="none" stroke={item.color} strokeWidth="2.5" strokeLinecap="round" />
+                                                        <circle cx="120" cy="20" r="3.5" fill={item.color} className="drop-shadow-[0_0_8px_rgba(255,255,255,0.9)]" />
                                                     </svg>
                                                 </div>
 
-                                                <div className="flex justify-between text-xs text-gray-400 font-medium px-1 w-full box-border">
-                                                    <span>{t('minRate') || 'Նվազագույն'}: <strong className="text-white">{item.min} ֏</strong></span>
-                                                    <span>{t('maxRate') || 'Առավելագույն'}: <strong className="text-white">{item.max} ֏</strong></span>
+                                                <div className="flex justify-between text-xs text-gray-400 font-light px-1 w-full box-border">
+                                                    <span>{t('minRate') || 'Նվազագույն'}: <strong className="text-white font-normal">{item.min} ֏</strong></span>
+                                                    <span>{t('maxRate') || 'Առավելագույն'}: <strong className="text-white font-normal">{item.max} ֏</strong></span>
                                                 </div>
 
                                                 <div className="bg-white/[0.03] p-3 rounded-xl border border-white/10 flex flex-col gap-2 w-full box-border">
-                                                    <span className="text-xs font-bold text-gray-300">{t('converterTitle') || 'Արժույթի փոխարկիչ'}</span>
+                                                    <span className="text-xs font-normal text-gray-300">{t('converterTitle') || 'Արժույթի փոխարկիչ'}</span>
                                                     <div className="flex items-center justify-between gap-3 w-full box-border">
-                                                        <input
-                                                            type="number"
-                                                            value={currentAmount}
-                                                            onChange={(e) => setConvertAmounts({ ...convertAmounts, [item.code]: e.target.value })}
-                                                            className="w-1/2 bg-[#0d1322] text-white text-sm py-2 px-3 rounded-xl border border-white/20 outline-none focus:border-emerald-500 font-bold box-border"
-                                                            placeholder={t('enterAmount') || 'Գումարը'}
-                                                        />
-                                                        <span className="text-sm font-black text-emerald-400 w-1/2 text-right truncate">
-                                                            {convertedResult} ֏
-                                                        </span>
+                                                        <input type="number" value={currentAmount} onChange={(e) => setConvertAmounts({ ...convertAmounts, [item.code]: e.target.value })} className="w-1/2 bg-[#0d1322] text-white text-xs sm:text-sm py-2 px-3 rounded-xl border border-white/20 outline-none focus:border-emerald-500 font-light box-border" placeholder={t('enterAmount') || 'Գումարը'} />
+                                                        <span className="text-sm font-normal text-emerald-400 w-1/2 text-right truncate">{convertedResult} ֏</span>
                                                     </div>
                                                 </div>
-
                                             </div>
                                         )}
                                     </div>
@@ -408,24 +445,139 @@ export default function WidgetsDock() {
                 </div>
             )}
 
+            {/* ԵՂԱՆԱԿԻ ՎԻՋԵԹԻ ՄՈԴԱԼ */}
+            {activeModal === 'weather' && (
+                <div className="fixed inset-0 z-[1000] flex items-start justify-center pt-[90px] sm:pt-[110px] p-3 sm:p-6 bg-black/85 backdrop-blur-md overflow-y-auto" onClick={handleCloseModal}>
+                    <div className="relative w-full max-w-lg sm:max-w-2xl glass-card p-4 sm:p-8 rounded-3xl border border-white/25 bg-gradient-to-br from-[#0b0f19]/95 via-[#101726]/90 to-[#070a12]/98 shadow-[0_25px_70px_rgba(0,0,0,0.95)] my-auto box-border" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-between mb-4 sm:mb-6 border-b border-white/15 pb-3 sm:pb-4">
+                            <div className="w-8 sm:w-10"></div>
+                            <div className="flex items-center gap-2 sm:gap-3 text-sky-400 text-sm sm:text-lg font-normal tracking-wider uppercase text-center">
+                                <CloudSun size={24} className="shrink-0" />
+                                <span>{t('weatherTitle') || 'Եղանակային պայմաններ'}</span>
+                            </div>
+                            <button type="button" onClick={handleCloseModal} className="text-gray-400 hover:text-white p-2 rounded-xl hover:bg-white/15 transition cursor-pointer shrink-0">
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        {/* Տարածաշրջանների ներդիրներ (Tabs) */}
+                        <div className="flex justify-center gap-2 mb-6 w-full">
+                            <button type="button" onClick={() => setWeatherTab('georgia')} className={`px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-light transition-all ${weatherTab === 'georgia' ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/30' : 'bg-white/5 text-gray-400 hover:text-white'}`}>
+                                {t('regionGeorgia') || 'Վրաստան'}
+                            </button>
+                            <button type="button" onClick={() => setWeatherTab('armenia')} className={`px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-light transition-all ${weatherTab === 'armenia' ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/30' : 'bg-white/5 text-gray-400 hover:text-white'}`}>
+                                {t('regionArmenia') || 'Հայաստան'}
+                            </button>
+                            <button type="button" onClick={() => setWeatherTab('europe')} className={`px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-light transition-all ${weatherTab === 'europe' ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/30' : 'bg-white/5 text-gray-400 hover:text-white'}`}>
+                                {t('regionEurope') || 'Եվրոպա'}
+                            </button>
+                        </div>
+
+                        {/* Քաղաքների ցանկ և ընտրություն */}
+                        <div className="space-y-4 w-full box-border">
+                            {/* Ընտրված քաղաքի հիմնական գլխավոր քարտը */}
+                            {(() => {
+                                const currentCityList = WEATHER_REGIONS[weatherTab];
+                                const activeCityName = selectedWeatherCity[weatherTab] || currentCityList[0].name;
+                                const cityData = currentCityList.find(c => c.name === activeCityName) || currentCityList[0];
+
+                                return (
+                                    <div className="p-5 rounded-3xl bg-gradient-to-br from-sky-500/20 via-sky-900/10 to-transparent border border-sky-500/40 flex flex-col items-center text-center shadow-inner">
+                                        <div className="my-2">{renderAnimatedWeatherIcon(cityData.type)}</div>
+                                        <h3 className="text-xl sm:text-2xl font-normal text-white mt-2">{cityData.name}</h3>
+                                        <p className="text-3xl sm:text-4xl font-light text-sky-300 my-1">{cityData.temp}</p>
+                                        <p className="text-xs sm:text-sm font-light text-gray-300 mb-4">{cityData.condition}</p>
+
+                                        <div className="flex items-center gap-6 text-xs text-gray-300 border-t border-white/10 pt-3 w-full justify-center">
+                                            <div className="flex items-center gap-1.5">
+                                                <Droplets size={14} className="text-sky-400" />
+                                                <span>{t('humidity') || 'Խոնավություն'}: <strong className="font-normal">{cityData.humidity}</strong></span>
+                                            </div>
+                                            <div className="flex items-center gap-1.5">
+                                                <Wind size={14} className="text-sky-400" />
+                                                <span>{t('wind') || 'Քամի'}: <strong className="font-normal">{cityData.wind}</strong></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })()}
+
+                            {/* Մյուս քաղաքների ցանկը՝ կենտրոնացված իդեալական սիմետրիայով */}
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-2 justify-items-center">
+                                {WEATHER_REGIONS[weatherTab].map((city, idx, arr) => {
+                                    const isLastSingle = arr.length % 2 !== 0 && idx === arr.length - 1;
+                                    const isLastSmSingle = arr.length % 3 === 1 && idx === arr.length - 1;
+                                    const isLastSmSecond = arr.length % 3 === 2 && (idx === arr.length - 1 || idx === arr.length - 2);
+
+                                    return (
+                                        <button
+                                            key={idx}
+                                            type="button"
+                                            onClick={() => setSelectedWeatherCity({ ...selectedWeatherCity, [weatherTab]: city.name })}
+                                            className={`p-2.5 sm:p-3 rounded-xl border text-left transition-all flex items-center justify-between w-full box-border ${selectedWeatherCity[weatherTab] === city.name ? 'bg-sky-500/30 border-sky-400 text-white' : 'bg-white/[0.03] border-white/10 text-gray-400 hover:text-white'} ${isLastSingle ? 'col-span-2 sm:col-span-1' : ''}`}
+                                        >
+                                            <span className="text-xs font-light truncate">{city.name}</span>
+                                            <span className="text-xs font-normal text-sky-300 ml-1">{city.temp}</span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ՕԴԻ ՈՐԱԿԻ ՎԻՋԵԹԻ ՄՈԴԱԼ (AQI) - Լիարժեք սիմետրիկ */}
+            {activeModal === 'aqi' && (
+                <div className="fixed inset-0 z-[1000] flex items-start justify-center pt-[90px] sm:pt-[110px] p-3 sm:p-6 bg-black/85 backdrop-blur-md overflow-y-auto" onClick={handleCloseModal}>
+                    <div className="relative w-full max-w-lg sm:max-w-2xl glass-card p-4 sm:p-8 rounded-3xl border border-white/25 bg-gradient-to-br from-[#0b0f19]/95 via-[#101726]/90 to-[#070a12]/98 shadow-[0_25px_70px_rgba(0,0,0,0.95)] my-auto box-border" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-between mb-4 sm:mb-6 border-b border-white/15 pb-3 sm:pb-4">
+                            <div className="w-8 sm:w-10"></div>
+                            <div className="flex items-center gap-2 sm:gap-3 text-amber-400 text-sm sm:text-lg font-normal tracking-wider uppercase text-center">
+                                <Wind size={24} className="shrink-0" />
+                                <span>{t('airQualityTitle') || 'Օդի որակը (AQI)'}</span>
+                            </div>
+                            <button type="button" onClick={handleCloseModal} className="text-gray-400 hover:text-white p-2 rounded-xl hover:bg-white/15 transition cursor-pointer shrink-0">
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <div className="space-y-3 sm:space-y-4 w-full box-border">
+                            {AIR_QUALITY_DATA.map((item, index) => (
+                                <div key={index} className="flex items-center justify-between p-3.5 sm:p-4 rounded-2xl bg-white/[0.04] border border-white/15 w-full box-border">
+                                    <div className="flex items-center gap-3 min-w-0 flex-1 pr-2">
+                                        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center font-normal text-white text-sm shadow-md shrink-0" style={{ backgroundColor: item.color }}>
+                                            {item.aqi}
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <h4 className="font-normal text-white text-sm sm:text-base truncate">{item.city}</h4>
+                                            <p className="text-xs text-gray-400 font-light truncate">{item.status}</p>
+                                        </div>
+                                    </div>
+                                    <div className="text-right shrink-0">
+                                        <span className="text-xs font-light px-3 py-1.5 rounded-xl border inline-block" style={{ color: item.color, backgroundColor: `${item.color}15`, borderColor: `${item.color}40` }}>
+                                            AQI Index
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Ժամային գոտու փոփոխման մոդալ */}
             {expandedZoneIndex !== null && (
-                <div
-                    className="fixed inset-0 z-[1050] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md transition-all duration-500 ease-out"
-                    onClick={() => setExpandedZoneIndex(null)}
-                >
-                    <div
-                        className="relative w-full max-w-md glass-card p-6 sm:p-8 rounded-3xl bg-[#0b0f19] border border-blue-500/40 shadow-[0_0_50px_rgba(59,130,246,0.4)] flex flex-col items-center transition-all duration-500 ease-out transform scale-100 opacity-100 box-border"
-                        onClick={(e) => e.stopPropagation()}
-                    >
+                <div className="fixed inset-0 z-[1050] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md" onClick={() => setExpandedZoneIndex(null)}>
+                    <div className="relative w-full max-w-md glass-card p-6 sm:p-8 rounded-3xl bg-[#0b0f19] border border-blue-500/40 shadow-[0_0_50px_rgba(59,130,246,0.4)] flex flex-col items-center box-border" onClick={(e) => e.stopPropagation()}>
                         <button type="button" onClick={() => setExpandedZoneIndex(null)} className="absolute top-4 right-4 text-gray-300 hover:text-white p-2">
                             <X size={20} />
                         </button>
-                        <span className="text-xs sm:text-sm font-bold text-blue-400 tracking-wider uppercase mb-3 text-center">
+                        <span className="text-xs sm:text-sm font-normal text-blue-400 tracking-wider uppercase mb-3 text-center">
                             Փոխել ժամային գոտին
                         </span>
                         <div className="w-full mb-6 text-center">
-                            <p className="text-sm sm:text-base text-gray-300">Ընտրեք նոր քաղաք կամ գոտի #{expandedZoneIndex + 1}-ի համար</p>
+                            <p className="text-sm text-gray-300 font-light">Ընտրեք նոր քաղաք կամ գոտի #{expandedZoneIndex + 1}-ի համար</p>
                         </div>
                         <div className="w-full box-border">
                             <select
@@ -434,7 +586,7 @@ export default function WidgetsDock() {
                                     handleZoneChange(expandedZoneIndex, e.target.value);
                                     setExpandedZoneIndex(null);
                                 }}
-                                className="w-full bg-[#0d1322] text-gray-100 text-sm sm:text-base py-3.5 px-4 rounded-2xl border border-white/20 outline-none cursor-pointer hover:border-blue-500 focus:border-blue-500 shadow-inner text-center font-bold box-border"
+                                className="w-full bg-[#0d1322] text-gray-100 text-sm sm:text-base py-3.5 px-4 rounded-2xl border border-white/20 outline-none cursor-pointer hover:border-blue-500 focus:border-blue-500 shadow-inner text-center font-normal box-border"
                             >
                                 {TIMEZONES.map((tz) => (
                                     <option key={tz.value} value={tz.value} className="bg-[#0b0f19] text-white py-3">

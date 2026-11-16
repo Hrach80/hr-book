@@ -191,7 +191,18 @@ export const translations = {
         "maxRate": "Առավելագույն",
         "converterTitle": "Արժույթի փոխարկիչ",
         "enterAmount": "Գումարը",
-        "tapToExpand": "Սեղմեք՝ մանրամասների համար"
+        "tapToExpand": "Սեղմեք՝ մանրամասների համար",
+        "weatherTitle": "Եղանակային պայմաններ",
+        "airQualityTitle": "Օդի որակը (AQI)",
+        "regionArmenia": "Հայաստան",
+        "regionGeorgia": "Վրաստան",
+        "regionEurope": "Եվրոպա",
+        "humidity": "Խոնավություն",
+        "wind": "Քամի",
+        "aqiGood": "Լավ (0-50)",
+        "aqiModerate": "Միջին (51-100)",
+        "aqiUnhealthy": "Վնասակար (101+)"
+        
 
     },
     ru: {
@@ -386,7 +397,17 @@ export const translations = {
         "maxRate": "Максимум",
         "converterTitle": "Конвертер валют",
         "enterAmount": "Сумма",
-        "tapToExpand": "Нажмите для деталей"
+        "tapToExpand": "Нажмите для деталей",
+        "weatherTitle": "Погодные условия",
+        "airQualityTitle": "Качество воздуха (AQI)",
+        "regionArmenia": "Армения",
+        "regionGeorgia": "Грузия",
+        "regionEurope": "Европа",
+        "humidity": "Влажность",
+        "wind": "Ветер",
+        "aqiGood": "Хорошо (0-50)",
+        "aqiModerate": "Умеренно (51-100)",
+        "aqiUnhealthy": "Вредно (101+)"
     },
     en: {
         title: 'My Assistant',
@@ -579,6 +600,16 @@ export const translations = {
         "maxRate": "Maximum",
         "converterTitle": "Currency Converter",
         "enterAmount": "Amount",
-        "tapToExpand": "Tap for details"
+        "tapToExpand": "Tap for details",
+        "weatherTitle": "Weather Conditions",
+        "airQualityTitle": "Air Quality (AQI)",
+        "regionArmenia": "Armenia",
+        "regionGeorgia": "Georgia",
+        "regionEurope": "Europe",
+        "humidity": "Humidity",
+        "wind": "Wind",
+        "aqiGood": "Good (0-50)",
+        "aqiModerate": "Moderate (51-100)",
+        "aqiUnhealthy": "Unhealthy (101+)"
     }
 };

@@ -246,52 +246,52 @@ export default function WidgetsDock() {
                 <button
                     type="button"
                     onClick={() => setIsDockOpen(!isDockOpen)}
-                    className="px-6 py-3 rounded-3xl border border-white/30 bg-gradient-to-b from-white/18 via-white/8 to-transparent backdrop-blur-xl shadow-[0_12px_40px_0_rgba(31,38,135,0.45),inset_0_1px_2px_0_rgba(255,255,255,0.5)] text-gray-100 hover:text-white hover:border-blue-400 hover:bg-white/25 transition-all duration-500 flex items-center gap-3 cursor-pointer active:scale-95 group pointer-events-auto"
+                    className="px-11 py-[10px] rounded-2xl border border-blue-500/40 bg-gradient-to-b from-[#0e1b38]/90 via-[#081024]/80 to-[#040812]/95 backdrop-blur-xl shadow-[0_0_25px_rgba(59,130,246,0.45),inset_0_1px_2px_0_rgba(147,197,253,0.3)] animate-pulse hover:shadow-[0_0_40px_rgba(59,130,246,0.7)] text-blue-200 hover:text-white hover:border-blue-400 active:bg-[#03060e] active:shadow-[inset_0_4px_12px_rgba(0,0,0,0.9),0_0_15px_rgba(59,130,246,0.3)] transition-all duration-300 flex items-center gap-3 cursor-pointer active:scale-95 group pointer-events-auto"
                     title="Վիդջեթների մենյու"
                 >
-                    <LayoutGrid size={20} className="text-blue-300 drop-shadow-[0_0_12px_rgba(59,130,246,0.95)] group-hover:rotate-90 transition-transform duration-500" />
-                    <span className="text-xs sm:text-sm font-normal tracking-widest uppercase text-gray-100 group-hover:text-white select-none drop-shadow-md">
+                    <LayoutGrid size={20} className="text-cyan-400 drop-shadow-[0_0_12px_rgba(34,211,238,0.95)] group-hover:rotate-90 transition-transform duration-500" />
+                    <span className="text-xs sm:text-sm font-normal tracking-widest uppercase text-blue-100 group-hover:text-white select-none drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]">
                         WIDGETS
                     </span>
-                    <ChevronDown size={16} className={`text-gray-200 transition-transform duration-500 ${isDockOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown size={16} className={`text-blue-300 transition-transform duration-500 ${isDockOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {isDockOpen && (
-                    <div className="absolute top-[68px] left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-3 p-2.5 rounded-3xl border border-white/25 bg-[#0b0f19]/95 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_1px_2px_rgba(255,255,255,0.35)] transition-all duration-500 ease-out transform scale-100 opacity-100 pointer-events-auto whitespace-nowrap">
+                    <div className="absolute top-[68px] left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-3 p-2.5 rounded-2xl border border-blue-500/40 bg-[#060c1a]/95 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.9),inset_0_1px_2px_rgba(59,130,246,0.3)] transition-all duration-500 ease-out transform scale-100 opacity-100 pointer-events-auto whitespace-nowrap">
                         <button
                             type="button"
                             onClick={(e) => { e.stopPropagation(); setActiveModal('clock'); setIsDockOpen(false); }}
-                            className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-500/45 to-indigo-500/35 border border-white/35 text-blue-300 hover:border-blue-400 hover:scale-110 transition-all duration-300 flex items-center justify-center cursor-pointer active:scale-95 group"
+                            className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-600/40 to-cyan-600/30 border border-blue-400/40 text-blue-200 hover:border-cyan-400 hover:scale-110 active:scale-95 active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.8)] transition-all duration-300 flex items-center justify-center cursor-pointer group"
                             title="World Clocks"
                         >
-                            <Globe size={20} className="group-hover:rotate-45 transition-transform duration-500" />
+                            <Globe size={20} className="group-hover:rotate-45 transition-transform duration-500 text-cyan-300" />
                         </button>
 
                         <button
                             type="button"
                             onClick={(e) => { e.stopPropagation(); setActiveModal('currency'); setIsDockOpen(false); }}
-                            className="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-500/45 to-teal-500/35 border border-white/35 text-emerald-300 hover:border-emerald-400 hover:scale-110 transition-all duration-300 flex items-center justify-center cursor-pointer active:scale-95 group"
+                            className="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-600/40 to-teal-600/30 border border-emerald-400/40 text-emerald-200 hover:border-emerald-400 hover:scale-110 active:scale-95 active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.8)] transition-all duration-300 flex items-center justify-center cursor-pointer group"
                             title="Market Rates"
                         >
-                            <DollarSign size={20} className="group-hover:scale-110 transition-transform duration-500" />
+                            <DollarSign size={20} className="group-hover:scale-110 transition-transform duration-500 text-emerald-300" />
                         </button>
 
                         <button
                             type="button"
                             onClick={(e) => { e.stopPropagation(); setActiveModal('weather'); setIsDockOpen(false); }}
-                            className="w-11 h-11 rounded-2xl bg-gradient-to-br from-sky-500/45 to-cyan-500/35 border border-white/35 text-sky-300 hover:border-sky-400 hover:scale-110 transition-all duration-300 flex items-center justify-center cursor-pointer active:scale-95 group"
+                            className="w-11 h-11 rounded-2xl bg-gradient-to-br from-sky-600/40 to-blue-600/30 border border-sky-400/40 text-sky-200 hover:border-sky-400 hover:scale-110 active:scale-95 active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.8)] transition-all duration-300 flex items-center justify-center cursor-pointer group"
                             title="Weather"
                         >
-                            <CloudSun size={20} className="group-hover:scale-110 transition-transform duration-500" />
+                            <CloudSun size={20} className="group-hover:scale-110 transition-transform duration-500 text-sky-300" />
                         </button>
 
                         <button
                             type="button"
                             onClick={(e) => { e.stopPropagation(); setActiveModal('aqi'); setIsDockOpen(false); }}
-                            className="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-500/45 to-orange-500/35 border border-white/35 text-amber-300 hover:border-amber-400 hover:scale-110 transition-all duration-300 flex items-center justify-center cursor-pointer active:scale-95 group"
+                            className="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-600/40 to-orange-600/30 border border-amber-400/40 text-amber-200 hover:border-amber-400 hover:scale-110 active:scale-95 active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.8)] transition-all duration-300 flex items-center justify-center cursor-pointer group"
                             title="Air Quality"
                         >
-                            <Wind size={20} className="group-hover:scale-110 transition-transform duration-500" />
+                            <Wind size={20} className="group-hover:scale-110 transition-transform duration-500 text-amber-300" />
                         </button>
                     </div>
                 )}

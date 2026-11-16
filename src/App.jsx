@@ -7,29 +7,27 @@ import Dashboard from './pages/Dashboard';
 import NotesPage from './pages/NotesPage';
 import PasswordsPage from './pages/PasswordsPage';
 import MedicalPage from './pages/MedicalPage';
-import DocsPage from './pages/DocsPage';          // Ընդհանուր փաստաթղթերի էջը
-import CarDocsPage from './pages/CarDocsPage';   // Մեքենայի փաստաթղթերի էջը
+import DocsPage from './pages/DocsPage';
+import CarDocsPage from './pages/CarDocsPage';
 import SettingsPage from './pages/SettingsPage';
 import AuthPage from './pages/AuthPage';
 import Navbar from './components/Navbar';
 import Search from './pages/Search';
 import RemindersPage from './pages/RemindersPage';
-import Footer from './components/Footer';          // <--- Ընդհանուր ֆուտերի բաղադրիչը
-import SplashLoader from './components/SplashLoader'; // <--- Բեռնման անիմացիայի բաղադրիչը
+import Footer from './components/Footer';
+import SplashLoader from './components/SplashLoader';
 
 function App() {
   const [isLaunching, setIsLaunching] = useState(true);
 
-  // 3 վայրկյանանոց անկախ բեռնման ցուցադրություն հավելված մտնելիս
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLaunching(false);
-    }, 3000);
+    }, 4000);
 
     return () => clearTimeout(timer);
   }, []);
 
-  // Ձայնային ազդանշանի ֆունկցիա (Web Audio API)
   const playAlertSound = () => {
     try {
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -37,7 +35,7 @@ function App() {
       const gainNode = audioCtx.createGain();
 
       oscillator.type = 'sine';
-      oscillator.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5 նոտա
+      oscillator.frequency.setValueAtTime(587.33, audioCtx.currentTime);
 
       gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
       gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.0);
@@ -52,7 +50,6 @@ function App() {
     }
   };
 
-  // Հիշեցումների ֆոնային/ժամային ստուգման տրամաբանություն
   useEffect(() => {
     if (Notification.permission === 'granted') {
       setTimeout(() => {
@@ -114,39 +111,31 @@ function App() {
     };
   }, []);
 
-  // Եթե բեռնման ժամանակահատվածն է (3 վայրկյան), ցույց ենք տալիս լոադերը
-  if (isLaunching) {
-    return <SplashLoader />;
-  }
-
   return (
     <LanguageProvider>
       <Router>
-        {/* pb-40-ը ապահովում է, որ ոչ մի էջի բովանդակություն չփակվի ֆուտերով */}
-        <div className="min-h-screen bg-[#0b0f19] text-white transition-colors duration-300 relative overflow-x-hidden pb-40">
+        {/* Եթե բեռնման փուլն է, ցույց ենք տալիս լոադերը որպես շերտ, առանց Router-ը կոտրելու */}
+        {isLaunching && <SplashLoader />}
 
-          {/* Միասնական Նավբար բոլոր էջերի համար */}
+        <div className="min-h-screen bg-[#0b0f19] text-white transition-colors duration-300 relative overflow-x-hidden pb-40">
           <Navbar />
 
-          {/* Էջերի բովանդակությունը */}
           <main className="max-w-7xl mx-auto px-4 sm:px-8 py-4">
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/notes" element={<NotesPage />} />
               <Route path="/passwords" element={<PasswordsPage />} />
               <Route path="/medical" element={<MedicalPage />} />
-              <Route path="/docs" element={<DocsPage />} />          {/* Ընդհանուր փաստաթղթեր */}
+              <Route path="/docs" element={<DocsPage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/search" element={<Search />} />
-              <Route path="/car-docs" element={<CarDocsPage />} />   {/* Մեքենայի փաստաթղթեր */}
+              <Route path="/car-docs" element={<CarDocsPage />} />
               <Route path="/reminders" element={<RemindersPage />} />
             </Routes>
           </main>
 
-          {/* 🌍 Ընդհանուր և անշարժ ֆուտեր բոլոր էջերի համար */}
           <Footer />
-
         </div>
       </Router>
     </LanguageProvider>

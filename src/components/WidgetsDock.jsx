@@ -103,10 +103,10 @@ export default function WidgetsDock() {
 
     return (
         <div className="relative z-[999]">
-            {/* Ձեր նշсծ իրական չափսերով՝ բարձրացված վերև */}
-            <div className="fixed left-1/2 -translate-x-1/2 top-[10px] sm:top-[-55px] flex flex-col items-center z-[999]">
+            {/* Ձեր հստակ նշված չափսերով դիրքավորում */}
+            <div className="fixed left-1/2 -translate-x-1/2 top-[-55px] sm:top-[-55px] flex flex-col items-center z-[999]">
 
-                {/* Մեծացված և հարմարեցված գլխավոր կոճակ */}
+                {/* Վիջեթների գլխավոր կոճակ */}
                 <button
                     type="button"
                     onClick={() => setIsDockOpen(!isDockOpen)}
@@ -120,9 +120,9 @@ export default function WidgetsDock() {
                     <ChevronDown size={16} className={`text-gray-200 transition-transform duration-500 ${isDockOpen ? 'rotate-180' : ''}`} />
                 </button>
 
-                {/* Բացվող հորիզոնական իկոնաների ցանկ */}
+                {/* Բացվող իկոնաների ցանկը՝ հարմարեցված տեղադրությամբ */}
                 {isDockOpen && (
-                    <div className="absolute top-16 z-[1000] flex items-center gap-3.5 p-2.5 rounded-3xl border border-white/25 bg-[#0b0f19]/95 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_1px_2px_rgba(255,255,255,0.35)] transition-all duration-500 ease-out transform scale-100 opacity-100 pointer-events-auto">
+                    <div className="absolute top-[68px] left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-3.5 p-2.5 rounded-3xl border border-white/25 bg-[#0b0f19]/95 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_1px_2px_rgba(255,255,255,0.35)] transition-all duration-500 ease-out transform scale-100 opacity-100 pointer-events-auto whitespace-nowrap">
 
                         <button
                             type="button"
@@ -155,7 +155,7 @@ export default function WidgetsDock() {
 
             </div>
 
-            {/* Ֆոնային թափանցիկ շերտ՝ մենյուի բացված ժամանակ այլ տեղ սեղմելիս փակելու համար */}
+            {/* Ֆոնային շերտ՝ սեղմելիս մենյուն փակելու համար */}
             {isDockOpen && (
                 <div
                     className="fixed inset-0 z-[950]"
@@ -163,7 +163,7 @@ export default function WidgetsDock() {
                 />
             )}
 
-            {/* Ժամացույցների Մոդալ (Հեռախոսի ողջ էկրանով, գեղեցիկ անիմացիայով) */}
+            {/* Ժամացույցների Մոդալ */}
             {activeModal === 'clock' && (
                 <div
                     className="fixed inset-0 z-[1000] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md transition-all duration-500 ease-out"
@@ -221,7 +221,7 @@ export default function WidgetsDock() {
                 </div>
             )}
 
-            {/* Տարադրամների Մոդալ (Հեռախոսի ողջ էկրանով, գեղեցիկ անիմացիայով) */}
+            {/* Տարադրամների Մոդալ */}
             {activeModal === 'currency' && (
                 <div
                     className="fixed inset-0 z-[1000] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md transition-all duration-500 ease-out"

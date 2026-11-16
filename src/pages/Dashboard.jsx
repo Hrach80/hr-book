@@ -4,25 +4,30 @@ import { Pencil, KeyRound, Plus, Folder, Search, Database, HardDrive, RefreshCw,
 import { useLanguage } from '../context/LanguageContext';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { supabase } from '../services/supabaseClient';
-import WidgetsDock from '../components/WidgetsDock'; // <--- Ներմուծում ենք վիջեթների վահանակը
+import WidgetsDock from '../components/WidgetsDock';
 
 export default function Dashboard() {
     const { t } = useLanguage();
     const location = useLocation();
 
-    // Ռեսուրսների օգտագործման վիճակ (Supabase Free Tier մետրիկաներ)
     const [dbUsageMB, setDbUsageMB] = useState(45.2);
     const [storageUsageMB, setStorageUsageMB] = useState(128.5);
     const [isLoading, setIsLoading] = useState(false);
+    const [chartHistory, setChartHistory] = useState([
+        { time: '01', db: 20, storage: 80, limit: 500 },
+        { time: '05', db: 35, storage: 95, limit: 500 },
+        { time: '10', db: 28, storage: 110, limit: 500 },
+        { time: '15', db: 42, storage: 120, limit: 500 },
+        { time: '20', db: 38, storage: 115, limit: 500 },
+        { time: '25', db: 45.2, storage: 128.5, limit: 500 },
+    ]);
 
-    // Հիշեցումների (ներառյալ ծննդյան օրեր) և նշումների վիճակներ
     const [upcomingCount, setUpcomingCount] = useState(0);
     const [notesCount, setNotesCount] = useState(0);
 
     const dbLimitMB = 500;
     const storageLimitMB = 1024;
 
-    // Ծննդյան օրերի ճիշտ հաշվարկման լոգիկա
     const getEffectiveEventDate = (item) => {
         const now = new Date();
         const originalDate = new Date(item.event_date);
@@ -41,65 +46,82 @@ export default function Dashboard() {
         return effectiveDate;
     };
 
-    // Բազայից կարդում ենք տվյալները
-    useEffect(() => {
-        const fetchDashboardData = async () => {
-            try {
-                const [remindersRes, notesRes] = await Promise.all([
-                    supabase.from('reminders').select('*'),
-                    supabase.from('notes').select('*')
-                ]);
+    const fetchDashboardData = async () => {
+        try {
+            setIsLoading(true);
+            const [remindersRes, notesRes, passwordsRes, medicalRes, storageFilesRes] = await Promise.all([
+                supabase.from('reminders').select('*'),
+                supabase.from('notes').select('*'),
+                supabase.from('passwords').select('*'),
+                supabase.from('medical_records').select('*'),
+                supabase.storage.from('documents').list()
+            ]);
 
-                if (remindersRes.data) {
-                    const now = new Date();
-                    const nowDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            if (remindersRes.data) {
+                const now = new Date();
+                const nowDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-                    const activeOrUpcoming = remindersRes.data.filter(item => {
-                        if (!item.event_date) return false;
-                        const eventTime = getEffectiveEventDate(item);
-                        const eventDateOnly = new Date(eventTime.getFullYear(), eventTime.getMonth(), eventTime.getDate());
-                        return eventDateOnly >= nowDateOnly;
-                    });
+                const activeOrUpcoming = remindersRes.data.filter(item => {
+                    if (!item.event_date) return false;
+                    const eventTime = getEffectiveEventDate(item);
+                    const eventDateOnly = new Date(eventTime.getFullYear(), eventTime.getMonth(), eventTime.getDate());
+                    return eventDateOnly >= nowDateOnly;
+                });
 
-                    setUpcomingCount(activeOrUpcoming.length);
-                }
-
-                if (notesRes.data) {
-                    setNotesCount(notesRes.data.length);
-                }
-            } catch (error) {
-                console.error('Error fetching dashboard data:', error);
+                setUpcomingCount(activeOrUpcoming.length);
             }
-        };
 
+            if (notesRes.data) {
+                setNotesCount(notesRes.data.length);
+            }
+
+            const totalRecords =
+                (notesRes.data?.length || 0) +
+                (remindersRes.data?.length || 0) +
+                (passwordsRes.data?.length || 0) +
+                (medicalRes.data?.length || 0);
+
+            const calculatedDbMB = Number((40 + totalRecords * 0.005).toFixed(2));
+            setDbUsageMB(calculatedDbMB);
+
+            let totalStorageBytes = 0;
+            if (storageFilesRes.data && storageFilesRes.data.length > 0) {
+                totalStorageBytes = storageFilesRes.data.reduce((acc, file) => acc + (file.metadata?.size || 0), 0);
+            }
+            const calculatedStorageMB = Number((120 + (totalStorageBytes / (1024 * 1024))).toFixed(2));
+            setStorageUsageMB(calculatedStorageMB);
+
+            setChartHistory(prev => {
+                const updated = [...prev];
+                updated[updated.length - 1] = {
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    db: calculatedDbMB,
+                    storage: calculatedStorageMB,
+                    limit: 500
+                };
+                return updated;
+            });
+
+        } catch (error) {
+            console.error('Error fetching dashboard data:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchDashboardData();
     }, []);
 
-    const chartData = [
-        { time: '01', db: 20, storage: 80, limit: 500 },
-        { time: '05', db: 35, storage: 95, limit: 500 },
-        { time: '10', db: 28, storage: 110, limit: 500 },
-        { time: '15', db: 42, storage: 120, limit: 500 },
-        { time: '20', db: 38, storage: 115, limit: 500 },
-        { time: '25', db: dbUsageMB, storage: storageUsageMB, limit: 500 },
-    ];
-
     const handleRefresh = () => {
-        setIsLoading(true);
-        setTimeout(() => {
-            setDbUsageMB(Number((45.2 + Math.random() * 2).toFixed(2)));
-            setStorageUsageMB(Number((128.5 + Math.random() * 5).toFixed(2)));
-            setIsLoading(false);
-        }, 600);
+        fetchDashboardData();
     };
 
     return (
-        <div className="font-sans w-full text-white animate-softFadeScale">
+        <div className="font-sans w-full text-white animate-softFadeScale pb-10">
 
-            {/* 🎯 Վիջեթների վահանակը (Ժամացույցներ և Տարադրամներ) - Աշխատում է միայն Դաշբորդում */}
             <WidgetsDock />
 
-            {/* Հորիզոնական դիրքով վիջեթների պատուհան */}
             <div className="grid grid-cols-2 gap-3.5 mb-5 mt-4">
                 <Link to="/notes" className="glass-card p-4 rounded-2xl flex items-center gap-3.5 shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-blue-500/30 bg-gradient-to-r from-blue-600/15 via-blue-900/5 to-transparent backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-blue-500/60 group relative">
                     <div className="w-11 h-11 rounded-xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0 group-hover:scale-110 transition-transform">
@@ -142,7 +164,6 @@ export default function Dashboard() {
                 </Link>
             </div>
 
-            {/* Supabase Ռեսուրսների Վերլուծական Վահանակ */}
             <div className="p-4 sm:p-6 rounded-3xl border border-blue-500/30 bg-gradient-to-b from-[#06142e] via-[#0b1f3d] to-[#040914] shadow-[0_20px_50px_rgba(0,0,0,0.9),inset_0_1px_2px_rgba(255,255,255,0.25)] mb-4 relative overflow-hidden">
 
                 <div className="flex items-center justify-between mb-4 relative z-10 border-b border-blue-500/20 pb-3">
@@ -161,9 +182,9 @@ export default function Dashboard() {
                     </button>
                 </div>
 
-                <div className="w-full h-52 sm:h-60 relative z-10">
+                <div className="w-full h-64 sm:h-72 relative z-10">
                     <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                        <LineChart data={chartHistory} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="rgba(59, 130, 246, 0.15)" />
                             <XAxis dataKey="time" stroke="#93c5fd" fontSize={10} tickLine={false} />
                             <YAxis stroke="#93c5fd" fontSize={10} tickLine={false} />

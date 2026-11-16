@@ -201,7 +201,8 @@ export const translations = {
         "wind": "Քամի",
         "aqiGood": "Լավ (0-50)",
         "aqiModerate": "Միջին (51-100)",
-        "aqiUnhealthy": "Վնասակար (101+)"
+        "aqiUnhealthy": "Վնասակար (101+)",
+        "searchCityPlaceholder": "Որոնել քաղաք աշխարհում..."
         
 
     },
@@ -407,7 +408,8 @@ export const translations = {
         "wind": "Ветер",
         "aqiGood": "Хорошо (0-50)",
         "aqiModerate": "Умеренно (51-100)",
-        "aqiUnhealthy": "Вредно (101+)"
+        "aqiUnhealthy": "Вредно (101+)",
+        "searchCityPlaceholder": "Поиск города по всему миру..."
     },
     en: {
         title: 'My Assistant',
@@ -610,6 +612,7 @@ export const translations = {
         "wind": "Wind",
         "aqiGood": "Good (0-50)",
         "aqiModerate": "Moderate (51-100)",
-        "aqiUnhealthy": "Unhealthy (101+)"
+        "aqiUnhealthy": "Unhealthy (101+)",
+        "searchCityPlaceholder": "Search city worldwide..."
     }
 };

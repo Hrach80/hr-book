@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Globe, DollarSign, Maximize2, X, TrendingUp, TrendingDown,
-    LayoutGrid, ChevronDown, ChevronUp, CloudSun, Wind, Droplets, Sun, CloudRain, Waves, Cloud, CloudLightning
+    LayoutGrid, ChevronDown, ChevronUp, CloudSun, Wind, Droplets, Sun, CloudRain, Waves, Cloud, Search
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -63,12 +63,21 @@ const WEATHER_REGIONS = {
     ]
 };
 
-const AIR_QUALITY_DATA = [
-    { city: 'Yerevan', aqi: 38, status: 'Լավ / Good', color: '#10b981' },
-    { city: 'Kobuleti', aqi: 22, status: 'Գերազանց / Excellent', color: '#3b82f6' },
-    { city: 'Antwerp', aqi: 45, status: 'Լավ / Good', color: '#10b981' },
-    { city: 'Tbilisi', aqi: 58, status: 'Միջին / Moderate', color: '#f59e0b' },
-    { city: 'Paris', aqi: 62, status: 'Միջին / Moderate', color: '#f59e0b' }
+const WORLD_AIR_QUALITY = [
+    { city: 'Yerevan', country: 'Armenia', aqi: 38, status: 'Լավ / Good', color: '#10b981' },
+    { city: 'Kobuleti', country: 'Georgia', aqi: 22, status: 'Գերազանց / Excellent', color: '#3b82f6' },
+    { city: 'Antwerp', country: 'Belgium', aqi: 45, status: 'Լավ / Good', color: '#10b981' },
+    { city: 'Tbilisi', country: 'Georgia', aqi: 58, status: 'Միջին / Moderate', color: '#f59e0b' },
+    { city: 'Paris', country: 'France', aqi: 62, status: 'Միջին / Moderate', color: '#f59e0b' },
+    { city: 'New York', country: 'USA', aqi: 42, status: 'Լավ / Good', color: '#10b981' },
+    { city: 'London', country: 'UK', aqi: 50, status: 'Լավ / Good', color: '#10b981' },
+    { city: 'Tokyo', country: 'Japan', aqi: 28, status: 'Գերազանց / Excellent', color: '#3b82f6' },
+    { city: 'Dubai', country: 'UAE', aqi: 75, status: 'Միջին / Moderate', color: '#f59e0b' },
+    { city: 'Moscow', country: 'Russia', aqi: 65, status: 'Միջին / Moderate', color: '#f59e0b' },
+    { city: 'Berlin', country: 'Germany', aqi: 35, status: 'Լավ / Good', color: '#10b981' },
+    { city: 'Rome', country: 'Italy', aqi: 68, status: 'Միջին / Moderate', color: '#f59e0b' },
+    { city: 'Beijing', country: 'China', aqi: 110, status: 'Վնասակար / Unhealthy', color: '#ef4444' },
+    { city: 'Los Angeles', country: 'USA', aqi: 82, status: 'Միջին / Moderate', color: '#f59e0b' }
 ];
 
 export default function WidgetsDock() {
@@ -91,6 +100,10 @@ export default function WidgetsDock() {
         georgia: 'Kobuleti',
         europe: 'Antwerp'
     });
+
+    const [aqiSearchQuery, setAqiSearchQuery] = useState('');
+    const [selectedAqiCity, setSelectedAqiCity] = useState('Yerevan');
+    const [isAqiDropdownOpen, setIsAqiDropdownOpen] = useState(false);
 
     const [expandedCurrencyCode, setExpandedCurrencyCode] = useState(null);
     const [timeFrame, setTimeFrame] = useState('daily');
@@ -229,6 +242,7 @@ export default function WidgetsDock() {
     const handleCloseModal = () => {
         setActiveModal(null);
         setExpandedCurrencyCode(null);
+        setIsAqiDropdownOpen(false);
         navigate('/');
     };
 
@@ -245,6 +259,13 @@ export default function WidgetsDock() {
                 return <Cloud size={42} className="text-slate-300 animate-pulse" />;
         }
     };
+
+    const filteredAqiList = WORLD_AIR_QUALITY.filter(item =>
+        item.city.toLowerCase().includes(aqiSearchQuery.toLowerCase()) ||
+        item.country.toLowerCase().includes(aqiSearchQuery.toLowerCase())
+    );
+
+    const activeAqiData = WORLD_AIR_QUALITY.find(item => item.city === selectedAqiCity) || WORLD_AIR_QUALITY[0];
 
     return (
         <div className="relative z-[999]">
@@ -460,7 +481,6 @@ export default function WidgetsDock() {
                             </button>
                         </div>
 
-                        {/* Տարածաշրջանների ներդիրներ (Tabs) */}
                         <div className="flex justify-center gap-2 mb-6 w-full">
                             <button type="button" onClick={() => setWeatherTab('georgia')} className={`px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-light transition-all ${weatherTab === 'georgia' ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/30' : 'bg-white/5 text-gray-400 hover:text-white'}`}>
                                 {t('regionGeorgia') || 'Վրաստան'}
@@ -473,9 +493,7 @@ export default function WidgetsDock() {
                             </button>
                         </div>
 
-                        {/* Քաղաքների ցանկ և ընտրություն */}
                         <div className="space-y-4 w-full box-border">
-                            {/* Ընտրված քաղաքի հիմնական գլխավոր քարտը */}
                             {(() => {
                                 const currentCityList = WEATHER_REGIONS[weatherTab];
                                 const activeCityName = selectedWeatherCity[weatherTab] || currentCityList[0].name;
@@ -502,19 +520,16 @@ export default function WidgetsDock() {
                                 );
                             })()}
 
-                            {/* Մյուս քաղաքների ցանկը՝ կենտրոնացված իդեալական սիմետրիայով */}
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-2 justify-items-center">
                                 {WEATHER_REGIONS[weatherTab].map((city, idx, arr) => {
                                     const isLastSingle = arr.length % 2 !== 0 && idx === arr.length - 1;
-                                    const isLastSmSingle = arr.length % 3 === 1 && idx === arr.length - 1;
-                                    const isLastSmSecond = arr.length % 3 === 2 && (idx === arr.length - 1 || idx === arr.length - 2);
 
                                     return (
                                         <button
                                             key={idx}
                                             type="button"
                                             onClick={() => setSelectedWeatherCity({ ...selectedWeatherCity, [weatherTab]: city.name })}
-                                            className={`p-2.5 sm:p-3 rounded-xl border text-left transition-all flex items-center justify-between w-full box-border ${selectedWeatherCity[weatherTab] === city.name ? 'bg-sky-500/30 border-sky-400 text-white' : 'bg-white/[0.03] border-white/10 text-gray-400 hover:text-white'} ${isLastSingle ? 'col-span-2 sm:col-span-1' : ''}`}
+                                            className={`p-2.5 sm:p-3 rounded-xl border text-left transition-all flex items-center justify-between w-full box-border ${selectedWeatherCity[weatherTab] === city.name ? 'bg-sky-500/30 border-sky-400 text-white' : 'bg-white/[0.03] border-white/10 text-gray-400 hover:text-white'} ${isLastSingle ? 'col-span-2 sm:col-span-1 justify-self-center max-w-[50%] sm:max-w-none' : ''}`}
                                         >
                                             <span className="text-xs font-light truncate">{city.name}</span>
                                             <span className="text-xs font-normal text-sky-300 ml-1">{city.temp}</span>
@@ -527,7 +542,7 @@ export default function WidgetsDock() {
                 </div>
             )}
 
-            {/* ՕԴԻ ՈՐԱԿԻ ՎԻՋԵԹԻ ՄՈԴԱԼ (AQI) - Լիարժեք սիմետրիկ */}
+            {/* ՕԴԻ ՈՐԱԿԻ ՎԻՋԵԹԻ ՄՈԴԱԼ (AQI) - Հենց ինփութի տակից բացվող կաթիլային ցանկով */}
             {activeModal === 'aqi' && (
                 <div className="fixed inset-0 z-[1000] flex items-start justify-center pt-[90px] sm:pt-[110px] p-3 sm:p-6 bg-black/85 backdrop-blur-md overflow-y-auto" onClick={handleCloseModal}>
                     <div className="relative w-full max-w-lg sm:max-w-2xl glass-card p-4 sm:p-8 rounded-3xl border border-white/25 bg-gradient-to-br from-[#0b0f19]/95 via-[#101726]/90 to-[#070a12]/98 shadow-[0_25px_70px_rgba(0,0,0,0.95)] my-auto box-border" onClick={(e) => e.stopPropagation()}>
@@ -542,21 +557,88 @@ export default function WidgetsDock() {
                             </button>
                         </div>
 
-                        <div className="space-y-3 sm:space-y-4 w-full box-border">
-                            {AIR_QUALITY_DATA.map((item, index) => (
-                                <div key={index} className="flex items-center justify-between p-3.5 sm:p-4 rounded-2xl bg-white/[0.04] border border-white/15 w-full box-border">
+                        {/* Որոնման դաշտ և կաթիլային (Dropdown) ցանկ ինփութի տակից */}
+                        <div className="mb-4 relative w-full box-border">
+                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                                <Search size={16} />
+                            </div>
+                            <input
+                                type="text"
+                                value={aqiSearchQuery}
+                                onChange={(e) => {
+                                    setAqiSearchQuery(e.target.value);
+                                    setIsAqiDropdownOpen(true);
+                                }}
+                                onFocus={() => setIsAqiDropdownOpen(true)}
+                                placeholder={t('searchCityPlaceholder') || 'Որոնել քաղաք աշխարհում...'}
+                                className="w-full bg-[#0d1322] text-white text-xs sm:text-sm py-2.5 pl-10 pr-4 rounded-2xl border border-white/20 outline-none focus:border-amber-500 font-light box-border shadow-inner"
+                            />
+
+                            {/* Կաթիլային ցանկը հենց ինփութի տակից */}
+                            {isAqiDropdownOpen && filteredAqiList.length > 0 && (
+                                <div className="absolute top-full left-0 right-0 mt-1.5 bg-[#0d1322] border border-white/20 rounded-2xl shadow-2xl max-h-52 overflow-y-auto z-50 box-border">
+                                    {filteredAqiList.map((item, index) => (
+                                        <div
+                                            key={index}
+                                            onClick={() => {
+                                                setSelectedAqiCity(item.city);
+                                                setAqiSearchQuery('');
+                                                setIsAqiDropdownOpen(false);
+                                            }}
+                                            className="px-4 py-2.5 hover:bg-white/10 cursor-pointer flex items-center justify-between transition border-b border-white/5 last:border-0"
+                                        >
+                                            <div className="flex items-center gap-2.5">
+                                                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }}></span>
+                                                <span className="text-xs sm:text-sm text-white font-light">{item.city}</span>
+                                                <span className="text-[11px] text-gray-400 font-light">({item.country})</span>
+                                            </div>
+                                            <span className="text-xs font-light px-2.5 py-0.5 rounded-lg border" style={{ color: item.color, backgroundColor: `${item.color}15`, borderColor: `${item.color}40` }}>
+                                                AQI: {item.aqi}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Ընտրված կամ դեֆոլտ քաղաքի գլխավոր ցուցադրություն (Երևան սկզբում) */}
+                        <div className="mb-5 p-4 sm:p-5 rounded-3xl bg-gradient-to-br from-amber-500/15 via-amber-900/5 to-transparent border border-amber-500/40 flex items-center justify-between shadow-inner w-full box-border">
+                            <div className="flex items-center gap-4 min-w-0 flex-1 pr-2">
+                                <div className="w-12 h-12 rounded-2xl flex items-center justify-center font-normal text-white text-lg shadow-md shrink-0" style={{ backgroundColor: activeAqiData.color }}>
+                                    {activeAqiData.aqi}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                    <h3 className="font-normal text-white text-base sm:text-lg truncate">{activeAqiData.city}</h3>
+                                    <p className="text-xs text-gray-400 font-light truncate">{activeAqiData.country} • {activeAqiData.status}</p>
+                                </div>
+                            </div>
+                            <div className="text-right shrink-0">
+                                <span className="text-xs font-light px-3.5 py-1.5 rounded-xl border inline-block" style={{ color: activeAqiData.color, backgroundColor: `${activeAqiData.color}15`, borderColor: `${activeAqiData.color}40` }}>
+                                    Live AQI
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Աշխարհի խոշոր քաղաքների հիմնական սիմետրիկ ցանկ */}
+                        <div className="space-y-2.5 max-h-[220px] overflow-y-auto pr-1 w-full box-border">
+                            {WORLD_AIR_QUALITY.map((item, index) => (
+                                <div
+                                    key={index}
+                                    onClick={() => setSelectedAqiCity(item.city)}
+                                    className={`flex items-center justify-between p-3 sm:p-3.5 rounded-2xl border cursor-pointer transition-all w-full box-border ${selectedAqiCity === item.city ? 'bg-amber-500/20 border-amber-400/60 shadow-md' : 'bg-white/[0.04] border-white/15 hover:border-white/30'}`}
+                                >
                                     <div className="flex items-center gap-3 min-w-0 flex-1 pr-2">
-                                        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center font-normal text-white text-sm shadow-md shrink-0" style={{ backgroundColor: item.color }}>
+                                        <div className="w-9 h-9 rounded-xl flex items-center justify-center font-light text-white text-xs shadow-sm shrink-0" style={{ backgroundColor: item.color }}>
                                             {item.aqi}
                                         </div>
                                         <div className="min-w-0 flex-1">
-                                            <h4 className="font-normal text-white text-sm sm:text-base truncate">{item.city}</h4>
-                                            <p className="text-xs text-gray-400 font-light truncate">{item.status}</p>
+                                            <h4 className="font-normal text-white text-xs sm:text-sm truncate">{item.city}</h4>
+                                            <p className="text-[11px] text-gray-400 font-light truncate">{item.country} • {item.status}</p>
                                         </div>
                                     </div>
                                     <div className="text-right shrink-0">
-                                        <span className="text-xs font-light px-3 py-1.5 rounded-xl border inline-block" style={{ color: item.color, backgroundColor: `${item.color}15`, borderColor: `${item.color}40` }}>
-                                            AQI Index
+                                        <span className="text-[11px] font-light px-2.5 py-1 rounded-lg border inline-block" style={{ color: item.color, backgroundColor: `${item.color}15`, borderColor: `${item.color}40` }}>
+                                            {item.status.split('/')[0]}
                                         </span>
                                     </div>
                                 </div>

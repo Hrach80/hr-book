@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Globe, DollarSign, Maximize2, X, TrendingUp, TrendingDown, LayoutGrid, ChevronDown } from 'lucide-react';
+import { Globe, DollarSign, Maximize2, X, TrendingUp, TrendingDown, LayoutGrid, ChevronDown, ChevronUp } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
 const TIMEZONES = [
@@ -30,15 +30,71 @@ export default function WidgetsDock() {
     ]);
     const [expandedZoneIndex, setExpandedZoneIndex] = useState(null);
 
-    // Ժամանակահատվածի ընտրություն (Օր, Եռամսյակ, Տարի)
-    const [timeFrame, setTimeFrame] = useState('daily'); // 'daily' | 'quarter' | 'yearly'
+    const [expandedCurrencyCode, setExpandedCurrencyCode] = useState(null);
+    const [timeFrame, setTimeFrame] = useState('daily');
+    const [convertAmounts, setConvertAmounts] = useState({ 'USD/AMD': 100, 'EUR/AMD': 100, 'RUB/AMD': 1000, 'GEL/AMD': 100 });
 
-    // Արժույթների սկզբնական վիճակը (իրական API-ով ավտոմատ թարմացվելու համար)
     const [currencies, setCurrencies] = useState([
-        { code: 'USD/AMD', name: 'US Dollar (Market)', rate: '402.50', change: '+0.30%', isUp: true, color: '#10b981', svgPath: "M 0 35 C 30 10, 60 45, 90 20 C 120 5, 150 40, 180 15 C 200 5, 220 25, 240 10" },
-        { code: 'EUR/AMD', name: 'Euro (Market)', rate: '429.20', change: '-0.15%', isUp: false, color: '#3b82f6', svgPath: "M 0 15 C 30 35, 60 10, 90 30 C 120 45, 150 20, 180 35 C 200 40, 220 15, 240 30" },
-        { code: 'RUB/AMD', name: 'Russian Ruble', rate: '4.18', change: '+0.80%', isUp: true, color: '#f59e0b', svgPath: "M 0 40 C 30 20, 60 35, 90 15 C 120 30, 150 10, 180 25 C 200 15, 220 20, 240 8" },
-        { code: 'GEL/AMD', name: 'Georgian Lari', rate: '148.80', change: '+0.20%', isUp: true, color: '#ec4899', svgPath: "M 0 25 C 30 40, 60 15, 90 35 C 120 10, 150 30, 180 12 C 200 25, 220 10, 240 18" },
+        {
+            code: 'USD/AMD',
+            name: 'US Dollar (Market)',
+            rate: 402.50,
+            change: '+0.30%',
+            isUp: true,
+            color: '#10b981',
+            min: 398.0,
+            max: 405.2,
+            svgPaths: {
+                daily: "M 0 30 C 40 10, 80 40, 120 20 C 160 5, 200 35, 240 15",
+                quarter: "M 0 40 C 50 5, 100 35, 150 15 C 180 5, 210 25, 240 8",
+                yearly: "M 0 45 C 60 5, 120 40, 180 10 C 200 2, 220 20, 240 5"
+            }
+        },
+        {
+            code: 'EUR/AMD',
+            name: 'Euro (Market)',
+            rate: 429.20,
+            change: '-0.15%',
+            isUp: false,
+            color: '#3b82f6',
+            min: 425.0,
+            max: 433.5,
+            svgPaths: {
+                daily: "M 0 20 C 40 40, 80 15, 120 35 C 160 20, 200 40, 240 25",
+                quarter: "M 0 10 C 50 45, 100 20, 150 35 C 180 15, 210 40, 240 20",
+                yearly: "M 0 5 C 60 45, 120 15, 180 40 C 200 30, 220 10, 240 35"
+            }
+        },
+        {
+            code: 'RUB/AMD',
+            name: 'Russian Ruble',
+            rate: 4.18,
+            change: '+0.80%',
+            isUp: true,
+            color: '#f59e0b',
+            min: 4.05,
+            max: 4.22,
+            svgPaths: {
+                daily: "M 0 35 C 40 15, 80 30, 120 10 C 160 25, 200 15, 240 5",
+                quarter: "M 0 30 C 50 15, 100 40, 150 10 C 180 30, 210 10, 240 12",
+                yearly: "M 0 35 C 60 10, 120 45, 180 20 C 200 10, 220 25, 240 8"
+            }
+        },
+        {
+            code: 'GEL/AMD',
+            name: 'Georgian Lari',
+            rate: 148.80,
+            change: '+0.20%',
+            isUp: true,
+            color: '#ec4899',
+            min: 146.5,
+            max: 150.0,
+            svgPaths: {
+                daily: "M 0 25 C 40 35, 80 10, 120 30 C 160 15, 200 35, 240 20",
+                quarter: "M 0 20 C 50 30, 100 10, 150 40 C 180 20, 210 30, 240 15",
+                yearly: "M 0 15 C 60 40, 120 10, 180 35 C 200 20, 220 30, 240 18"
+            }
+        },
     ]);
 
     useEffect(() => {
@@ -46,30 +102,25 @@ export default function WidgetsDock() {
         return () => clearInterval(timer);
     }, []);
 
-    // Իրական Փոխարժեքների բեռնում API-ից (օգտագործելով բաց և անվճար Frankfurter API)
     useEffect(() => {
         const fetchRealRates = async () => {
             try {
-                // Վերցնում ենք ընթացիկ փոխարժեքները USD-ի նկատմամբ (EUR, GEL, RUB)
                 const res = await fetch('https://api.frankfurter.app/latest?from=USD&to=EUR,RUB');
                 const data = await res.json();
 
                 if (data && data.rates) {
                     const eurToUsd = 1 / data.rates.EUR;
-                    const rubToUsd = 1 / data.rates.RUB;
-
-                    // ՀՀ բանկային/շուկայական միջին մոտավոր փոխարժեքներով հաշվարկ AMD-ի համար
-                    const baseAmdUSD = 402.5; // ՀՀ շուկայական հիմք
+                    const baseAmdUSD = 402.5;
                     const usdRate = baseAmdUSD;
                     const eurRate = Number((baseAmdUSD * eurToUsd).toFixed(2));
-                    const rubRate = Number((baseAmdUSD / (data.rates.RUB * 21.5)).toFixed(2)); // Մոտավոր շուկայական կշիռ
+                    const rubRate = Number((baseAmdUSD / (data.rates.RUB * 21.5)).toFixed(2));
                     const gelRate = 148.8;
 
                     setCurrencies(prev => [
-                        { ...prev[0], rate: usdRate.toString() },
-                        { ...prev[1], rate: eurRate.toString() },
-                        { ...prev[2], rate: rubRate.toString() },
-                        { ...prev[3], rate: gelRate.toString() },
+                        { ...prev[0], rate: usdRate },
+                        { ...prev[1], rate: eurRate },
+                        { ...prev[2], rate: rubRate },
+                        { ...prev[3], rate: gelRate },
                     ]);
                 }
             } catch (err) {
@@ -78,7 +129,7 @@ export default function WidgetsDock() {
         };
 
         fetchRealRates();
-    }, [timeFrame]); // Երբ ժամանակահատվածը փոխվում է, տվյալները թարմացվում են
+    }, []);
 
     const handleZoneChange = (index, newZone) => {
         const updated = [...selectedZones];
@@ -115,34 +166,8 @@ export default function WidgetsDock() {
 
     const handleCloseModal = () => {
         setActiveModal(null);
+        setExpandedCurrencyCode(null);
         navigate('/');
-    };
-
-    // Գրաֆիկի կորերի գեներացիա՝ կախված ընտրված ժամանակահատվածից (Օր, Եռամսյակ, Տարի)
-    const getDynamicPath = (index) => {
-        if (timeFrame === 'daily') {
-            return [
-                "M 0 30 C 40 10, 80 40, 120 20 C 160 5, 200 35, 240 15",
-                "M 0 20 C 40 40, 80 15, 120 35 C 160 20, 200 40, 240 25",
-                "M 0 35 C 40 15, 80 30, 120 10 C 160 25, 200 15, 240 5",
-                "M 0 25 C 40 35, 80 10, 120 30 C 160 15, 200 35, 240 20"
-            ][index];
-        } else if (timeFrame === 'quarter') {
-            return [
-                "M 0 40 C 50 5, 100 35, 150 15 C 180 5, 210 25, 240 8",
-                "M 0 10 C 50 45, 100 20, 150 35 C 180 15, 210 40, 240 20",
-                "M 0 30 C 50 15, 100 40, 150 10 C 180 30, 210 10, 240 12",
-                "M 0 20 C 50 30, 100 10, 150 40 C 180 20, 210 30, 240 15"
-            ][index];
-        } else {
-            // Yearly (Տարեկան խոշոր տատանումներ)
-            return [
-                "M 0 45 C 60 5, 120 40, 180 10 C 200 2, 220 20, 240 5",
-                "M 0 5 C 60 45, 120 15, 180 40 C 200 30, 220 10, 240 35",
-                "M 0 35 C 60 10, 120 45, 180 20 C 200 10, 220 25, 240 8",
-                "M 0 15 C 60 40, 120 10, 180 35 C 200 20, 220 30, 240 18"
-            ][index];
-        }
     };
 
     return (
@@ -204,7 +229,7 @@ export default function WidgetsDock() {
                     onClick={handleCloseModal}
                 >
                     <div
-                        className="relative w-full max-w-lg sm:max-w-2xl glass-card p-4 sm:p-8 rounded-3xl border border-white/25 bg-gradient-to-br from-[#0b0f19]/95 via-[#101726]/90 to-[#070a12]/98 shadow-[0_25px_70px_rgba(0,0,0,0.95)] backdrop-blur-2xl transition-all duration-500 ease-out transform scale-100 opacity-100 my-auto"
+                        className="relative w-full max-w-lg sm:max-w-2xl glass-card p-4 sm:p-8 rounded-3xl border border-white/25 bg-gradient-to-br from-[#0b0f19]/95 via-[#101726]/90 to-[#070a12]/98 shadow-[0_25px_70px_rgba(0,0,0,0.95)] backdrop-blur-2xl transition-all duration-500 ease-out transform scale-100 opacity-100 my-auto box-border"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex items-center justify-between mb-4 sm:mb-6 border-b border-white/15 pb-3 sm:pb-4">
@@ -218,7 +243,7 @@ export default function WidgetsDock() {
                             </button>
                         </div>
 
-                        <div className="flex flex-col gap-3 sm:gap-4 relative z-10">
+                        <div className="flex flex-col gap-3 sm:gap-4 relative z-10 w-full box-border">
                             {selectedZones.map((zone, index) => {
                                 const { hours, minutes, seconds, dateStr } = getTimeComponents(zone);
                                 const secondDeg = (seconds / 60) * 360;
@@ -227,9 +252,9 @@ export default function WidgetsDock() {
                                 const currentObj = TIMEZONES.find(item => item.value === zone);
 
                                 return (
-                                    <div key={index} onClick={() => setExpandedZoneIndex(index)} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3.5 sm:p-5 rounded-2xl bg-white/[0.04] border border-white/15 backdrop-blur-xl hover:border-blue-500/60 cursor-pointer transition gap-3 sm:gap-4 group">
+                                    <div key={index} onClick={() => setExpandedZoneIndex(index)} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3.5 sm:p-5 rounded-2xl bg-white/[0.04] border border-white/15 backdrop-blur-xl hover:border-blue-500/60 cursor-pointer transition gap-3 sm:gap-4 group w-full box-border">
 
-                                        <div className="flex items-center gap-3 sm:gap-5 w-full sm:w-auto">
+                                        <div className="flex items-center gap-3 sm:gap-5 w-full sm:w-auto min-w-0">
                                             <div className="relative w-12 h-12 sm:w-16 sm:h-16 rounded-full border border-white/25 bg-gradient-to-b from-[#060911] to-[#0b101d] flex items-center justify-center shadow-[inset_0_3px_10px_rgba(0,0,0,0.9)] shrink-0">
                                                 <div className="absolute w-2 h-2 rounded-full bg-blue-400 z-30"></div>
                                                 <div className="absolute w-0.5 bg-blue-400 rounded-full origin-bottom z-20" style={{ height: '12px', bottom: '50%', transform: `rotate(${hourDeg}deg)` }}></div>
@@ -242,7 +267,7 @@ export default function WidgetsDock() {
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-0 border-white/10">
+                                        <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-0 border-white/10 box-border">
                                             <span className="text-lg sm:text-2xl font-black text-blue-300 tracking-wider">
                                                 {String(hours).padStart(2, '0')}:{String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
                                             </span>
@@ -259,83 +284,122 @@ export default function WidgetsDock() {
                 </div>
             )}
 
-            {/* ՏԱՐԱԴՐԱՄՆԵՐԻ ՄՈԴԱԼ (Իրական տվյալներով, ժամանակահատվածի ընտրությամբ և ալիքաձև գծերով) */}
+            {/* ՏԱՐԱԴՐԱՄՆԵՐԻ ՄՈԴԱԼ (Լիարժեք սիմետրիկ և հարմարեցված) */}
             {activeModal === 'currency' && (
                 <div
                     className="fixed inset-0 z-[1000] flex items-start justify-center pt-[90px] sm:pt-[110px] p-3 sm:p-6 bg-black/85 backdrop-blur-md transition-all duration-500 ease-out overflow-y-auto"
                     onClick={handleCloseModal}
                 >
                     <div
-                        className="relative w-full max-w-lg sm:max-w-2xl glass-card p-4 sm:p-8 rounded-3xl border border-white/25 bg-gradient-to-br from-[#0b0f19]/95 via-[#101726]/90 to-[#070a12]/98 shadow-[0_25px_70px_rgba(0,0,0,0.95)] backdrop-blur-2xl transition-all duration-500 ease-out transform scale-100 opacity-100 my-auto"
+                        className="relative w-full max-w-lg sm:max-w-2xl glass-card p-4 sm:p-8 rounded-3xl border border-white/25 bg-gradient-to-br from-[#0b0f19]/95 via-[#101726]/90 to-[#070a12]/98 shadow-[0_25px_70px_rgba(0,0,0,0.95)] backdrop-blur-2xl transition-all duration-500 ease-out transform scale-100 opacity-100 my-auto box-border"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex items-center justify-between mb-4 sm:mb-6 border-b border-white/15 pb-3 sm:pb-4">
                             <div className="w-8 sm:w-10"></div>
                             <div className="flex items-center gap-2 sm:gap-3 text-emerald-400 text-sm sm:text-lg font-extrabold tracking-wider uppercase text-center">
                                 <DollarSign size={22} className="shrink-0" />
-                                <span>{t('liveRates') || 'Armenian Market Rates'}</span>
+                                <span>{t('marketRatesTitle') || 'Տարադրամի փոխարժեք'}</span>
                             </div>
                             <button type="button" onClick={handleCloseModal} className="text-gray-400 hover:text-white p-2 rounded-xl hover:bg-white/15 transition cursor-pointer shrink-0">
                                 <X size={20} />
                             </button>
                         </div>
 
-                        {/* Ժամանակահատվածի կոճակներ (Օր, Եռամսյակ, Տարի) */}
-                        <div className="flex justify-center gap-2 mb-5">
-                            <button
-                                onClick={() => setTimeFrame('daily')}
-                                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${timeFrame === 'daily' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30' : 'bg-white/5 text-gray-400 hover:text-white'}`}
-                            >
-                                Օր (Daily)
-                            </button>
-                            <button
-                                onClick={() => setTimeFrame('quarter')}
-                                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${timeFrame === 'quarter' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30' : 'bg-white/5 text-gray-400 hover:text-white'}`}
-                            >
-                                Եռամսյակ (Quarter)
-                            </button>
-                            <button
-                                onClick={() => setTimeFrame('yearly')}
-                                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${timeFrame === 'yearly' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30' : 'bg-white/5 text-gray-400 hover:text-white'}`}
-                            >
-                                Տարի (Yearly)
-                            </button>
-                        </div>
-
-                        <div className="space-y-3 sm:space-y-4">
+                        <div className="space-y-3 sm:space-y-4 w-full box-border">
                             {currencies.map((item, index) => {
-                                const currentPath = getDynamicPath(index);
+                                const isExpanded = expandedCurrencyCode === item.code;
+                                const currentPath = item.svgPaths[timeFrame];
+                                const currentAmount = convertAmounts[item.code] || 100;
+                                const convertedResult = (currentAmount * item.rate).toFixed(2);
+
                                 return (
-                                    <div key={index} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3.5 sm:p-5 rounded-2xl bg-white/[0.04] border border-white/15 gap-3 sm:gap-4">
+                                    <div
+                                        key={index}
+                                        onClick={() => setExpandedCurrencyCode(isExpanded ? null : item.code)}
+                                        className="p-3.5 sm:p-5 rounded-2xl bg-white/[0.04] border border-white/15 hover:border-emerald-500/50 cursor-pointer transition-all duration-300 w-full box-border"
+                                    >
+                                        <div className="flex items-center justify-between gap-3 w-full box-border">
+                                            <div className="flex flex-col min-w-0 flex-1 pr-2">
+                                                <span className="font-extrabold text-white text-sm sm:text-lg truncate">{item.code}</span>
+                                                <span className="text-xs sm:text-sm text-gray-400 font-medium truncate">{item.name}</span>
+                                            </div>
 
-                                        <div className="flex flex-col min-w-0 w-full sm:w-36 shrink-0">
-                                            <span className="font-extrabold text-white text-sm sm:text-lg truncate">{item.code}</span>
-                                            <span className="text-xs sm:text-sm text-gray-400 font-medium truncate">{item.name}</span>
-                                        </div>
-
-                                        {/* Դինամիկ SVG գրաֆիկ՝ կախված ընտրված ժամանակահատվածից */}
-                                        <div className="w-full sm:w-48 h-12 sm:h-14 relative flex items-center">
-                                            <svg viewBox="0 0 240 50" className="w-full h-full overflow-visible">
-                                                <defs>
-                                                    <linearGradient id={`svg-real-grad-${index}`} x1="0" y1="0" x2="0" y2="1">
-                                                        <stop offset="0%" stopColor={item.color} stopOpacity="0.5" />
-                                                        <stop offset="100%" stopColor={item.color} stopOpacity="0.0" />
-                                                    </linearGradient>
-                                                </defs>
-                                                <path d={`${currentPath} L 240 50 L 0 50 Z`} fill={`url(#svg-real-grad-${index})`} />
-                                                <path d={currentPath} fill="none" stroke={item.color} strokeWidth="3" strokeLinecap="round" />
-                                                <circle cx="120" cy="20" r="3.5" fill={item.color} className="drop-shadow-[0_0_6px_rgba(255,255,255,0.9)]" />
-                                            </svg>
-                                        </div>
-
-                                        <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-0 border-white/10 shrink-0">
-                                            <span className="font-black text-white text-base sm:text-xl">{item.rate} ֏</span>
-                                            <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold px-2.5 py-1.5 rounded-xl border" style={{ color: item.color, backgroundColor: `${item.color}15`, borderColor: `${item.color}40` }}>
-                                                {item.isUp ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                                                <span>{item.change}</span>
+                                            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                                                <span className="font-black text-white text-base sm:text-xl">{item.rate} ֏</span>
+                                                <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold px-2 py-1 rounded-xl border shrink-0" style={{ color: item.color, backgroundColor: `${item.color}15`, borderColor: `${item.color}40` }}>
+                                                    {item.isUp ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                                                    <span>{item.change}</span>
+                                                </div>
+                                                <div className="text-gray-400 hover:text-white shrink-0">
+                                                    {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                                                </div>
                                             </div>
                                         </div>
 
+                                        {isExpanded && (
+                                            <div className="mt-4 pt-4 border-t border-white/10 space-y-4 cursor-default w-full box-border" onClick={(e) => e.stopPropagation()}>
+
+                                                <div className="flex justify-center gap-2 w-full">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setTimeFrame('daily')}
+                                                        className={`px-3 py-1 rounded-xl text-xs font-bold transition-all ${timeFrame === 'daily' ? 'bg-emerald-500 text-white' : 'bg-white/5 text-gray-400'}`}
+                                                    >
+                                                        {t('daily') || 'Օր'}
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setTimeFrame('quarter')}
+                                                        className={`px-3 py-1 rounded-xl text-xs font-bold transition-all ${timeFrame === 'quarter' ? 'bg-emerald-500 text-white' : 'bg-white/5 text-gray-400'}`}
+                                                    >
+                                                        {t('quarter') || 'Եռամսյակ'}
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setTimeFrame('yearly')}
+                                                        className={`px-3 py-1 rounded-xl text-xs font-bold transition-all ${timeFrame === 'yearly' ? 'bg-emerald-500 text-white' : 'bg-white/5 text-gray-400'}`}
+                                                    >
+                                                        {t('yearly') || 'Տարի'}
+                                                    </button>
+                                                </div>
+
+                                                <div className="w-full h-20 relative flex items-center bg-black/30 rounded-xl p-2 border border-white/10 box-border overflow-hidden">
+                                                    <svg viewBox="0 0 240 50" className="w-full h-full overflow-visible">
+                                                        <defs>
+                                                            <linearGradient id={`svg-exp-grad-${index}`} x1="0" y1="0" x2="0" y2="1">
+                                                                <stop offset="0%" stopColor={item.color} stopOpacity="0.6" />
+                                                                <stop offset="100%" stopColor={item.color} stopOpacity="0.0" />
+                                                            </linearGradient>
+                                                        </defs>
+                                                        <path d={`${currentPath} L 240 50 L 0 50 Z`} fill={`url(#svg-exp-grad-${index})`} />
+                                                        <path d={currentPath} fill="none" stroke={item.color} strokeWidth="3" strokeLinecap="round" />
+                                                        <circle cx="120" cy="20" r="4" fill={item.color} className="drop-shadow-[0_0_8px_rgba(255,255,255,0.9)]" />
+                                                    </svg>
+                                                </div>
+
+                                                <div className="flex justify-between text-xs text-gray-400 font-medium px-1 w-full box-border">
+                                                    <span>{t('minRate') || 'Նվազագույն'}: <strong className="text-white">{item.min} ֏</strong></span>
+                                                    <span>{t('maxRate') || 'Առավելագույն'}: <strong className="text-white">{item.max} ֏</strong></span>
+                                                </div>
+
+                                                <div className="bg-white/[0.03] p-3 rounded-xl border border-white/10 flex flex-col gap-2 w-full box-border">
+                                                    <span className="text-xs font-bold text-gray-300">{t('converterTitle') || 'Արժույթի փոխարկիչ'}</span>
+                                                    <div className="flex items-center justify-between gap-3 w-full box-border">
+                                                        <input
+                                                            type="number"
+                                                            value={currentAmount}
+                                                            onChange={(e) => setConvertAmounts({ ...convertAmounts, [item.code]: e.target.value })}
+                                                            className="w-1/2 bg-[#0d1322] text-white text-sm py-2 px-3 rounded-xl border border-white/20 outline-none focus:border-emerald-500 font-bold box-border"
+                                                            placeholder={t('enterAmount') || 'Գումարը'}
+                                                        />
+                                                        <span className="text-sm font-black text-emerald-400 w-1/2 text-right truncate">
+                                                            {convertedResult} ֏
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        )}
                                     </div>
                                 );
                             })}
@@ -351,7 +415,7 @@ export default function WidgetsDock() {
                     onClick={() => setExpandedZoneIndex(null)}
                 >
                     <div
-                        className="relative w-full max-w-md glass-card p-6 sm:p-8 rounded-3xl bg-[#0b0f19] border border-blue-500/40 shadow-[0_0_50px_rgba(59,130,246,0.4)] flex flex-col items-center transition-all duration-500 ease-out transform scale-100 opacity-100"
+                        className="relative w-full max-w-md glass-card p-6 sm:p-8 rounded-3xl bg-[#0b0f19] border border-blue-500/40 shadow-[0_0_50px_rgba(59,130,246,0.4)] flex flex-col items-center transition-all duration-500 ease-out transform scale-100 opacity-100 box-border"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <button type="button" onClick={() => setExpandedZoneIndex(null)} className="absolute top-4 right-4 text-gray-300 hover:text-white p-2">
@@ -363,14 +427,14 @@ export default function WidgetsDock() {
                         <div className="w-full mb-6 text-center">
                             <p className="text-sm sm:text-base text-gray-300">Ընտրեք նոր քաղաք կամ գոտի #{expandedZoneIndex + 1}-ի համար</p>
                         </div>
-                        <div className="w-full">
+                        <div className="w-full box-border">
                             <select
                                 value={selectedZones[expandedZoneIndex]}
                                 onChange={(e) => {
                                     handleZoneChange(expandedZoneIndex, e.target.value);
                                     setExpandedZoneIndex(null);
                                 }}
-                                className="w-full bg-[#0d1322] text-gray-100 text-sm sm:text-base py-3.5 px-4 rounded-2xl border border-white/20 outline-none cursor-pointer hover:border-blue-500 focus:border-blue-500 shadow-inner text-center font-bold"
+                                className="w-full bg-[#0d1322] text-gray-100 text-sm sm:text-base py-3.5 px-4 rounded-2xl border border-white/20 outline-none cursor-pointer hover:border-blue-500 focus:border-blue-500 shadow-inner text-center font-bold box-border"
                             >
                                 {TIMEZONES.map((tz) => (
                                     <option key={tz.value} value={tz.value} className="bg-[#0b0f19] text-white py-3">

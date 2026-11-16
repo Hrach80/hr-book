@@ -183,6 +183,15 @@ export const translations = {
         pinLengthError: "Նոր PIN-ը պետք է լինի ճիշտ 4 նիշ:",
         pinMismatch: "Նոր PIN կոդերը չեն համընկնում:",
         pinSuccess: "PIN կոդը հաջողությամբ փոխվեց!",
+        "marketRatesTitle": "Տարադրամի փոխարժեք",
+        "daily": "Օր",
+        "quarter": "Եռամսյակ",
+        "yearly": "Տարի",
+        "minRate": "Նվազագույն",
+        "maxRate": "Առավելագույն",
+        "converterTitle": "Արժույթի փոխարկիչ",
+        "enterAmount": "Գումարը",
+        "tapToExpand": "Սեղմեք՝ մանրամասների համար"
 
     },
     ru: {
@@ -369,6 +378,15 @@ export const translations = {
         pinLengthError: "Новый PIN должен состоять ровно из 4 цифр.",
         pinMismatch: "Новые PIN-коды не совпадают.",
         pinSuccess: "PIN-код успешно изменен!",
+        "marketRatesTitle": "Курсы валют",
+        "daily": "День",
+        "quarter": "Квартал",
+        "yearly": "Год",
+        "minRate": "Минимум",
+        "maxRate": "Максимум",
+        "converterTitle": "Конвертер валют",
+        "enterAmount": "Сумма",
+        "tapToExpand": "Нажмите для деталей"
     },
     en: {
         title: 'My Assistant',
@@ -553,5 +571,14 @@ export const translations = {
         pinLengthError: "New PIN must be exactly 4 digits.",
         pinMismatch: "New PIN codes do not match.",
         pinSuccess: "PIN code changed successfully!",
+        "marketRatesTitle": "Market Rates",
+        "daily": "Daily",
+        "quarter": "Quarter",
+        "yearly": "Yearly",
+        "minRate": "Minimum",
+        "maxRate": "Maximum",
+        "converterTitle": "Currency Converter",
+        "enterAmount": "Amount",
+        "tapToExpand": "Tap for details"
     }
 };

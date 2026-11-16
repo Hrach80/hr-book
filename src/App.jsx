@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { LanguageProvider } from './context/LanguageContext';
 import { supabase } from './services/supabaseClient';
@@ -15,8 +15,19 @@ import Navbar from './components/Navbar';
 import Search from './pages/Search';
 import RemindersPage from './pages/RemindersPage';
 import Footer from './components/Footer';          // <--- Ընդհանուր ֆուտերի բաղադրիչը
+import SplashLoader from './components/SplashLoader'; // <--- Բեռնման անիմացիայի բաղադրիչը
 
 function App() {
+  const [isLaunching, setIsLaunching] = useState(true);
+
+  // 3 վայրկյանանոց անկախ բեռնման ցուցադրություն հավելված մտնելիս
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLaunching(false);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Ձայնային ազդանշանի ֆունկցիա (Web Audio API)
   const playAlertSound = () => {
@@ -102,6 +113,11 @@ function App() {
       clearInterval(interval);
     };
   }, []);
+
+  // Եթե բեռնման ժամանակահատվածն է (3 վայրկյան), ցույց ենք տալիս լոադերը
+  if (isLaunching) {
+    return <SplashLoader />;
+  }
 
   return (
     <LanguageProvider>

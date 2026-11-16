@@ -452,7 +452,8 @@ export default function WidgetsDock() {
                                                 <div className="bg-white/[0.03] p-3 rounded-xl border border-white/10 flex flex-col gap-2 w-full box-border">
                                                     <span className="text-xs font-normal text-gray-300">{t('converterTitle') || 'Արժույթի փոխարկիչ'}</span>
                                                     <div className="flex items-center justify-between gap-3 w-full box-border">
-                                                        <input type="number" value={currentAmount} onChange={(e) => setConvertAmounts({ ...convertAmounts, [item.code]: e.target.value })} className="w-1/2 bg-[#0d1322] text-white text-xs sm:text-sm py-2 px-3 rounded-xl border border-white/20 outline-none focus:border-emerald-500 font-light box-border" placeholder={t('enterAmount') || 'Գումարը'} />
+                                                        {/* Կանխված է զումը text-base-ի միջոցով */}
+                                                        <input type="number" value={currentAmount} onChange={(e) => setConvertAmounts({ ...convertAmounts, [item.code]: e.target.value })} className="w-1/2 bg-[#0d1322] text-white text-base py-2 px-3 rounded-xl border border-white/20 outline-none focus:border-emerald-500 font-light box-border" placeholder={t('enterAmount') || 'Գումարը'} />
                                                         <span className="text-sm font-normal text-emerald-400 w-1/2 text-right truncate">{convertedResult} ֏</span>
                                                     </div>
                                                 </div>
@@ -542,7 +543,7 @@ export default function WidgetsDock() {
                 </div>
             )}
 
-            {/* ՕԴԻ ՈՐԱԿԻ ՎԻՋԵԹԻ ՄՈԴԱԼ (AQI) - Հենց ինփութի տակից բացվող կաթիլային ցանկով */}
+            {/* ՕԴԻ ՈՐԱԿԻ ՎԻՋԵԹԻ ՄՈԴԱԼ (AQI) - Որոնման ինփութ text-base չափսով (կանխում է զումը) */}
             {activeModal === 'aqi' && (
                 <div className="fixed inset-0 z-[1000] flex items-start justify-center pt-[90px] sm:pt-[110px] p-3 sm:p-6 bg-black/85 backdrop-blur-md overflow-y-auto" onClick={handleCloseModal}>
                     <div className="relative w-full max-w-lg sm:max-w-2xl glass-card p-4 sm:p-8 rounded-3xl border border-white/25 bg-gradient-to-br from-[#0b0f19]/95 via-[#101726]/90 to-[#070a12]/98 shadow-[0_25px_70px_rgba(0,0,0,0.95)] my-auto box-border" onClick={(e) => e.stopPropagation()}>
@@ -557,11 +558,12 @@ export default function WidgetsDock() {
                             </button>
                         </div>
 
-                        {/* Որոնման դաշտ և կաթիլային (Dropdown) ցանկ ինփութի տակից */}
+                        {/* Որոնման դաշտ և կաթիլային (Dropdown) ցանկ հենց տակից */}
                         <div className="mb-4 relative w-full box-border">
                             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
                                 <Search size={16} />
                             </div>
+                            {/* ԿԱՆԽՎԱԾ Է ԶՈՒՄԸ text-base (16px) միջոցով */}
                             <input
                                 type="text"
                                 value={aqiSearchQuery}
@@ -571,7 +573,7 @@ export default function WidgetsDock() {
                                 }}
                                 onFocus={() => setIsAqiDropdownOpen(true)}
                                 placeholder={t('searchCityPlaceholder') || 'Որոնել քաղաք աշխարհում...'}
-                                className="w-full bg-[#0d1322] text-white text-xs sm:text-sm py-2.5 pl-10 pr-4 rounded-2xl border border-white/20 outline-none focus:border-amber-500 font-light box-border shadow-inner"
+                                className="w-full bg-[#0d1322] text-white text-base py-2.5 pl-10 pr-4 rounded-2xl border border-white/20 outline-none focus:border-amber-500 font-light box-border shadow-inner"
                             />
 
                             {/* Կաթիլային ցանկը հենց ինփութի տակից */}
@@ -585,12 +587,12 @@ export default function WidgetsDock() {
                                                 setAqiSearchQuery('');
                                                 setIsAqiDropdownOpen(false);
                                             }}
-                                            className="px-4 py-2.5 hover:bg-white/10 cursor-pointer flex items-center justify-between transition border-b border-white/5 last:border-0"
+                                            className="px-4 py-3 hover:bg-white/10 cursor-pointer flex items-center justify-between transition border-b border-white/5 last:border-0"
                                         >
                                             <div className="flex items-center gap-2.5">
                                                 <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }}></span>
-                                                <span className="text-xs sm:text-sm text-white font-light">{item.city}</span>
-                                                <span className="text-[11px] text-gray-400 font-light">({item.country})</span>
+                                                <span className="text-sm text-white font-light">{item.city}</span>
+                                                <span className="text-xs text-gray-400 font-light">({item.country})</span>
                                             </div>
                                             <span className="text-xs font-light px-2.5 py-0.5 rounded-lg border" style={{ color: item.color, backgroundColor: `${item.color}15`, borderColor: `${item.color}40` }}>
                                                 AQI: {item.aqi}

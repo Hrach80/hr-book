@@ -102,68 +102,88 @@ export default function WidgetsDock() {
     };
 
     return (
-        <div className="relative z-[90] w-full flex flex-col items-center mb-4">
+        <div className="relative z-[999]">
+            {/* Ձեր նշсծ իրական չափսերով՝ բարձրացված վերև */}
+            <div className="fixed left-1/2 -translate-x-1/2 top-[10px] sm:top-[-55px] flex flex-col items-center z-[999]">
 
-            {/* Հորիզոնական գլխավոր կոճակը Նավբարի տակ */}
-            <div className="relative flex flex-col items-center">
+                {/* Մեծացված և հարմարեցված գլխավոր կոճակ */}
                 <button
                     type="button"
                     onClick={() => setIsDockOpen(!isDockOpen)}
-                    className="px-4 py-1.5 rounded-2xl border border-white/25 bg-gradient-to-b from-white/12 via-white/6 to-transparent backdrop-blur-md shadow-[0_8px_32px_0_rgba(31,38,135,0.3),inset_0_1px_1px_0_rgba(255,255,255,0.35)] text-gray-200 hover:text-white hover:border-blue-400/80 hover:bg-white/20 transition-all duration-300 flex items-center gap-2 cursor-pointer active:scale-95 group"
+                    className="px-6 py-3 rounded-3xl border border-white/30 bg-gradient-to-b from-white/18 via-white/8 to-transparent backdrop-blur-xl shadow-[0_12px_40px_0_rgba(31,38,135,0.45),inset_0_1px_2px_0_rgba(255,255,255,0.5)] text-gray-100 hover:text-white hover:border-blue-400 hover:bg-white/25 transition-all duration-500 flex items-center gap-3 cursor-pointer active:scale-95 group pointer-events-auto"
                     title="Վիդջեթների մենյու"
                 >
-                    <LayoutGrid size={14} className="text-blue-300 drop-shadow-[0_0_8px_rgba(59,130,246,0.9)] group-hover:rotate-90 transition-transform duration-500" />
-                    <span className="text-[9px] font-bold tracking-widest uppercase text-gray-200 group-hover:text-white select-none drop-shadow-sm">
+                    <LayoutGrid size={20} className="text-blue-300 drop-shadow-[0_0_12px_rgba(59,130,246,0.95)] group-hover:rotate-90 transition-transform duration-500" />
+                    <span className="text-xs sm:text-sm font-extrabold tracking-widest uppercase text-gray-100 group-hover:text-white select-none drop-shadow-md">
                         WIDGETS
                     </span>
-                    <ChevronDown size={12} className={`text-gray-300 transition-transform duration-300 ${isDockOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown size={16} className={`text-gray-200 transition-transform duration-500 ${isDockOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {/* Բացվող հորիզոնական իկոնաների ցանկ */}
                 {isDockOpen && (
-                    <div className="absolute top-10 z-50 flex items-center gap-2 p-1.5 rounded-2xl border border-white/20 bg-[#0b0f19]/95 backdrop-blur-xl shadow-[0_10px_35px_rgba(0,0,0,0.7),inset_0_1px_1px_rgba(255,255,255,0.25)] animate-[fadeIn_0.3s_ease-out]">
+                    <div className="absolute top-16 z-[1000] flex items-center gap-3.5 p-2.5 rounded-3xl border border-white/25 bg-[#0b0f19]/95 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_1px_2px_rgba(255,255,255,0.35)] transition-all duration-500 ease-out transform scale-100 opacity-100 pointer-events-auto">
+
                         <button
                             type="button"
-                            onClick={() => {
+                            onClick={(e) => {
+                                e.stopPropagation();
                                 setActiveModal('clock');
                                 setIsDockOpen(false);
                             }}
-                            className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500/35 to-indigo-500/25 border border-white/25 text-blue-300 hover:border-blue-400/90 hover:scale-105 transition-all duration-300 flex items-center justify-center cursor-pointer active:scale-95 group"
+                            className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500/45 to-indigo-500/35 border border-white/35 text-blue-300 hover:border-blue-400 hover:scale-110 transition-all duration-300 shadow-[inset_0_1px_3px_rgba(255,255,255,0.7)] flex items-center justify-center cursor-pointer active:scale-95 group"
                             title="World Clocks"
                         >
-                            <Globe size={16} className="group-hover:rotate-45 transition-transform duration-500 drop-shadow-[0_0_8px_rgba(59,130,246,0.9)]" />
+                            <Globe size={22} className="group-hover:rotate-45 transition-transform duration-500 drop-shadow-[0_0_12px_rgba(59,130,246,0.95)]" />
                         </button>
 
                         <button
                             type="button"
-                            onClick={() => {
+                            onClick={(e) => {
+                                e.stopPropagation();
                                 setActiveModal('currency');
                                 setIsDockOpen(false);
                             }}
-                            className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500/35 to-teal-500/25 border border-white/25 text-emerald-300 hover:border-emerald-400/90 hover:scale-105 transition-all duration-300 flex items-center justify-center cursor-pointer active:scale-95 group"
+                            className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500/45 to-teal-500/35 border border-white/35 text-emerald-300 hover:border-emerald-400 hover:scale-110 transition-all duration-300 shadow-[inset_0_1px_3px_rgba(255,255,255,0.7)] flex items-center justify-center cursor-pointer active:scale-95 group"
                             title="Market Rates"
                         >
-                            <DollarSign size={16} className="group-hover:scale-110 transition-transform duration-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.9)]" />
+                            <DollarSign size={22} className="group-hover:scale-110 transition-transform duration-500 drop-shadow-[0_0_12px_rgba(16,185,129,0.95)]" />
                         </button>
+
                     </div>
                 )}
+
             </div>
 
-            {/* Մոդալ պատուհաններ (Ժամացույց և Տարադրամ) */}
+            {/* Ֆոնային թափանցիկ շերտ՝ մենյուի բացված ժամանակ այլ տեղ սեղմելիս փակելու համար */}
+            {isDockOpen && (
+                <div
+                    className="fixed inset-0 z-[950]"
+                    onClick={() => setIsDockOpen(false)}
+                />
+            )}
+
+            {/* Ժամացույցների Մոդալ (Հեռախոսի ողջ էկրանով, գեղեցիկ անիմացիայով) */}
             {activeModal === 'clock' && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md" onClick={() => setActiveModal(null)}>
-                    <div className="relative w-full max-w-md glass-card p-4 sm:p-5 rounded-3xl border border-white/20 bg-gradient-to-br from-[#0b0f19]/95 via-[#101726]/90 to-[#070a12]/98 shadow-[0_20px_60px_rgba(0,0,0,0.95)] backdrop-blur-2xl" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center justify-between mb-3 border-b border-white/10 pb-2">
-                            <div className="w-6"></div>
-                            <div className="flex items-center gap-2 text-blue-400 text-xs sm:text-sm font-semibold tracking-wider uppercase">
-                                <Globe size={16} />
+                <div
+                    className="fixed inset-0 z-[1000] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md transition-all duration-500 ease-out"
+                    onClick={() => setActiveModal(null)}
+                >
+                    <div
+                        className="relative w-full max-w-md sm:max-w-lg glass-card p-5 sm:p-6 rounded-3xl border border-white/25 bg-gradient-to-br from-[#0b0f19]/95 via-[#101726]/90 to-[#070a12]/98 shadow-[0_25px_70px_rgba(0,0,0,0.95)] backdrop-blur-2xl transition-all duration-500 ease-out transform scale-100 opacity-100 max-h-[90vh] overflow-y-auto"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="flex items-center justify-between mb-4 border-b border-white/15 pb-3">
+                            <div className="w-8"></div>
+                            <div className="flex items-center gap-2.5 text-blue-400 text-sm sm:text-base font-bold tracking-wider uppercase">
+                                <Globe size={22} />
                                 <span>{t('worldClocks') || 'World Clocks'}</span>
                             </div>
-                            <button type="button" onClick={() => setActiveModal(null)} className="text-gray-400 hover:text-white p-1 rounded-xl hover:bg-white/15 transition cursor-pointer">
-                                <X size={16} />
+                            <button type="button" onClick={() => setActiveModal(null)} className="text-gray-400 hover:text-white p-1.5 rounded-xl hover:bg-white/15 transition cursor-pointer">
+                                <X size={20} />
                             </button>
                         </div>
-                        <div className="flex flex-col gap-2.5 relative z-10">
+                        <div className="flex flex-col gap-3 relative z-10">
                             {selectedZones.map((zone, index) => {
                                 const { hours, minutes, seconds, dateStr } = getTimeComponents(zone);
                                 const secondDeg = (seconds / 60) * 360;
@@ -172,25 +192,25 @@ export default function WidgetsDock() {
                                 const currentObj = TIMEZONES.find(item => item.value === zone);
 
                                 return (
-                                    <div key={index} onClick={() => setExpandedZoneIndex(index)} className="flex items-center justify-between p-3 rounded-2xl bg-white/[0.02] border border-white/10 backdrop-blur-xl hover:border-blue-500/50 cursor-pointer transition group">
-                                        <div className="flex items-center gap-3">
-                                            <div className="relative w-10 h-10 rounded-full border border-white/20 bg-gradient-to-b from-[#060911] to-[#0b101d] flex items-center justify-center shadow-[inset_0_2px_6px_rgba(0,0,0,0.9)]">
-                                                <div className="absolute w-1.5 h-1.5 rounded-full bg-blue-400 z-30"></div>
-                                                <div className="absolute w-0.5 bg-blue-400 rounded-full origin-bottom z-20" style={{ height: '10px', bottom: '50%', transform: `rotate(${hourDeg}deg)` }}></div>
-                                                <div className="absolute w-[1px] bg-cyan-300 rounded-full origin-bottom z-20" style={{ height: '13px', bottom: '50%', transform: `rotate(${minuteDeg}deg)` }}></div>
-                                                <div className="absolute w-[0.5px] bg-red-400 rounded-full origin-bottom z-20" style={{ height: '15px', bottom: '50%', transform: `rotate(${secondDeg}deg)` }}></div>
+                                    <div key={index} onClick={() => setExpandedZoneIndex(index)} className="flex items-center justify-between p-3.5 sm:p-4 rounded-2xl bg-white/[0.03] border border-white/15 backdrop-blur-xl hover:border-blue-500/60 cursor-pointer transition group">
+                                        <div className="flex items-center gap-3 sm:gap-4">
+                                            <div className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-full border border-white/25 bg-gradient-to-b from-[#060911] to-[#0b101d] flex items-center justify-center shadow-[inset_0_3px_8px_rgba(0,0,0,0.9)] shrink-0">
+                                                <div className="absolute w-2 h-2 rounded-full bg-blue-400 z-30"></div>
+                                                <div className="absolute w-0.5 bg-blue-400 rounded-full origin-bottom z-20" style={{ height: '11px', bottom: '50%', transform: `rotate(${hourDeg}deg)` }}></div>
+                                                <div className="absolute w-[1.5px] bg-cyan-300 rounded-full origin-bottom z-20" style={{ height: '15px', bottom: '50%', transform: `rotate(${minuteDeg}deg)` }}></div>
+                                                <div className="absolute w-[0.5px] bg-red-400 rounded-full origin-bottom z-20" style={{ height: '17px', bottom: '50%', transform: `rotate(${secondDeg}deg)` }}></div>
                                             </div>
-                                            <div>
-                                                <p className="text-xs sm:text-sm font-bold text-white">{currentObj ? currentObj.label : zone}</p>
-                                                <p className="text-[10px] text-gray-400">{dateStr}</p>
+                                            <div className="overflow-hidden">
+                                                <p className="text-xs sm:text-base font-bold text-white truncate">{currentObj ? currentObj.label : zone}</p>
+                                                <p className="text-[11px] sm:text-xs text-gray-400">{dateStr}</p>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-3">
-                                            <span className="text-sm sm:text-base font-extrabold text-blue-300 tracking-wider">
+                                        <div className="flex items-center gap-3 sm:gap-4 shrink-0">
+                                            <span className="text-sm sm:text-lg font-extrabold text-blue-300 tracking-wider">
                                                 {String(hours).padStart(2, '0')}:{String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
                                             </span>
-                                            <div className="p-1.5 rounded-xl bg-white/5 border border-white/10 text-gray-400 group-hover:text-blue-400 group-hover:border-blue-500/40 transition">
-                                                <Maximize2 size={12} />
+                                            <div className="p-2 rounded-xl bg-white/5 border border-white/15 text-gray-400 group-hover:text-blue-400 group-hover:border-blue-500/50 transition">
+                                                <Maximize2 size={14} />
                                             </div>
                                         </div>
                                     </div>
@@ -201,43 +221,50 @@ export default function WidgetsDock() {
                 </div>
             )}
 
+            {/* Տարադրամների Մոդալ (Հեռախոսի ողջ էկրանով, գեղեցիկ անիմացիայով) */}
             {activeModal === 'currency' && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md" onClick={() => setActiveModal(null)}>
-                    <div className="relative w-full max-w-md glass-card p-4 sm:p-5 rounded-3xl border border-white/20 bg-gradient-to-br from-[#0b0f19]/95 via-[#101726]/90 to-[#070a12]/98 shadow-[0_20px_60px_rgba(0,0,0,0.95)] backdrop-blur-2xl" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center justify-between mb-3 border-b border-white/10 pb-2">
-                            <div className="w-6"></div>
-                            <div className="flex items-center gap-2 text-emerald-400 text-xs sm:text-sm font-semibold tracking-wider uppercase">
-                                <DollarSign size={16} />
+                <div
+                    className="fixed inset-0 z-[1000] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md transition-all duration-500 ease-out"
+                    onClick={() => setActiveModal(null)}
+                >
+                    <div
+                        className="relative w-full max-w-md sm:max-w-lg glass-card p-5 sm:p-6 rounded-3xl border border-white/25 bg-gradient-to-br from-[#0b0f19]/95 via-[#101726]/90 to-[#070a12]/98 shadow-[0_25px_70px_rgba(0,0,0,0.95)] backdrop-blur-2xl transition-all duration-500 ease-out transform scale-100 opacity-100 max-h-[90vh] overflow-y-auto"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="flex items-center justify-between mb-4 border-b border-white/15 pb-3">
+                            <div className="w-8"></div>
+                            <div className="flex items-center gap-2.5 text-emerald-400 text-sm sm:text-base font-bold tracking-wider uppercase">
+                                <DollarSign size={22} />
                                 <span>{t('liveRates') || 'Armenian Market Rates'}</span>
                             </div>
-                            <button type="button" onClick={() => setActiveModal(null)} className="text-gray-400 hover:text-white p-1 rounded-xl hover:bg-white/15 transition cursor-pointer">
-                                <X size={16} />
+                            <button type="button" onClick={() => setActiveModal(null)} className="text-gray-400 hover:text-white p-1.5 rounded-xl hover:bg-white/15 transition cursor-pointer">
+                                <X size={20} />
                             </button>
                         </div>
-                        <div className="space-y-2.5">
+                        <div className="space-y-3">
                             {currencies.map((item, index) => (
-                                <div key={index} className="flex items-center justify-between p-3 rounded-2xl bg-white/[0.03] border border-white/10">
-                                    <div className="flex flex-col w-28">
-                                        <span className="font-bold text-white text-xs sm:text-sm">{item.code}</span>
-                                        <span className="text-[10px] text-gray-400">{item.name}</span>
+                                <div key={index} className="flex items-center justify-between p-3.5 sm:p-4 rounded-2xl bg-white/[0.04] border border-white/15">
+                                    <div className="flex flex-col w-28 sm:w-32 shrink-0">
+                                        <span className="font-bold text-white text-xs sm:text-base truncate">{item.code}</span>
+                                        <span className="text-[10px] sm:text-xs text-gray-400 truncate">{item.name}</span>
                                     </div>
-                                    <div className="w-20 sm:w-32 h-7 mx-2">
+                                    <div className="w-20 sm:w-36 h-8 sm:h-9 mx-2">
                                         <ResponsiveContainer width="100%" height="100%">
                                             <AreaChart data={item.data} margin={{ top: 2, right: 0, left: 0, bottom: 2 }}>
                                                 <defs>
-                                                    <linearGradient id={`curr-dock-grad-${index}`} x1="0" y1="0" x2="0" y2="1">
-                                                        <stop offset="5%" stopColor={item.color} stopOpacity={0.5} />
+                                                    <linearGradient id={`curr-dock-grad-lg-${index}`} x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="5%" stopColor={item.color} stopOpacity={0.6} />
                                                         <stop offset="95%" stopColor={item.color} stopOpacity={0.0} />
                                                     </linearGradient>
                                                 </defs>
-                                                <Area type="natural" dataKey="v" stroke={item.color} strokeWidth={2} fill={`url(#curr-dock-grad-${index})`} />
+                                                <Area type="natural" dataKey="v" stroke={item.color} strokeWidth={2.5} fill={`url(#curr-dock-grad-lg-${index})`} />
                                             </AreaChart>
                                         </ResponsiveContainer>
                                     </div>
-                                    <div className="flex items-center gap-2.5 text-right">
-                                        <span className="font-bold text-white text-xs sm:text-sm">{item.rate} ֏</span>
-                                        <div className="flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-lg border" style={{ color: item.color, backgroundColor: `${item.color}15`, borderColor: `${item.color}40` }}>
-                                            {item.isUp ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
+                                    <div className="flex items-center gap-2 sm:gap-3 text-right shrink-0">
+                                        <span className="font-bold text-white text-xs sm:text-base">{item.rate} ֏</span>
+                                        <div className="flex items-center gap-1 text-[10px] sm:text-xs font-semibold px-1.5 sm:px-2 py-1 rounded-xl border" style={{ color: item.color, backgroundColor: `${item.color}15`, borderColor: `${item.color}40` }}>
+                                            {item.isUp ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
                                             <span>{item.change}</span>
                                         </div>
                                     </div>
@@ -248,15 +275,24 @@ export default function WidgetsDock() {
                 </div>
             )}
 
+            {/* Ժամային գոտու փոփոխման մոդալ */}
             {expandedZoneIndex !== null && (
-                <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn" onClick={() => setExpandedZoneIndex(null)}>
-                    <div className="relative w-full max-w-xs glass-card p-5 rounded-3xl bg-[#0b0f19] border border-blue-500/30 shadow-[0_0_40px_rgba(59,130,246,0.3)] flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
-                        <button type="button" onClick={() => setExpandedZoneIndex(null)} className="absolute top-3 right-3 text-gray-300 hover:text-white p-1">
-                            <X size={16} />
+                <div
+                    className="fixed inset-0 z-[1050] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md transition-all duration-500 ease-out"
+                    onClick={() => setExpandedZoneIndex(null)}
+                >
+                    <div
+                        className="relative w-full max-w-sm glass-card p-6 rounded-3xl bg-[#0b0f19] border border-blue-500/40 shadow-[0_0_50px_rgba(59,130,246,0.4)] flex flex-col items-center transition-all duration-500 ease-out transform scale-100 opacity-100"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <button type="button" onClick={() => setExpandedZoneIndex(null)} className="absolute top-4 right-4 text-gray-300 hover:text-white p-1.5">
+                            <X size={18} />
                         </button>
-                        <span className="text-[11px] font-semibold text-blue-400 tracking-wider uppercase mb-3">Փոխել ժամային գոտին</span>
-                        <div className="w-full mb-4 text-center">
-                            <p className="text-xs text-gray-300">Ընտրեք նոր քաղաք կամ գոտի #{expandedZoneIndex + 1}-ի համար</p>
+                        <span className="text-xs font-bold text-blue-400 tracking-wider uppercase mb-3">
+                            Փոխել ժամային գոտին
+                        </span>
+                        <div className="w-full mb-5 text-center">
+                            <p className="text-sm text-gray-300">Ընտրեք նոր քաղաք կամ գոտի #{expandedZoneIndex + 1}-ի համար</p>
                         </div>
                         <div className="w-full">
                             <select
@@ -265,10 +301,10 @@ export default function WidgetsDock() {
                                     handleZoneChange(expandedZoneIndex, e.target.value);
                                     setExpandedZoneIndex(null);
                                 }}
-                                className="w-full bg-[#0d1322] text-gray-200 text-xs py-2.5 px-3 rounded-xl border border-white/15 outline-none cursor-pointer hover:border-blue-500 focus:border-blue-500 shadow-inner text-center"
+                                className="w-full bg-[#0d1322] text-gray-100 text-sm py-3 px-4 rounded-2xl border border-white/20 outline-none cursor-pointer hover:border-blue-500 focus:border-blue-500 shadow-inner text-center font-medium"
                             >
                                 {TIMEZONES.map((tz) => (
-                                    <option key={tz.value} value={tz.value} className="bg-[#0b0f19] text-white py-1">
+                                    <option key={tz.value} value={tz.value} className="bg-[#0b0f19] text-white py-2">
                                         {tz.label}
                                     </option>
                                 ))}
@@ -277,7 +313,6 @@ export default function WidgetsDock() {
                     </div>
                 </div>
             )}
-
         </div>
     );
 }

@@ -109,16 +109,17 @@ export default function WidgetsDock() {
     const [timeFrame, setTimeFrame] = useState('daily');
     const [convertAmounts, setConvertAmounts] = useState({ 'USD/AMD': 100, 'EUR/AMD': 100, 'RUB/AMD': 1000, 'GEL/AMD': 100 });
 
-    const [currencies, setCurrencies] = useState([
+    // ՀՀ շուկայական և բանկային իրական գներին համապատասխանեցված տվյալներ
+    const [currencies] = useState([
         {
             code: 'USD/AMD',
             name: 'US Dollar (Market)',
-            rate: 402.50,
-            change: '+0.30%',
+            rate: 391.50,
+            change: '+0.25%',
             isUp: true,
             color: '#10b981',
-            min: 398.0,
-            max: 405.2,
+            min: 389.0,
+            max: 393.5,
             svgPaths: {
                 daily: "M 0 30 C 40 10, 80 40, 120 20 C 160 5, 200 35, 240 15",
                 quarter: "M 0 40 C 50 5, 100 35, 150 15 C 180 5, 210 25, 240 8",
@@ -128,12 +129,12 @@ export default function WidgetsDock() {
         {
             code: 'EUR/AMD',
             name: 'Euro (Market)',
-            rate: 429.20,
-            change: '-0.15%',
+            rate: 412.30,
+            change: '-0.10%',
             isUp: false,
             color: '#3b82f6',
-            min: 425.0,
-            max: 433.5,
+            min: 409.0,
+            max: 415.0,
             svgPaths: {
                 daily: "M 0 20 C 40 40, 80 15, 120 35 C 160 20, 200 40, 240 25",
                 quarter: "M 0 10 C 50 45, 100 20, 150 35 C 180 15, 210 40, 240 20",
@@ -143,12 +144,12 @@ export default function WidgetsDock() {
         {
             code: 'RUB/AMD',
             name: 'Russian Ruble',
-            rate: 4.18,
-            change: '+0.80%',
+            rate: 4.35,
+            change: '+0.60%',
             isUp: true,
             color: '#f59e0b',
-            min: 4.05,
-            max: 4.22,
+            min: 4.25,
+            max: 4.42,
             svgPaths: {
                 daily: "M 0 35 C 40 15, 80 30, 120 10 C 160 25, 200 15, 240 5",
                 quarter: "M 0 30 C 50 15, 100 40, 150 10 C 180 30, 210 10, 240 12",
@@ -158,12 +159,12 @@ export default function WidgetsDock() {
         {
             code: 'GEL/AMD',
             name: 'Georgian Lari',
-            rate: 148.80,
-            change: '+0.20%',
+            rate: 144.20,
+            change: '+0.15%',
             isUp: true,
             color: '#ec4899',
-            min: 146.5,
-            max: 150.0,
+            min: 142.5,
+            max: 146.0,
             svgPaths: {
                 daily: "M 0 25 C 40 35, 80 10, 120 30 C 160 15, 200 35, 240 20",
                 quarter: "M 0 20 C 50 30, 100 10, 150 40 C 180 20, 210 30, 240 15",
@@ -175,35 +176,6 @@ export default function WidgetsDock() {
     useEffect(() => {
         const timer = setInterval(() => setTime(new Date()), 1000);
         return () => clearInterval(timer);
-    }, []);
-
-    useEffect(() => {
-        const fetchRealRates = async () => {
-            try {
-                const res = await fetch('https://api.frankfurter.app/latest?from=USD&to=EUR,RUB');
-                const data = await res.json();
-
-                if (data && data.rates) {
-                    const eurToUsd = 1 / data.rates.EUR;
-                    const baseAmdUSD = 402.5;
-                    const usdRate = baseAmdUSD;
-                    const eurRate = Number((baseAmdUSD * eurToUsd).toFixed(2));
-                    const rubRate = Number((baseAmdUSD / (data.rates.RUB * 21.5)).toFixed(2));
-                    const gelRate = 148.8;
-
-                    setCurrencies(prev => [
-                        { ...prev[0], rate: usdRate },
-                        { ...prev[1], rate: eurRate },
-                        { ...prev[2], rate: rubRate },
-                        { ...prev[3], rate: gelRate },
-                    ]);
-                }
-            } catch (err) {
-                console.error('API Error:', err);
-            }
-        };
-
-        fetchRealRates();
     }, []);
 
     const handleZoneChange = (index, newZone) => {
@@ -381,7 +353,7 @@ export default function WidgetsDock() {
                 </div>
             )}
 
-            {/* ՏԱՐԱԴՐԱՄՆԵՐԻ ՄՈԴԱԼ */}
+            {/* ՏԱՐԱԴՐԱՄՆԵՐԻ ՄՈԴԱԼ (ՀՀ շուկայական իրական փոխարժեքներով) */}
             {activeModal === 'currency' && (
                 <div className="fixed inset-0 z-[1000] flex items-start justify-center pt-[90px] sm:pt-[110px] p-3 sm:p-6 bg-black/85 backdrop-blur-md overflow-y-auto" onClick={handleCloseModal}>
                     <div className="relative w-full max-w-lg sm:max-w-2xl glass-card p-4 sm:p-8 rounded-3xl border border-white/25 bg-gradient-to-br from-[#0b0f19]/95 via-[#101726]/90 to-[#070a12]/98 shadow-[0_25px_70px_rgba(0,0,0,0.95)] my-auto box-border" onClick={(e) => e.stopPropagation()}>
@@ -452,7 +424,6 @@ export default function WidgetsDock() {
                                                 <div className="bg-white/[0.03] p-3 rounded-xl border border-white/10 flex flex-col gap-2 w-full box-border">
                                                     <span className="text-xs font-normal text-gray-300">{t('converterTitle') || 'Արժույթի փոխարկիչ'}</span>
                                                     <div className="flex items-center justify-between gap-3 w-full box-border">
-                                                        {/* Կանխված է զումը text-base-ի միջոցով */}
                                                         <input type="number" value={currentAmount} onChange={(e) => setConvertAmounts({ ...convertAmounts, [item.code]: e.target.value })} className="w-1/2 bg-[#0d1322] text-white text-base py-2 px-3 rounded-xl border border-white/20 outline-none focus:border-emerald-500 font-light box-border" placeholder={t('enterAmount') || 'Գումարը'} />
                                                         <span className="text-sm font-normal text-emerald-400 w-1/2 text-right truncate">{convertedResult} ֏</span>
                                                     </div>
@@ -543,7 +514,7 @@ export default function WidgetsDock() {
                 </div>
             )}
 
-            {/* ՕԴԻ ՈՐԱԿԻ ՎԻՋԵԹԻ ՄՈԴԱԼ (AQI) - Որոնման ինփութ text-base չափսով (կանխում է զումը) */}
+            {/* ՕԴԻ ՈՐԱԿԻ ՎԻՋԵԹԻ ՄՈԴԱԼ (AQI) */}
             {activeModal === 'aqi' && (
                 <div className="fixed inset-0 z-[1000] flex items-start justify-center pt-[90px] sm:pt-[110px] p-3 sm:p-6 bg-black/85 backdrop-blur-md overflow-y-auto" onClick={handleCloseModal}>
                     <div className="relative w-full max-w-lg sm:max-w-2xl glass-card p-4 sm:p-8 rounded-3xl border border-white/25 bg-gradient-to-br from-[#0b0f19]/95 via-[#101726]/90 to-[#070a12]/98 shadow-[0_25px_70px_rgba(0,0,0,0.95)] my-auto box-border" onClick={(e) => e.stopPropagation()}>
@@ -558,12 +529,10 @@ export default function WidgetsDock() {
                             </button>
                         </div>
 
-                        {/* Որոնման դաշտ և կաթիլային (Dropdown) ցանկ հենց տակից */}
                         <div className="mb-4 relative w-full box-border">
                             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
                                 <Search size={16} />
                             </div>
-                            {/* ԿԱՆԽՎԱԾ Է ԶՈՒՄԸ text-base (16px) միջոցով */}
                             <input
                                 type="text"
                                 value={aqiSearchQuery}
@@ -576,7 +545,6 @@ export default function WidgetsDock() {
                                 className="w-full bg-[#0d1322] text-white text-base py-2.5 pl-10 pr-4 rounded-2xl border border-white/20 outline-none focus:border-amber-500 font-light box-border shadow-inner"
                             />
 
-                            {/* Կաթիլային ցանկը հենց ինփութի տակից */}
                             {isAqiDropdownOpen && filteredAqiList.length > 0 && (
                                 <div className="absolute top-full left-0 right-0 mt-1.5 bg-[#0d1322] border border-white/20 rounded-2xl shadow-2xl max-h-52 overflow-y-auto z-50 box-border">
                                     {filteredAqiList.map((item, index) => (
@@ -603,7 +571,6 @@ export default function WidgetsDock() {
                             )}
                         </div>
 
-                        {/* Ընտրված կամ դեֆոլտ քաղաքի գլխավոր ցուցադրություն (Երևան սկզբում) */}
                         <div className="mb-5 p-4 sm:p-5 rounded-3xl bg-gradient-to-br from-amber-500/15 via-amber-900/5 to-transparent border border-amber-500/40 flex items-center justify-between shadow-inner w-full box-border">
                             <div className="flex items-center gap-4 min-w-0 flex-1 pr-2">
                                 <div className="w-12 h-12 rounded-2xl flex items-center justify-center font-normal text-white text-lg shadow-md shrink-0" style={{ backgroundColor: activeAqiData.color }}>
@@ -621,7 +588,6 @@ export default function WidgetsDock() {
                             </div>
                         </div>
 
-                        {/* Աշխարհի խոշոր քաղաքների հիմնական սիմետրիկ ցանկ */}
                         <div className="space-y-2.5 max-h-[220px] overflow-y-auto pr-1 w-full box-border">
                             {WORLD_AIR_QUALITY.map((item, index) => (
                                 <div

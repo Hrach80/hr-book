@@ -209,14 +209,21 @@ export default function NotesPage() {
                     {t('notesTitle') || 'Notes & Tasks'}
                 </h1>
 
+                {/* Ավելացման կոճակ՝ նշումների քանակը ցույց տվող գեղեցիկ անիմացիոն բեջով */}
                 <button
                     onClick={() => setIsAddingOpen(!isAddingOpen)}
-                    className={`p-2.5 rounded-2xl border transition-all duration-300 hover:scale-105 shadow-lg flex items-center justify-center cursor-pointer ${isAddingOpen
+                    className={`relative p-2.5 rounded-2xl border transition-all duration-300 hover:scale-105 shadow-lg flex items-center justify-center cursor-pointer ${isAddingOpen
                         ? 'bg-red-600/20 border-red-500/40 text-red-300 shadow-[0_0_15px_rgba(239,68,68,0.3)]'
                         : 'bg-emerald-600/20 border-emerald-500/40 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.3)]'
                         }`}
                 >
                     {isAddingOpen ? <X size={18} /> : <Plus size={18} />}
+
+                    {notes.length > 0 && (
+                        <span className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1.5 bg-emerald-500 text-black text-[10px] font-extrabold rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(16,185,129,0.8)] animate-pulse border border-emerald-300/40">
+                            {notes.length}
+                        </span>
+                    )}
                 </button>
             </div>
 

@@ -24,6 +24,9 @@ export default function Dashboard() {
 
     const [upcomingCount, setUpcomingCount] = useState(0);
     const [notesCount, setNotesCount] = useState(0);
+    const [passwordsCount, setPasswordsCount] = useState(0);
+    const [medicalCount, setMedicalCount] = useState(0);
+    const [documentsCount, setDocumentsCount] = useState(0);
 
     const dbLimitMB = 500;
     const storageLimitMB = 1024;
@@ -49,11 +52,27 @@ export default function Dashboard() {
     const fetchDashboardData = async () => {
         try {
             setIsLoading(true);
-            const [remindersRes, notesRes, passwordsRes, medicalRes, storageFilesRes] = await Promise.all([
-                supabase.from('reminders').select('*'),
-                supabase.from('notes').select('*'),
-                supabase.from('passwords').select('*'),
-                supabase.from('medical_records').select('*'),
+
+            // Ստուգում ենք արդյոք կա ակտիվ սեսիա
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (!session) {
+                // Եթե սեսիա չկա՝ բոլոր քանակները զրոյացնում ենք
+                setNotesCount(0);
+                setPasswordsCount(0);
+                setMedicalCount(0);
+                setDocumentsCount(0);
+                setUpcomingCount(0);
+                setIsLoading(false);
+                return;
+            }
+
+            const [remindersRes, notesRes, passwordsRes, medicalRes, documentsRes, storageFilesRes] = await Promise.all([
+                supabase.from('reminders').select('*').eq('user_id', session.user.id),
+                supabase.from('notes').select('*').eq('user_id', session.user.id),
+                supabase.from('passwords').select('*').eq('user_id', session.user.id),
+                supabase.from('medical_records').select('*').eq('user_id', session.user.id),
+                supabase.from('documents').select('*').eq('user_id', session.user.id),
                 supabase.storage.from('documents').list()
             ]);
 
@@ -71,15 +90,17 @@ export default function Dashboard() {
                 setUpcomingCount(activeOrUpcoming.length);
             }
 
-            if (notesRes.data) {
-                setNotesCount(notesRes.data.length);
-            }
+            if (notesRes.data) setNotesCount(notesRes.data.length);
+            if (passwordsRes.data) setPasswordsCount(passwordsRes.data.length);
+            if (medicalRes.data) setMedicalCount(medicalRes.data.length);
+            if (documentsRes.data) setDocumentsCount(documentsRes.data.length);
 
             const totalRecords =
                 (notesRes.data?.length || 0) +
                 (remindersRes.data?.length || 0) +
                 (passwordsRes.data?.length || 0) +
-                (medicalRes.data?.length || 0);
+                (medicalRes.data?.length || 0) +
+                (documentsRes.data?.length || 0);
 
             const calculatedDbMB = Number((40 + totalRecords * 0.005).toFixed(2));
             setDbUsageMB(calculatedDbMB);
@@ -104,6 +125,11 @@ export default function Dashboard() {
 
         } catch (error) {
             console.error('Error fetching dashboard data:', error);
+            setNotesCount(0);
+            setPasswordsCount(0);
+            setMedicalCount(0);
+            setDocumentsCount(0);
+            setUpcomingCount(0);
         } finally {
             setIsLoading(false);
         }
@@ -111,7 +137,7 @@ export default function Dashboard() {
 
     useEffect(() => {
         fetchDashboardData();
-    }, []);
+    }, [location.pathname]);
 
     const handleRefresh = () => {
         fetchDashboardData();
@@ -123,9 +149,16 @@ export default function Dashboard() {
             <WidgetsDock />
 
             <div className="grid grid-cols-2 gap-3.5 mb-5 mt-4">
+
+                {/* 1. Notes */}
                 <Link to="/notes" className="glass-card p-4 rounded-2xl flex items-center gap-3.5 shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-blue-500/30 bg-gradient-to-r from-blue-600/15 via-blue-900/5 to-transparent backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-blue-500/60 group relative">
-                    <div className="w-11 h-11 rounded-xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0 group-hover:scale-110 transition-transform">
+                    <div className="relative w-11 h-11 rounded-xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0 group-hover:scale-110 transition-transform">
                         <Pencil size={22} className="drop-shadow-[0_0_8px_rgba(59,130,246,0.6)]" />
+                        {notesCount > 0 && (
+                            <span className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1.5 bg-blue-500 text-black text-[10px] font-extrabold rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(59,130,246,0.8)] animate-pulse border border-blue-200/40">
+                                {notesCount}
+                            </span>
+                        )}
                     </div>
                     <div className="overflow-hidden">
                         <span className="font-bold text-xs sm:text-sm text-white tracking-wide block truncate">{t('notes') || 'Notes'}</span>
@@ -133,33 +166,51 @@ export default function Dashboard() {
                     </div>
                 </Link>
 
-                <Link to="/passwords" className="glass-card p-4 rounded-2xl flex items-center gap-3.5 shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-white/10 bg-gradient-to-r from-white/[0.04] to-transparent backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-white/30 group">
-                    <div className="w-11 h-11 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center text-gray-200 shrink-0 group-hover:scale-110 transition-transform">
+                {/* 2. Passwords */}
+                <Link to="/passwords" className="glass-card p-4 rounded-2xl flex items-center gap-3.5 shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-white/10 bg-gradient-to-r from-white/[0.04] to-transparent backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-white/30 group relative">
+                    <div className="relative w-11 h-11 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center text-gray-200 shrink-0 group-hover:scale-110 transition-transform">
                         <KeyRound size={22} className="drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]" />
+                        {passwordsCount > 0 && (
+                            <span className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1.5 bg-white text-black text-[10px] font-extrabold rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(255,255,255,0.8)] animate-pulse border border-gray-300">
+                                {passwordsCount}
+                            </span>
+                        )}
                     </div>
                     <div className="overflow-hidden">
                         <span className="font-bold text-xs sm:text-sm text-gray-200 tracking-wide block truncate">{t('passwords') || 'Passwords'}</span>
-                        <span className="text-[10px] text-gray-400 block truncate">Գաղտնաբառեր</span>
+                        <span className="text-[10px] text-gray-400 block truncate">Գաղտնաբառեր ({passwordsCount})</span>
                     </div>
                 </Link>
 
-                <Link to="/medical" className="glass-card p-4 rounded-2xl flex items-center gap-3.5 shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-white/10 bg-gradient-to-r from-white/[0.04] to-transparent backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-white/30 group">
-                    <div className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0 group-hover:scale-110 transition-transform">
+                {/* 3. Medical */}
+                <Link to="/medical" className="glass-card p-4 rounded-2xl flex items-center gap-3.5 shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-white/10 bg-gradient-to-r from-white/[0.04] to-transparent backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-white/30 group relative">
+                    <div className="relative w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0 group-hover:scale-110 transition-transform">
                         <Plus size={22} className="drop-shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
+                        {medicalCount > 0 && (
+                            <span className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1.5 bg-emerald-500 text-black text-[10px] font-extrabold rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(16,185,129,0.8)] animate-pulse border border-emerald-200/40">
+                                {medicalCount}
+                            </span>
+                        )}
                     </div>
                     <div className="overflow-hidden">
                         <span className="font-bold text-xs sm:text-sm text-gray-200 tracking-wide block truncate">{t('medical') || 'Medical'}</span>
-                        <span className="text-[10px] text-gray-400 block truncate">Բժշկական</span>
+                        <span className="text-[10px] text-gray-400 block truncate">Բժշկական ({medicalCount})</span>
                     </div>
                 </Link>
 
-                <Link to="/docs" className="glass-card p-4 rounded-2xl flex items-center gap-3.5 shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-white/10 bg-gradient-to-r from-white/[0.04] to-transparent backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-white/30 group">
-                    <div className="w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0 group-hover:scale-110 transition-transform">
+                {/* 4. Documents */}
+                <Link to="/docs" className="glass-card p-4 rounded-2xl flex items-center gap-3.5 shadow-[0_8px_30px_rgba(0,0,0,0.4)] border border-white/10 bg-gradient-to-r from-white/[0.04] to-transparent backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-white/30 group relative">
+                    <div className="relative w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0 group-hover:scale-110 transition-transform">
                         <Folder size={22} className="drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
+                        {documentsCount > 0 && (
+                            <span className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1.5 bg-amber-500 text-black text-[10px] font-extrabold rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(251,191,36,0.8)] animate-pulse border border-amber-200/40">
+                                {documentsCount}
+                            </span>
+                        )}
                     </div>
                     <div className="overflow-hidden">
                         <span className="font-bold text-xs sm:text-sm text-gray-200 tracking-wide block truncate">{t('documents') || 'Documents'}</span>
-                        <span className="text-[10px] text-gray-400 block truncate">Փաստաթղթեր</span>
+                        <span className="text-[10px] text-gray-400 block truncate">Փաստաթղթեր ({documentsCount})</span>
                     </div>
                 </Link>
             </div>

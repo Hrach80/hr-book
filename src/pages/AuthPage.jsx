@@ -17,12 +17,12 @@ export default function AuthPage() {
     useEffect(() => {
         checkUser();
 
-        const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             setUser(session?.user || null);
         });
 
         return () => {
-            authListener?.subscription?.unsubscribe();
+            subscription?.unsubscribe();
         };
     }, []);
 
@@ -56,11 +56,13 @@ export default function AuthPage() {
         }
     };
 
-    // Ելք համակարգից
+    // Ելք համակարգից (Մաքրում է տվյալները և նստաշրջանը)
     const handleLogout = async () => {
         await supabase.auth.signOut();
         setUser(null);
         setMessage({ type: 'success', text: 'Դուք հաջողությամբ դուրս եկաք' });
+        // Ավտոմատ ուղղորդում ենք գլխավոր էջ կամ թարմացնում վիճակը
+        setTimeout(() => navigate('/auth'), 500);
     };
 
     if (user) {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ArrowLeft, Plus, Folder, ExternalLink, Trash2, X, Upload, CheckCircle2, Sparkles, Search, User, Activity, Bell } from 'lucide-react';
+import { ArrowLeft, Plus, Folder, ExternalLink, Trash2, X, Upload, CheckCircle2, Sparkles } from 'lucide-react';
 import { supabase } from '../services/supabaseClient';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -22,12 +22,23 @@ export default function DocsPage() {
     useEffect(() => {
         fetchDocuments();
         fetchRemindersCount();
-    }, []);
+    }, [location.pathname]);
 
-    // Բազայից կարդում ենք մոտեցող հիշեցումների քանակը ֆուտերի համար
+    // Բազայից կարդում ենք մոտեցող հիշեցումների քանակը փաստաթղթերի էջի համար
     const fetchRemindersCount = async () => {
         try {
-            const { data, error } = await supabase.from('reminders').select('event_date');
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (!session) {
+                setUpcomingCount(0);
+                return;
+            }
+
+            const { data, error } = await supabase
+                .from('reminders')
+                .select('event_date')
+                .eq('user_id', session.user.id);
+
             if (error) throw error;
 
             if (data) {
@@ -35,15 +46,19 @@ export default function DocsPage() {
                 const nowDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
                 const count = data.filter(item => {
+                    if (!item.event_date) return false;
                     const eventDate = new Date(item.event_date);
                     const eventDateOnly = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
                     return eventDateOnly >= nowDateOnly;
                 }).length;
 
                 setUpcomingCount(count);
+            } else {
+                setUpcomingCount(0);
             }
         } catch (e) {
             console.error('Error fetching reminders count:', e);
+            setUpcomingCount(0);
         }
     };
 
@@ -57,15 +72,26 @@ export default function DocsPage() {
     const fetchDocuments = async () => {
         try {
             setLoading(true);
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (!session) {
+                // Եթե օգտատերը դուրս է եկել կամ մուտք գործած չէ՝ ԱՆՄԻՋԱՊԵՍ մաքրում ենք փաստաթղթերը
+                setDocs([]);
+                setLoading(false);
+                return;
+            }
+
             const { data, error } = await supabase
                 .from('documents')
                 .select('*')
+                .eq('user_id', session.user.id)
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
             setDocs(data || []);
         } catch (error) {
             console.error('Սխալ փաստաթղթերը բեռնելիս:', error.message);
+            setDocs([]);
         } finally {
             setLoading(false);
         }
@@ -301,7 +327,6 @@ export default function DocsPage() {
                 )}
             </div>
 
-            
         </div>
     );
 }

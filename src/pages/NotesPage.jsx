@@ -24,12 +24,23 @@ export default function NotesPage() {
     useEffect(() => {
         fetchNotes();
         fetchRemindersCount();
-    }, []);
+    }, [location.pathname]);
 
     // Բազայից կարդում ենք մոտեցող հիշեցումների քանակը ֆուտերի համար
     const fetchRemindersCount = async () => {
         try {
-            const { data, error } = await supabase.from('reminders').select('event_date');
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (!session) {
+                setUpcomingCount(0);
+                return;
+            }
+
+            const { data, error } = await supabase
+                .from('reminders')
+                .select('event_date')
+                .eq('user_id', session.user.id);
+
             if (error) throw error;
 
             if (data) {
@@ -37,15 +48,19 @@ export default function NotesPage() {
                 const nowDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
                 const count = data.filter(item => {
+                    if (!item.event_date) return false;
                     const eventDate = new Date(item.event_date);
                     const eventDateOnly = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
                     return eventDateOnly >= nowDateOnly;
                 }).length;
 
                 setUpcomingCount(count);
+            } else {
+                setUpcomingCount(0);
             }
         } catch (e) {
             console.error('Error fetching reminders count:', e);
+            setUpcomingCount(0);
         }
     };
 
@@ -59,15 +74,26 @@ export default function NotesPage() {
     const fetchNotes = async () => {
         try {
             setLoading(true);
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (!session) {
+                // Եթե օգտատերը դուրս է եկել կամ մուտք գործած չէ՝ ԱՆՄԻՋԱՊԵՍ մաքրում ենք նշումները
+                setNotes([]);
+                setLoading(false);
+                return;
+            }
+
             const { data, error } = await supabase
                 .from('notes')
                 .select('*')
+                .eq('user_id', session.user.id)
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
             setNotes(data || []);
         } catch (error) {
             console.error('Սխալ նշումները բեռնելիս:', error.message);
+            setNotes([]);
         } finally {
             setLoading(false);
         }
@@ -164,10 +190,10 @@ export default function NotesPage() {
             {toast.show && (
                 <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 animate-bounce transition-all duration-300">
                     <div className={`px-4 py-2.5 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl border flex items-center gap-2.5 text-xs font-semibold ${toast.type === 'error'
-                            ? 'bg-red-950/80 border-red-500/40 text-red-200'
-                            : toast.type === 'info'
-                                ? 'bg-amber-950/80 border-amber-500/40 text-amber-200'
-                                : 'bg-emerald-950/80 border-emerald-500/40 text-emerald-200'
+                        ? 'bg-red-950/80 border-red-500/40 text-red-200'
+                        : toast.type === 'info'
+                            ? 'bg-amber-950/80 border-amber-500/40 text-amber-200'
+                            : 'bg-emerald-950/80 border-emerald-500/40 text-emerald-200'
                         }`}>
                         <Sparkles size={16} className="text-emerald-400" />
                         <span>{toast.message}</span>
@@ -186,22 +212,20 @@ export default function NotesPage() {
                 <button
                     onClick={() => setIsAddingOpen(!isAddingOpen)}
                     className={`p-2.5 rounded-2xl border transition-all duration-300 hover:scale-105 shadow-lg flex items-center justify-center cursor-pointer ${isAddingOpen
-                            ? 'bg-red-600/20 border-red-500/40 text-red-300 shadow-[0_0_15px_rgba(239,68,68,0.3)]'
-                            : 'bg-emerald-600/20 border-emerald-500/40 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.3)]'
+                        ? 'bg-red-600/20 border-red-500/40 text-red-300 shadow-[0_0_15px_rgba(239,68,68,0.3)]'
+                        : 'bg-emerald-600/20 border-emerald-500/40 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.3)]'
                         }`}
                 >
                     {isAddingOpen ? <X size={18} /> : <Plus size={18} />}
                 </button>
             </div>
 
-            {/* Նոր նշում հավելելու սահուն բացվող վահանակ (Inline Slide-down Panel) */}
             {isAddingOpen && (
                 <form onSubmit={addNote} className="w-full glass-card p-4 rounded-3xl border border-emerald-500/40 bg-[#0b0f19]/95 backdrop-blur-2xl shadow-[0_15px_35px_rgba(0,0,0,0.8)] mb-4 animate-fadeIn">
                     <h2 className="text-[11px] font-bold text-emerald-300 uppercase tracking-wider mb-2">
                         {t('addNewNote') || 'Նոր նշում կամ անելիք'}
                     </h2>
 
-                    {/* text-base-ը (16px) կանխում է Այֆոնի ավտոմատ մեծացումն ու էջի շեղումը */}
                     <textarea
                         value={newNoteTitle}
                         onChange={(e) => setNewNoteTitle(e.target.value)}
@@ -321,7 +345,6 @@ export default function NotesPage() {
                 )}
             </div>
 
-            
         </div>
     );
 }

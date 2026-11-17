@@ -28,32 +28,37 @@ export default function Footer() {
         return effectiveDate;
     };
 
-    useEffect(() => {
-        const fetchUpcomingCount = async () => {
-            try {
-                const { data, error } = await supabase.from('reminders').select('*');
-                if (error) throw error;
+    const fetchUpcomingCount = async () => {
+        try {
+            const { data, error } = await supabase.from('reminders').select('*');
+            if (error) throw error;
 
-                if (data) {
-                    const now = new Date();
-                    const nowDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            if (data) {
+                const now = new Date();
+                const nowDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-                    const activeOrUpcoming = data.filter(item => {
-                        if (!item.event_date) return false;
-                        const eventTime = getEffectiveEventDate(item);
-                        const eventDateOnly = new Date(eventTime.getFullYear(), eventTime.getMonth(), eventTime.getDate());
-                        return eventDateOnly >= nowDateOnly;
-                    });
+                const activeOrUpcoming = data.filter(item => {
+                    if (!item.event_date) return false;
+                    const eventTime = getEffectiveEventDate(item);
+                    const eventDateOnly = new Date(eventTime.getFullYear(), eventTime.getMonth(), eventTime.getDate());
+                    return eventDateOnly >= nowDateOnly;
+                });
 
-                    setUpcomingCount(activeOrUpcoming.length);
-                }
-            } catch (error) {
-                console.error('Error fetching reminders count for footer:', error);
+                setUpcomingCount(activeOrUpcoming.length);
             }
-        };
+        } catch (error) {
+            console.error('Error fetching reminders count for footer:', error);
+        }
+    };
 
+    useEffect(() => {
+        // Աշխատում է սկզբնական բեռնման և էջերի փոփոխության (նավարկության) ժամանակ
         fetchUpcomingCount();
-    }, []);
+
+        // Լրացուցիչ՝ թարմացնել նաև, երբ հավելվածը նորից ակտիվանում է (focus)
+        window.addEventListener('focus', fetchUpcomingCount);
+        return () => window.removeEventListener('focus', fetchUpcomingCount);
+    }, [location.pathname]); // <-- Ավելացված է location.pathname-ը
 
     return (
         <footer className="fixed bottom-4 left-0 right-0 mx-auto max-w-md px-4 z-50 pointer-events-auto">
@@ -75,14 +80,20 @@ export default function Footer() {
                         <span className={`text-[10px] mt-1 ${location.pathname === '/search' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('search') || 'Search'}</span>
                     </Link>
 
-                    {/* 3. Reminders (Ծանուցումների կարմիր նշանով) */}
+                    {/* 3. Reminders (Ծանուցումների կարմիր նշանով և փարոսի անիմացիայով) */}
                     <Link to="/reminders" className={`flex flex-col items-center justify-center py-2 px-2 rounded-2xl transition-all duration-300 hover:scale-105 group relative ${location.pathname === '/reminders' ? 'text-amber-400 bg-amber-600/20 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.25)]' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}>
                         <div className="relative">
                             <Bell size={22} className={location.pathname === '/reminders' ? 'drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]' : 'group-hover:drop-shadow-[0_0_8px_rgba(245,158,11,0.5)] transition-all'} />
                             {upcomingCount > 0 && (
-                                <span className="absolute -top-1.5 -right-2 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full border border-[#070a14] shadow">
-                                    {upcomingCount}
-                                </span>
+                                <>
+                                    {/* Փարոսի (Radar/Beacon) հետևի թարթող շերտ */}
+                                    <span className="absolute -top-1.5 -right-2 w-4 h-4 rounded-full bg-red-500/60 animate-ping pointer-events-none"></span>
+
+                                    {/* Հիմնական թվային նշանը */}
+                                    <span className="absolute -top-1.5 -right-2 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.2 rounded-full border border-[#070a14] shadow-[0_0_10px_rgba(239,68,68,0.8)] z-10">
+                                        {upcomingCount}
+                                    </span>
+                                </>
                             )}
                         </div>
                         <span className={`text-[10px] mt-1 ${location.pathname === '/reminders' ? 'font-semibold tracking-wide' : 'font-medium'}`}>{t('remindersTab') || 'Հիշեցումներ'}</span>
